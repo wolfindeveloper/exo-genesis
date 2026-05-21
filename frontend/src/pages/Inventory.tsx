@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
 
+import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 import type { InventoryItem } from '../types'
 
@@ -16,35 +18,17 @@ const elementData: Record<string, { name: string; emoji: string; rarity: string 
   elem_void_essence: { name: 'Эссенция Пустоты', emoji: '🌀', rarity: 'legendary' },
 }
 
-const rarityColors: Record<string, string> = {
-  common: 'border-slate-500 text-slate-300',
-  uncommon: 'border-green-500 text-green-400',
-  rare: 'border-purple-500 text-purple-400',
-  epic: 'border-orange-500 text-orange-400',
-  legendary: 'border-red-500 text-red-400',
+const rarityColors: Record<string, { border: string; bg: string; text: string }> = {
+  common: { border: 'border-slate-500/20', bg: 'bg-slate-500/5', text: 'text-slate-300' },
+  uncommon: { border: 'border-neon-green/20', bg: 'bg-neon-green/5', text: 'text-neon-green' },
+  rare: { border: 'border-neon-purple/20', bg: 'bg-neon-purple/5', text: 'text-neon-purple' },
+  epic: { border: 'border-neon-amber/20', bg: 'bg-neon-amber/5', text: 'text-neon-amber' },
+  legendary: { border: 'border-neon-red/20', bg: 'bg-neon-red/5', text: 'text-neon-red' },
 }
 
-const rarityBg: Record<string, string> = {
-  common: 'bg-slate-500/20',
-  uncommon: 'bg-green-500/20',
-  rare: 'bg-purple-500/20',
-  epic: 'bg-orange-500/20',
-  legendary: 'bg-red-500/20',
-}
-
-const typeIcons: Record<string, string> = {
-  element: '🧪',
-  resource: '📦',
-  artifact: '✨',
-  consumable: '💊',
-}
-
+const typeIcons: Record<string, string> = { element: '🧪', resource: '📦', artifact: '✨', consumable: '💊' }
 const typeLabels: Record<string, string> = {
-  all: 'Всё',
-  element: 'Элементы',
-  resource: 'Ресурсы',
-  artifact: 'Артефакты',
-  consumable: 'Расходники',
+  all: 'Всё', element: 'Элементы', resource: 'Ресурсы', artifact: 'Артефакты', consumable: 'Расходники',
 }
 
 export function Inventory() {
@@ -57,39 +41,43 @@ export function Inventory() {
   const types = ['all', ...new Set(inventory.map((i) => i.item_type))]
 
   return (
-    <div className="p-4 pb-24">
-      <header className="mb-4">
-        <h1 className="text-2xl font-bold">Инвентарь</h1>
-        <p className="text-sm text-slate-400">{inventory.length} предметов</p>
-      </header>
+    <div className="p-4 pb-28">
+      <motion.header className="mb-4" variants={fadeIn} initial="hidden" animate="visible">
+        <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-green">Инвентарь</h1>
+        <p className="text-xs text-slate-500 mt-1">{inventory.length} предметов</p>
+      </motion.header>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-none">
         {types.map((t) => (
           <button
             key={t}
             onClick={() => setFilter(t)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-full text-[10px] font-display uppercase tracking-wider transition whitespace-nowrap ${
               filter === t
-                ? 'bg-cyan-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                ? 'bg-neon-green/20 text-neon-green border border-neon-green/30'
+                : 'bg-space-700/50 text-slate-500 border border-white/5 hover:border-white/20'
             }`}
           >
             {typeIcons[t] || ''} {typeLabels[t] || t}
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {filtered.length === 0 ? (
-        <div className="bg-slate-800/40 rounded-xl p-8 text-center">
-          <p className="text-slate-500 text-sm">Пусто</p>
-        </div>
+        <motion.div variants={fadeIn} initial="hidden" animate="visible" className="glass-card p-8 text-center">
+          <p className="text-slate-500 text-xs font-display uppercase tracking-wider">Пусто</p>
+        </motion.div>
       ) : (
-        <div className="flex flex-col gap-2">
+        <motion.div
+          className="flex flex-col gap-2"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {filtered.map((item) => (
             <InventoryRow key={item.id} item={item} />
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   )
@@ -98,27 +86,38 @@ export function Inventory() {
 function InventoryRow({ item }: { item: InventoryItem }) {
   const ed = elementData[item.item_config_id]
   const rarity = ed?.rarity || (item.metadata?.rarity as string) || 'common'
+  const rc = rarityColors[rarity] || rarityColors.common
   const meta = item.metadata || {}
 
   return (
-    <div className={`rounded-xl p-3 border ${rarityColors[rarity]} ${rarityBg[rarity]} flex items-center gap-3`}>
+    <motion.div
+      variants={scaleIn}
+      whileHover={{ x: 4, transition: { type: 'spring', stiffness: 300 } }}
+      className={`glass-card p-3 flex items-center gap-3 ${rc.border} ${rc.bg}`}
+      style={{ borderLeft: '3px solid', borderLeftColor: rc.border.includes('slate') ? '#64748b' : rc.border.includes('green') ? '#22c55e' : rc.border.includes('purple') ? '#a855f7' : rc.border.includes('amber') ? '#f59e0b' : '#ef4444' }}
+    >
       <div className="text-xl">{ed?.emoji || typeIcons[item.item_type] || '📦'}</div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">
           {ed?.name || item.item_config_id.replace(/_/g, ' ')}
         </p>
-        <p className="text-xs text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
+        <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
         {item.item_type === 'artifact' && Object.keys(meta).length > 0 && (
-          <div className="flex gap-2 mt-1 text-[10px] text-slate-400">
-            {(meta.speed_mod as number) && <span>⚡ +{(meta.speed_mod as number).toFixed(2)}</span>}
-            {(meta.stability_bonus as number) && <span>🛡️ +{meta.stability_bonus as number}</span>}
-            {(meta.fuel_efficiency as number) && <span>⛽ +{(meta.fuel_efficiency as number).toFixed(2)}</span>}
+          <div className="flex gap-2 mt-1">
+            {(meta.speed_mod as number) && <span className="text-[9px] text-neon-cyan/70">⚡ +{(meta.speed_mod as number).toFixed(2)}</span>}
+            {(meta.stability_bonus as number) && <span className="text-[9px] text-neon-green/70">🛡️ +{meta.stability_bonus as number}</span>}
+            {(meta.fuel_efficiency as number) && <span className="text-[9px] text-neon-amber/70">⛽ +{(meta.fuel_efficiency as number).toFixed(2)}</span>}
           </div>
         )}
       </div>
-      <div className="text-right">
-        <span className="text-lg font-bold">{item.quantity}</span>
-      </div>
-    </div>
+      <motion.div
+        className="text-right"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+      >
+        <span className={`text-lg font-display ${rc.text}`}>{item.quantity}</span>
+      </motion.div>
+    </motion.div>
   )
 }

@@ -1,32 +1,39 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
+import { AnimatePresence } from 'motion/react'
+import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
 
 import { Galaxy } from './pages/Galaxy'
 import { Hangar } from './pages/Hangar'
 import { Inventory } from './pages/Inventory'
 import { Lab } from './pages/Lab'
 import { Profile } from './pages/Profile'
+import { PageTransition } from './components/PageTransition'
 
 function NavBar() {
+  const linkClass = (path: string) =>
+    `flex flex-col items-center gap-0.5 text-xs transition-colors ${
+      location.pathname === path ? 'text-neon-cyan' : 'text-slate-500 hover:text-slate-300'
+    }`
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 z-50">
-      <div className="flex justify-around py-2">
-        <Link to="/hangar" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-space-800/80 backdrop-blur-xl border-t border-white/5">
+      <div className="flex justify-around py-2 max-w-lg mx-auto">
+        <Link to="/hangar" className={linkClass('/hangar')}>
           <span className="text-lg">🚀</span>
           <span>Ангар</span>
         </Link>
-        <Link to="/galaxy" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link to="/galaxy" className={linkClass('/galaxy')}>
           <span className="text-lg">🌌</span>
           <span>Галактика</span>
         </Link>
-        <Link to="/lab" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link to="/lab" className={linkClass('/lab')}>
           <span className="text-lg">🔬</span>
           <span>Лаб</span>
         </Link>
-        <Link to="/inventory" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link to="/inventory" className={linkClass('/inventory')}>
           <span className="text-lg">🎒</span>
           <span>Инв</span>
         </Link>
-        <Link to="/profile" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+        <Link to="/profile" className={linkClass('/profile')}>
           <span className="text-lg">👤</span>
           <span>Проф</span>
         </Link>
@@ -35,20 +42,31 @@ function NavBar() {
   )
 }
 
+function AppContent() {
+  const location = useLocation()
+
+  return (
+    <div className="min-h-screen text-white max-w-lg mx-auto relative z-10">
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Hangar /></PageTransition>} />
+          <Route path="/hangar" element={<PageTransition><Hangar /></PageTransition>} />
+          <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
+          <Route path="/lab" element={<PageTransition><Lab /></PageTransition>} />
+          <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+      <NavBar />
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#0a0e17] text-white max-w-lg mx-auto">
-        <Routes>
-          <Route path="/" element={<Navigate to="/hangar" replace />} />
-          <Route path="/hangar" element={<Hangar />} />
-          <Route path="/galaxy" element={<Galaxy />} />
-          <Route path="/lab" element={<Lab />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-        <NavBar />
-      </div>
+      <div className="starfield" />
+      <AppContent />
     </BrowserRouter>
   )
 }

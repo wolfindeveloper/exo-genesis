@@ -1,36 +1,66 @@
+import { motion } from 'motion/react'
+
+import { cardHover } from '../lib/animations'
 import type { Ship } from '../types'
 
-const tierColors = ['', 'border-cyan-400', 'border-green-400', 'border-purple-400', 'border-orange-400', 'border-red-400']
+const tierBorders = ['', 'tier-border-1', 'tier-border-2', 'tier-border-3', 'tier-border-4', 'tier-border-5']
+const tierGlows = ['', 'tier-glow-1', 'tier-glow-2', 'tier-glow-3', 'tier-glow-4', 'tier-glow-5']
 const statusLabels: Record<string, string> = { idle: 'Готов', expedition: 'В полёте', repair: 'Ремонт' }
 
-export function ShipCard({ ship }: { ship: Ship }) {
+export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
   const tier = parseInt(ship.ship_config_id.match(/t(\d)/)?.[1] || '1')
   const isIdle = ship.status === 'idle'
 
   return (
-    <div className={`bg-slate-800/60 rounded-xl p-4 border ${tierColors[tier]} backdrop-blur-sm`}>
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-bold text-lg">{ship.ship_config_id.replace(/_/g, ' ')}</h3>
-        <span className={`text-xs px-2 py-1 rounded-full ${isIdle ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, type: 'spring', stiffness: 300, damping: 24 }}
+      {...cardHover}
+      className={`glass-card p-4 ${tierBorders[tier]} ${tierGlows[tier]}`}
+    >
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <h3 className="font-display text-sm uppercase tracking-wider text-slate-300">
+            {ship.ship_config_id.replace(/_/g, ' ')}
+          </h3>
+          <div className="flex gap-1 mt-1">
+            {Array.from({ length: tier }, (_, i) => (
+              <span key={i} className="text-xs" style={{ color: ['#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444'][tier - 1] }}>
+                ★
+              </span>
+            ))}
+          </div>
+        </div>
+        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full uppercase tracking-wider ${
+          isIdle ? 'bg-neon-green/10 text-neon-green border border-neon-green/20' : 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20'
+        }`}>
           {statusLabels[ship.status] || ship.status}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-sm text-slate-300">
+
+      <div className="grid grid-cols-3 gap-3 text-sm">
         <div>
-          <span className="text-slate-500">Прочность</span>
-          <div className="h-1.5 bg-slate-700 rounded-full mt-1">
-            <div className="h-full bg-green-500 rounded-full" style={{ width: `${ship.stability}%` }} />
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider">Прочность</span>
+          <div className="h-1.5 bg-space-500 rounded-full mt-1.5 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: `linear-gradient(90deg, #22c55e, #22d3ee)` }}
+              initial={{ width: 0 }}
+              animate={{ width: `${ship.stability}%` }}
+              transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+            />
           </div>
         </div>
         <div>
-          <span className="text-slate-500">Топливо</span>
-          <p className="font-mono">{ship.fuel_current}</p>
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider">Топливо</span>
+          <p className="font-display text-sm mt-0.5">{ship.fuel_current}</p>
         </div>
-        <div>
-          <span className="text-slate-500">Tier</span>
-          <p className="text-lg">{'★'.repeat(tier)}</p>
+        <div className="text-right">
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider">ID</span>
+          <p className="font-mono text-[10px] text-slate-400 mt-0.5 truncate">{ship.id.slice(0, 8)}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

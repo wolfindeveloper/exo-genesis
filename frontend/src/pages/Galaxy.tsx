@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { motion } from 'motion/react'
 
 import { ZoneCard } from '../components/ZoneCard'
+import { fadeIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
 
@@ -69,40 +71,47 @@ export function Galaxy() {
   }
 
   return (
-    <div className="p-4 pb-24">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold">Галактика</h1>
-        <p className="text-sm text-slate-400">Выбери зону для исследования</p>
-      </header>
+    <div className="p-4 pb-28">
+      <motion.header className="mb-6" variants={fadeIn} initial="hidden" animate="visible">
+        <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-purple">Галактика</h1>
+        <p className="text-xs text-slate-500 mt-1">Выбери зону для исследования</p>
+      </motion.header>
 
-      {idleShips.length > 0 && (
-        <div className="mb-4">
-          <label className="text-xs text-slate-500 mb-1 block">Корабль</label>
-          <select
-            value={selectedShipId || ''}
-            onChange={(e) => setSelectedShipId(e.target.value || null)}
-            className="w-full bg-slate-800 rounded-lg p-2.5 text-sm border border-slate-700"
-          >
-            <option value="">Выбери корабль...</option>
-            {idleShips.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.ship_config_id} (⛽ {s.fuel_current})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="mb-4">
+        <label className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 block">Корабль</label>
+        <select
+          value={selectedShipId || ''}
+          onChange={(e) => setSelectedShipId(e.target.value || null)}
+          className="w-full glass-card px-3 py-2.5 text-sm text-slate-300 appearance-none cursor-pointer"
+        >
+          <option value="" className="bg-space-800">Выбери корабль...</option>
+          {idleShips.map((s) => (
+            <option key={s.id} value={s.id} className="bg-space-800">
+              {s.ship_config_id.replace(/_/g, ' ')} — ⛽ {s.fuel_current}
+            </option>
+          ))}
+        </select>
+        {idleShips.length === 0 && (
+          <p className="text-[10px] text-neon-amber/70 mt-2">Все корабли заняты</p>
+        )}
+      </motion.div>
 
-      <div className="flex flex-col gap-3">
-        {ZONES.map((zone) => (
+      <motion.div
+        className="flex flex-col gap-3"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        {ZONES.map((zone, i) => (
           <ZoneCard
             key={zone.id}
             zone={zone}
             onSelect={handleSelectZone}
             disabled={!selectedShipId || isLoading}
+            index={i}
           />
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }
