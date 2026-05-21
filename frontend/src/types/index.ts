@@ -75,3 +75,13 @@ export interface ExperimentResult {
   is_first_discoverer: boolean
   xp_gained: number
 }
+
+export interface UserStats {
+  total_expeditions: number
+  completed_expeditions: number
+  failed_expeditions: number
+  artifacts_crafted: number
+  discoveries_made: number
+  total_elements: number
+  joined_days: number
+}

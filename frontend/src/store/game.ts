@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile } from '../types'
+import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile, UserStats } from '../types'
 import { api } from '../api/client'
 
 interface GameState {
@@ -9,6 +9,7 @@ interface GameState {
   inventory: InventoryItem[]
   activeExpedition: Expedition | null
   lastExperiment: ExperimentResult | null
+  stats: UserStats | null
   isLoading: boolean
   error: string | null
 
@@ -18,6 +19,7 @@ interface GameState {
   startExpedition: (shipId: string, zoneId: string) => Promise<void>
   claimExpedition: (expeditionId: string) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
+  loadStats: () => Promise<void>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -26,6 +28,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   inventory: [],
   activeExpedition: null,
   lastExperiment: null,
+  stats: null,
   isLoading: false,
   error: null,
 
@@ -88,6 +91,15 @@ export const useGameStore = create<GameState>((set, get) => ({
       await get().loadInventory()
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  loadStats: async () => {
+    try {
+      const stats = await api.getStats()
+      set({ stats })
+    } catch (e) {
+      set({ error: (e as Error).message })
     }
   },
 }))

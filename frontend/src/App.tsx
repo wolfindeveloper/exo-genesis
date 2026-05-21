@@ -2,7 +2,9 @@ import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
 
 import { Galaxy } from './pages/Galaxy'
 import { Hangar } from './pages/Hangar'
+import { Inventory } from './pages/Inventory'
 import { Lab } from './pages/Lab'
+import { Profile } from './pages/Profile'
 
 function NavBar() {
   return (
@@ -20,6 +22,14 @@ function NavBar() {
           <span className="text-lg">🔬</span>
           <span>Лаб</span>
         </Link>
+        <Link to="/inventory" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+          <span className="text-lg">🎒</span>
+          <span>Инв</span>
+        </Link>
+        <Link to="/profile" className="flex flex-col items-center gap-0.5 text-xs text-slate-400 hover:text-white transition-colors">
+          <span className="text-lg">👤</span>
+          <span>Проф</span>
+        </Link>
       </div>
     </nav>
   )
@@ -34,6 +44,8 @@ export default function App() {
           <Route path="/hangar" element={<Hangar />} />
           <Route path="/galaxy" element={<Galaxy />} />
           <Route path="/lab" element={<Lab />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
         <NavBar />
       </div>
