@@ -36,5 +36,7 @@ async def set_webhook() -> None:
 
 
 async def delete_webhook() -> None:
+    if not settings.bot_token:
+        return
     app = await get_bot_app()
     await app.bot.delete_webhook()

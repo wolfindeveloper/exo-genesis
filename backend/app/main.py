@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,14 +9,29 @@ from app.routers import auth, expeditions, health, user
 from app.services.content_loader import ContentLoader
 from bot.webhook import delete_webhook, set_webhook, router as bot_router
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.content_loader = ContentLoader()
-    app.state.content_loader.load_all()
-    await set_webhook()
+    try:
+        app.state.content_loader = ContentLoader()
+        app.state.content_loader.load_all()
+        logger.info("content loaded: %d ships", len(app.state.content_loader.ships))
+    except Exception as e:
+        logger.warning("content load failed: %s", e)
+
+    try:
+        await set_webhook()
+    except Exception as e:
+        logger.warning("webhook setup skipped: %s", e)
+
     yield
-    await delete_webhook()
+
+    try:
+        await delete_webhook()
+    except Exception:
+        pass
 
 
 app = FastAPI(
@@ -26,6 +42,7 @@ app = FastAPI(
 
 origins = [
     settings.frontend_url,
+    "https://exo-genesis.vercel.app",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
