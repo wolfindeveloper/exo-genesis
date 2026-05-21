@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Expedition, InventoryItem, Ship, UserProfile } from '../types'
+import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile } from '../types'
 import { api } from '../api/client'
 
 interface GameState {
@@ -8,6 +8,7 @@ interface GameState {
   ships: Ship[]
   inventory: InventoryItem[]
   activeExpedition: Expedition | null
+  lastExperiment: ExperimentResult | null
   isLoading: boolean
   error: string | null
 
@@ -16,6 +17,7 @@ interface GameState {
   loadInventory: () => Promise<void>
   startExpedition: (shipId: string, zoneId: string) => Promise<void>
   claimExpedition: (expeditionId: string) => Promise<void>
+  experiment: (elementIds: string[]) => Promise<void>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -23,6 +25,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   ships: [],
   inventory: [],
   activeExpedition: null,
+  lastExperiment: null,
   isLoading: false,
   error: null,
 
@@ -72,6 +75,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       await api.claimExpedition(expeditionId)
       set({ activeExpedition: null, isLoading: false })
       await Promise.all([get().loadShips(), get().loadInventory()])
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  experiment: async (elementIds) => {
+    try {
+      set({ isLoading: true, error: null, lastExperiment: null })
+      const result = await api.experiment(elementIds)
+      set({ lastExperiment: result, isLoading: false })
+      await get().loadInventory()
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
     }

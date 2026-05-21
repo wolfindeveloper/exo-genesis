@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, expeditions, health, user
+from app.routers import auth, expeditions, health, lab, system, user
 from app.services.content_loader import ContentLoader
 from bot.webhook import delete_webhook, set_webhook, router as bot_router
 
@@ -59,4 +59,6 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(expeditions.router)
+app.include_router(lab.router)
+app.include_router(system.router)
 app.include_router(bot_router)

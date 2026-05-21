@@ -33,3 +33,13 @@ backend/dist/
 
 # Supabase
 backend/supabase/.temp/
+
+# Graphify output
+graphify-out/
+
+# Project docs (local)
+SPEC.md
+AGENTS.md
+CONTEXT.md
+skills-lock.json
+.opencode/

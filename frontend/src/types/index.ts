@@ -64,3 +64,14 @@ export interface Expedition {
   status: string
   result_data: Record<string, unknown> | null
 }
+
+export interface ExperimentResult {
+  success: boolean
+  artifact_id: string | null
+  artifact_name_key: string | null
+  artifact_tier: number | null
+  artifact_rarity: string | null
+  stats_modifiers: Record<string, unknown> | null
+  is_first_discoverer: boolean
+  xp_gained: number
+}

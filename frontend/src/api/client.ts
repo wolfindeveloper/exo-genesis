@@ -1,4 +1,4 @@
-import type { Expedition, InventoryItem, Ship, UserProfile } from '../types'
+import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -53,4 +53,10 @@ export const api = {
         body: JSON.stringify({ expedition_id }),
       },
     ),
+
+  experiment: (element_ids: string[]) =>
+    request<ExperimentResult>('/lab/experiment', {
+      method: 'POST',
+      body: JSON.stringify({ element_ids }),
+    }),
 }
