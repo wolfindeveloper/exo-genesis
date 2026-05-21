@@ -1,0 +1,45 @@
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import settings
+from app.routers import auth, expeditions, health, user
+from app.services.content_loader import ContentLoader
+from bot.webhook import delete_webhook, set_webhook, router as bot_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.content_loader = ContentLoader()
+    app.state.content_loader.load_all()
+    await set_webhook()
+    yield
+    await delete_webhook()
+
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.version,
+    lifespan=lifespan,
+)
+
+origins = [
+    settings.frontend_url,
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(health.router)
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(expeditions.router)
+app.include_router(bot_router)

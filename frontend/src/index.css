@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+:root {
+  --tg-theme-bg-color: #0a0e17;
+  --tg-theme-text-color: #e2e8f0;
+  --tg-theme-button-color: #3b82f6;
+}
+
+body {
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}

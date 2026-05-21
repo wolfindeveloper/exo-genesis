@@ -1,0 +1,82 @@
+[
+  {
+    "id": "elem_hydrogen",
+    "name_key": "elem_hydrogen_name",
+    "tier": 1,
+    "rarity": "common",
+    "icon_path": "/assets/elements/hydrogen.webp",
+    "description_key": "elem_hydrogen_desc"
+  },
+  {
+    "id": "elem_helium",
+    "name_key": "elem_helium_name",
+    "tier": 1,
+    "rarity": "common",
+    "icon_path": "/assets/elements/helium.webp",
+    "description_key": "elem_helium_desc"
+  },
+  {
+    "id": "elem_carbon",
+    "name_key": "elem_carbon_name",
+    "tier": 1,
+    "rarity": "common",
+    "icon_path": "/assets/elements/carbon.webp",
+    "description_key": "elem_carbon_desc"
+  },
+  {
+    "id": "elem_iron",
+    "name_key": "elem_iron_name",
+    "tier": 1,
+    "rarity": "common",
+    "icon_path": "/assets/elements/iron.webp",
+    "description_key": "elem_iron_desc"
+  },
+  {
+    "id": "elem_silicon",
+    "name_key": "elem_silicon_name",
+    "tier": 1,
+    "rarity": "common",
+    "icon_path": "/assets/elements/silicon.webp",
+    "description_key": "elem_silicon_desc"
+  },
+  {
+    "id": "elem_titanium",
+    "name_key": "elem_titanium_name",
+    "tier": 2,
+    "rarity": "uncommon",
+    "icon_path": "/assets/elements/titanium.webp",
+    "description_key": "elem_titanium_desc"
+  },
+  {
+    "id": "elem_uranium",
+    "name_key": "elem_uranium_name",
+    "tier": 2,
+    "rarity": "uncommon",
+    "icon_path": "/assets/elements/uranium.webp",
+    "description_key": "elem_uranium_desc"
+  },
+  {
+    "id": "elem_quantum_crystal",
+    "name_key": "elem_quantum_crystal_name",
+    "tier": 3,
+    "rarity": "rare",
+    "icon_path": "/assets/elements/quantum_crystal.webp",
+    "description_key": "elem_quantum_crystal_desc"
+  },
+  {
+    "id": "elem_dark_matter",
+    "name_key": "elem_dark_matter_name",
+    "tier": 4,
+    "rarity": "epic",
+    "icon_path": "/assets/elements/dark_matter.webp",
+    "description_key": "elem_dark_matter_desc"
+  },
+  {
+    "id": "elem_void_essence",
+    "name_key": "elem_void_essence_name",
+    "tier": 5,
+    "rarity": "legendary",
+    "icon_path": "/assets/elements/void_essence.webp",
+    "description_key": "elem_void_essence_desc"
+  }
+]
