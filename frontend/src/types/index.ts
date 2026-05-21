@@ -21,6 +21,7 @@ export interface ShipConfig {
 export interface Zone {
   id: string
   name_key: string
+  description_key?: string
   tier: number
   risk_factor: number
   duration_hours: number

@@ -1,47 +1,47 @@
 [
   {
-    "id": "ship_t1_scout",
-    "name_key": "ship_scout_name",
+    "id": "ship_scout_t1",
+    "name_key": "Разведчик MK-I",
+    "description_key": "Лёгкий разведывательный корабль. Идеален для ближних вылазок и сбора ресурсов в безопасных зонах.",
     "tier": 1,
     "stats": { "stability": 100, "fuel_capacity": 50, "speed_mod": 1.2 },
     "required_level": 1,
-    "upgrade_cost": { "xgen": 0, "elements": {} },
-    "art_path": "/assets/ships/t1_scout.webp"
+    "art_path": "/assets/ships/scout_t1.webp"
   },
   {
-    "id": "ship_t2_hauler",
-    "name_key": "ship_hauler_name",
+    "id": "ship_freighter_t2",
+    "name_key": "Грузовой «Баржа»",
+    "description_key": "Прочный транспортировщик с увеличенным топливным баком. Создан для долгих экспедиций в астероидные поля.",
     "tier": 2,
     "stats": { "stability": 120, "fuel_capacity": 120, "speed_mod": 0.8 },
     "required_level": 3,
-    "upgrade_cost": { "xgen": 500, "elements": { "elem_iron": 10, "elem_titanium": 5 } },
-    "art_path": "/assets/ships/t2_hauler.webp"
+    "art_path": "/assets/ships/freighter_t2.webp"
   },
   {
-    "id": "ship_t3_explorer",
-    "name_key": "ship_explorer_name",
+    "id": "ship_corvette_t3",
+    "name_key": "Корвет «Молния»",
+    "description_key": "Быстрый маневренный корвет для исследований опасных зон. Оснащён усиленным корпусом и форсажными двигателями.",
     "tier": 3,
-    "stats": { "stability": 90, "fuel_capacity": 80, "speed_mod": 1.5 },
+    "stats": { "stability": 150, "fuel_capacity": 80, "speed_mod": 1.5 },
     "required_level": 5,
-    "upgrade_cost": { "xgen": 1500, "elements": { "elem_titanium": 15, "elem_quantum_crystal": 3 } },
-    "art_path": "/assets/ships/t3_explorer.webp"
+    "art_path": "/assets/ships/corvette_t3.webp"
   },
   {
-    "id": "ship_t4_cruiser",
-    "name_key": "ship_cruiser_name",
+    "id": "ship_cruiser_t4",
+    "name_key": "Крейсер «Горизонт»",
+    "description_key": "Тяжёлый крейсер дальнего радиуса. Способен неделями находиться в глубоком космосе и выдерживать экстремальные нагрузки.",
     "tier": 4,
-    "stats": { "stability": 160, "fuel_capacity": 200, "speed_mod": 1.0 },
-    "required_level": 8,
-    "upgrade_cost": { "xgen": 5000, "elements": { "elem_uranium": 10, "elem_dark_matter": 2 } },
-    "art_path": "/assets/ships/t4_cruiser.webp"
+    "stats": { "stability": 200, "fuel_capacity": 200, "speed_mod": 1.0 },
+    "required_level": 10,
+    "art_path": "/assets/ships/cruiser_t4.webp"
   },
   {
-    "id": "ship_t5_dreadnought",
-    "name_key": "ship_dreadnought_name",
+    "id": "ship_dreadnought_t5",
+    "name_key": "Дредноут «Творец»",
+    "description_key": "Легендарный флагманский дредноут. Спроектирован для проникновения в аномальные зоны и контакта с древними артефактами.",
     "tier": 5,
-    "stats": { "stability": 200, "fuel_capacity": 300, "speed_mod": 0.7 },
-    "required_level": 12,
-    "upgrade_cost": { "xgen": 15000, "elements": { "elem_dark_matter": 10, "elem_void_essence": 5 } },
-    "art_path": "/assets/ships/t5_dreadnought.webp"
+    "stats": { "stability": 300, "fuel_capacity": 350, "speed_mod": 0.7 },
+    "required_level": 20,
+    "art_path": "/assets/ships/dreadnought_t5.webp"
   }
 ]

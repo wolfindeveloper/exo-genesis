@@ -44,6 +44,13 @@
 - [x] .gitignore + .git/info/exclude (SPEC.md, AGENTS.md, CONTEXT.md, skills-lock.json, .opencode/, graphify-out/)
 
 ## 📋 Next Steps
+### Layout & Content ✅
+- [x] Реальный контент: корабли (5 имён + описания), зоны (5 имён + описания), элементы (10 имён + описания)
+- [x] Переработана навигация: активная вкладка с индикатором, compact nav bar
+- [x] Улучшен Galaxy: ship picker вместо select, описания зон
+- [x] Улучшен Hangar: счётчики готовых/в полёте, пустое состояние
+- [x] Все названия на русском, космическая тематика
+
 ### Monetization
 - [ ] Telegram Stars покупки (Energy Refill, Instant Finish, Lab Hint)
 - [ ] Webhook для Telegram Payments

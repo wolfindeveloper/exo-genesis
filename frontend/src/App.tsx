@@ -8,35 +8,38 @@ import { Lab } from './pages/Lab'
 import { Profile } from './pages/Profile'
 import { PageTransition } from './components/PageTransition'
 
+const nav = [
+  { path: '/hangar', icon: '🚀', label: 'Ангар' },
+  { path: '/galaxy', icon: '🌌', label: 'Карта' },
+  { path: '/lab', icon: '🔬', label: 'Лаб' },
+  { path: '/inventory', icon: '🎒', label: 'Инв' },
+  { path: '/profile', icon: '👤', label: 'Проф' },
+]
+
 function NavBar() {
-  const linkClass = (path: string) =>
-    `flex flex-col items-center gap-0.5 text-xs transition-colors ${
-      location.pathname === path ? 'text-neon-cyan' : 'text-slate-500 hover:text-slate-300'
-    }`
+  const location = useLocation()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-space-800/80 backdrop-blur-xl border-t border-white/5">
-      <div className="flex justify-around py-2 max-w-lg mx-auto">
-        <Link to="/hangar" className={linkClass('/hangar')}>
-          <span className="text-lg">🚀</span>
-          <span>Ангар</span>
-        </Link>
-        <Link to="/galaxy" className={linkClass('/galaxy')}>
-          <span className="text-lg">🌌</span>
-          <span>Галактика</span>
-        </Link>
-        <Link to="/lab" className={linkClass('/lab')}>
-          <span className="text-lg">🔬</span>
-          <span>Лаб</span>
-        </Link>
-        <Link to="/inventory" className={linkClass('/inventory')}>
-          <span className="text-lg">🎒</span>
-          <span>Инв</span>
-        </Link>
-        <Link to="/profile" className={linkClass('/profile')}>
-          <span className="text-lg">👤</span>
-          <span>Проф</span>
-        </Link>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-space-800/90 backdrop-blur-xl border-t border-white/5 safe-area-pb">
+      <div className="flex max-w-lg mx-auto">
+        {nav.map((item) => {
+          const active = location.pathname === item.path
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-all relative ${
+                active ? 'text-neon-cyan' : 'text-slate-600 hover:text-slate-400'
+              }`}
+            >
+              {active && (
+                <span className="absolute -top-px left-1/4 right-1/4 h-0.5 bg-neon-cyan rounded-full" />
+              )}
+              <span className={`${active ? 'scale-110' : ''} transition-transform text-base`}>{item.icon}</span>
+              <span className="font-display uppercase tracking-wider">{item.label}</span>
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )
@@ -46,7 +49,7 @@ function AppContent() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen text-white max-w-lg mx-auto relative z-10">
+    <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Hangar /></PageTransition>} />

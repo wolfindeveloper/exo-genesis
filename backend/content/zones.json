@@ -1,7 +1,8 @@
 [
   {
     "id": "zone_nebula_alpha",
-    "name_key": "zone_nebula_alpha_name",
+    "name_key": "Туманность Альфа",
+    "description_key": "Разреженное облако ионизированного газа на окраине сектора. Безопасная зона для начинающих исследователей.",
     "tier": 1,
     "risk_factor": 0.1,
     "duration_hours": 4,
@@ -14,7 +15,8 @@
   },
   {
     "id": "zone_asteroid_belt",
-    "name_key": "zone_asteroid_belt_name",
+    "name_key": "Пояс Астероидов",
+    "description_key": "Густое скопление каменных и металлических астероидов. Богатый источник редкоземельных элементов.",
     "tier": 1,
     "risk_factor": 0.15,
     "duration_hours": 6,
@@ -28,7 +30,8 @@
   },
   {
     "id": "zone_void_expanse",
-    "name_key": "zone_void_expanse_name",
+    "name_key": "Пустота",
+    "description_key": "Аномальная область пространства с пониженной гравитацией. Здесь найдены следы древних цивилизаций.",
     "tier": 2,
     "risk_factor": 0.25,
     "duration_hours": 8,
@@ -42,7 +45,8 @@
   },
   {
     "id": "zone_crystal_caverns",
-    "name_key": "zone_crystal_caverns_name",
+    "name_key": "Кристальные Пещеры",
+    "description_key": "Сеть гигантских пещер в астероиде, стены которых состоят из чистых квантовых кристаллов. Чрезвычайно ценный, но опасный район.",
     "tier": 2,
     "risk_factor": 0.3,
     "duration_hours": 10,
@@ -56,7 +60,8 @@
   },
   {
     "id": "zone_quantum_storm",
-    "name_key": "zone_quantum_storm_name",
+    "name_key": "Квантовый Шторм",
+    "description_key": "Зона пространственно-временной нестабильности. Только самые отважные пилоты рискуют войти в этот водоворот тёмной материи.",
     "tier": 3,
     "risk_factor": 0.45,
     "duration_hours": 14,
