@@ -49,10 +49,27 @@ async def debug_hmac(
 
     if not init_data:
         return {"ok": False, "error": "Empty initData"}
+
+    init_data = init_data.strip()
+
+    # Method 1: decode then hash (current approach)
     parsed = dict(parse_qsl(init_data))
     received_hash = parsed.pop("hash", "")
-    check_string = "\n".join(
+    check_string_decoded = "\n".join(
         f"{k}={v}" for k, v in sorted(parsed.items())
+    )
+
+    # Method 2: use raw (encoded) values — parse without URL-decoding
+    raw_pairs = [p.split("=", 1) for p in init_data.split("&") if "=" in p]
+    raw_dict = {}
+    raw_hash = ""
+    for k, v in raw_pairs:
+        if k == "hash":
+            raw_hash = v
+        else:
+            raw_dict[k] = v
+    check_string_raw = "\n".join(
+        f"{k}={raw_dict[k]}" for k in sorted(raw_dict.keys())
     )
 
     secret_key = hmac.new(
@@ -61,20 +78,31 @@ async def debug_hmac(
         hashlib.sha256,
     ).digest()
 
-    expected_hash = hmac.new(
+    expected_decoded = hmac.new(
         secret_key,
-        check_string.encode("utf-8"),
+        check_string_decoded.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    expected_raw = hmac.new(
+        secret_key,
+        check_string_raw.encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
 
     return {
-        "ok": received_hash == expected_hash,
+        "ok": received_hash == expected_decoded or received_hash == expected_raw,
+        "match_decoded": received_hash == expected_decoded,
+        "match_raw": received_hash == expected_raw,
         "received_hash": received_hash,
-        "expected_hash": expected_hash,
+        "expected_decoded": expected_decoded,
+        "expected_raw": expected_raw,
         "token_prefix": settings.bot_token[:6],
         "token_len": len(settings.bot_token),
         "keys": list(parsed.keys()),
-        "check_string": check_string[:200],
+        "check_string_decoded": check_string_decoded[:500],
+        "check_string_raw": check_string_raw[:500],
+        "init_data_length": len(init_data),
     }
 
 
