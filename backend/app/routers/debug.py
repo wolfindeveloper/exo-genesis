@@ -126,6 +126,10 @@ async def debug_hmac(
         hashlib.sha256,
     ).hexdigest()
 
+    # Log the SHA-256 of check_strings for comparison
+    cs_decoded_hash = hashlib.sha256(check_string_decoded.encode()).hexdigest() if check_string_decoded else None
+    cs_raw_hash = hashlib.sha256(check_string_raw.encode()).hexdigest() if check_string_raw else None
+
     # Try base64 decoding the signature (new Telegram API format)
     sig_bytes = None
     sig_hex = None
@@ -206,6 +210,8 @@ async def debug_hmac(
         "extra_fields": extra_fields,
         "check_string_decoded": check_string_decoded,
         "check_string_raw": check_string_raw,
+        "cs_sha256_decoded": cs_decoded_hash,
+        "cs_sha256_raw": cs_raw_hash,
         "init_data_length": len(init_data),
     }
 
