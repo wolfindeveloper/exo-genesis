@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -47,10 +47,11 @@ export function HmacDebug() {
   return (
     <div className="fixed bottom-16 left-0 right-0 z-[201] bg-gray-900/95 p-2 text-center text-[9px] text-gray-300 font-mono whitespace-pre-wrap break-all">
       {loading ? 'Checking HMAC...' : result?.error ? `HMAC error: ${result.error}` : (
-        `hash: ${result?.received_hash?.slice(0,12)}...  sig: ${result?.received_signature?.slice(0,12)}...\n` +
-        `dec→hash: ${result?.match_decoded_vs_hash ? '✅' : '❌'}  dec→sig: ${result?.match_decoded_vs_sig ? '✅' : '❌'}\n` +
-        `raw→hash: ${result?.match_raw_vs_hash ? '✅' : '❌'}   raw→sig: ${result?.match_raw_vs_sig ? '✅' : '❌'}\n` +
-        `extra: ${result?.extra_fields?.join(', ') || 'none'}  len: ${result?.init_data_length}`
+        `hash: ${(result?.received_hash||'?').slice(0,10)}...  sig: ${(result?.received_signature||'?').slice(0,10)}...\n` +
+        `dec w/ sig →hash:${result?.match_decoded_vs_hash?'✅':'❌'}  →sig:${result?.match_decoded_vs_sig?'✅':'❌'}\n` +
+        `dec no sig →hash:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'}  →sig:${result?.match_decoded_no_sig_vs_sig?'✅':'❌'}\n` +
+        `raw w/ sig →hash:${result?.match_raw_vs_hash?'✅':'❌'}  →sig:${result?.match_raw_vs_sig?'✅':'❌'}\n` +
+        `raw no sig →hash:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}  →sig:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}`
       )}
     </div>
   )
