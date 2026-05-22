@@ -150,17 +150,33 @@ async def debug_hmac(
                 "40055058a4ee38156a06562e52eece92a771bcd8346a8c4615cb7376eddf72ec",
             ]
             bot_id = settings.bot_token.split(":")[0] if ":" in settings.bot_token else ""
-            ed25519_check = f"{bot_id}:WebAppData\n" + "\n".join(
-                f"{k}={v}" for k, v in sorted(parsed_full.items()) if k not in ("hash", "signature")
+
+            # Try decoded values (standard parse_qsl)
+            ed25519_check_decoded = f"{bot_id}:WebAppData\n" + "\n".join(
+                f"{k}={v}" for k, v in sorted(parsed_full.items())
             )
-            for pub_key_hex in TELEGRAM_PUBLIC_KEYS:
-                try:
-                    verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
-                    verify_key.verify(ed25519_check.encode("utf-8"), sig_bytes)
-                    ed25519_ok = True
+
+            # Try raw (URL-encoded) values
+            raw_pairs_ed = [p.split("=", 1) for p in init_data.split("&") if "=" in p]
+            raw_dict_ed = {}
+            for k, v in raw_pairs_ed:
+                if k not in ("hash", "signature"):
+                    raw_dict_ed[k] = v
+            ed25519_check_raw = f"{bot_id}:WebAppData\n" + "\n".join(
+                f"{k}={raw_dict_ed[k]}" for k in sorted(raw_dict_ed.keys())
+            )
+
+            for check_str in [ed25519_check_decoded, ed25519_check_raw]:
+                for pub_key_hex in TELEGRAM_PUBLIC_KEYS:
+                    try:
+                        verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
+                        verify_key.verify(check_str.encode("utf-8"), sig_bytes)
+                        ed25519_ok = True
+                        break
+                    except (InvalidSignature, Exception):
+                        ed25519_ok = False
+                if ed25519_ok:
                     break
-                except (InvalidSignature, Exception):
-                    ed25519_ok = False
 
     extra_fields = [k for k in parsed_full.keys() if k not in ("query_id", "user", "auth_date")]
     return {
