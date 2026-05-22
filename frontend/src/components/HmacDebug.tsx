@@ -19,6 +19,7 @@ interface HmacResult {
   match_raw_vs_sig?: boolean
   match_raw_no_sig_vs_hash?: boolean
   match_raw_no_sig_vs_sig?: boolean
+  ed25519_ok?: boolean | null
   keys?: string[]
   extra_fields?: string[]
   check_string_decoded?: string
@@ -51,7 +52,8 @@ export function HmacDebug() {
         `dec w/ sig →hash:${result?.match_decoded_vs_hash?'✅':'❌'}  →sig:${result?.match_decoded_vs_sig?'✅':'❌'}\n` +
         `dec no sig →hash:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'}  →sig:${result?.match_decoded_no_sig_vs_sig?'✅':'❌'}\n` +
         `raw w/ sig →hash:${result?.match_raw_vs_hash?'✅':'❌'}  →sig:${result?.match_raw_vs_sig?'✅':'❌'}\n` +
-        `raw no sig →hash:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}  →sig:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}`
+        `raw no sig →hash:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}  →sig:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}\n` +
+        `ed25519: ${result?.ed25519_ok === true ? '✅' : result?.ed25519_ok === false ? '❌' : '?'}`
       )}
     </div>
   )

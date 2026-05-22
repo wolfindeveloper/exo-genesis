@@ -58,17 +58,45 @@ def _validate_init_data(init_data_raw: str) -> dict:
 
     # Second try: Ed25519 signature validation (Bot API 8.0+)
     if received_signature:
-        bot_id = settings.bot_token.split(":")[0] if ":" in settings.bot_token else ""
-        check_string = f"{bot_id}:WebAppData\n" + "\n".join(
-            f"{k}={v}" for k, v in sorted(parsed.items())
-        )
-        try:
-            sig_bytes = base64.urlsafe_b64decode(received_signature + "==")
-            verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(TELEGRAM_PUBLIC_KEY_HEX))
-            verify_key.verify(check_string.encode("utf-8"), sig_bytes)
-            return _build_payload(parsed, received_hash or received_signature)
-        except (InvalidSignature, Exception):
-            pass
+        TELEGRAM_PUBLIC_KEYS = [
+            "e7bf03a2fa4602af4580703d88dda5bb59f32ed8b02a56c187fe7d34caed242d",  # production
+            "40055058a4ee38156a06562e52eece92a771bcd8346a8c4615cb7376eddf72ec",  # test
+        ]
+        bot_ids = []
+        if ":" in settings.bot_token:
+            bot_ids.append(settings.bot_token.split(":")[0])
+        if parsed.get("query_id"):
+            bot_ids.append(parsed["query_id"].split("_")[0])
+
+        for bot_id in bot_ids:
+            if not bot_id:
+                continue
+            check_string = f"{bot_id}:WebAppData\n" + "\n".join(
+                f"{k}={v}" for k, v in sorted(parsed.items())
+            )
+
+            # Try different base64 padding options
+            sig_candidates = [received_signature]
+            padding = 4 - len(received_signature) % 4
+            if padding != 4:
+                sig_candidates.append(received_signature + "=" * padding)
+
+            for sig_str in sig_candidates:
+                try:
+                    sig_bytes = base64.urlsafe_b64decode(sig_str)
+                except Exception:
+                    try:
+                        sig_bytes = base64.b64decode(sig_str)
+                    except Exception:
+                        continue
+
+                for pub_key_hex in TELEGRAM_PUBLIC_KEYS:
+                    try:
+                        verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
+                        verify_key.verify(check_string.encode("utf-8"), sig_bytes)
+                        return _build_payload(parsed, received_hash or received_signature)
+                    except (InvalidSignature, Exception):
+                        pass
 
     raise HTTPException(status_code=401, detail="Invalid initData signature")
 

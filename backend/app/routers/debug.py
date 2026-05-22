@@ -5,6 +5,9 @@ import logging
 import os
 from urllib.parse import parse_qsl
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
 from fastapi import APIRouter, Depends, Header, HTTPException
 from supabase import Client
 
@@ -126,16 +129,38 @@ async def debug_hmac(
     # Try base64 decoding the signature (new Telegram API format)
     sig_bytes = None
     sig_hex = None
+    ed25519_ok = None
     if received_signature:
-        try:
-            sig_bytes = base64.urlsafe_b64decode(received_signature + "==")
-            sig_hex = sig_bytes.hex()
-        except Exception:
+        for pad in ["==", "=", ""]:
             try:
-                sig_bytes = base64.b64decode(received_signature + "==")
+                sig_bytes = base64.urlsafe_b64decode(received_signature + pad)
                 sig_hex = sig_bytes.hex()
+                break
             except Exception:
-                pass
+                try:
+                    sig_bytes = base64.b64decode(received_signature + pad)
+                    sig_hex = sig_bytes.hex()
+                    break
+                except Exception:
+                    pass
+
+        if sig_bytes:
+            TELEGRAM_PUBLIC_KEYS = [
+                "e7bf03a2fa4602af4580703d88dda5bb59f32ed8b02a56c187fe7d34caed242d",
+                "40055058a4ee38156a06562e52eece92a771bcd8346a8c4615cb7376eddf72ec",
+            ]
+            bot_id = settings.bot_token.split(":")[0] if ":" in settings.bot_token else ""
+            ed25519_check = f"{bot_id}:WebAppData\n" + "\n".join(
+                f"{k}={v}" for k, v in sorted(parsed_full.items()) if k not in ("hash", "signature")
+            )
+            for pub_key_hex in TELEGRAM_PUBLIC_KEYS:
+                try:
+                    verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
+                    verify_key.verify(ed25519_check.encode("utf-8"), sig_bytes)
+                    ed25519_ok = True
+                    break
+                except (InvalidSignature, Exception):
+                    ed25519_ok = False
 
     extra_fields = [k for k in parsed_full.keys() if k not in ("query_id", "user", "auth_date")]
     return {
@@ -152,6 +177,7 @@ async def debug_hmac(
         "sig_as_hex": sig_hex,
         "match_decoded_vs_sig_hex": sig_hex == expected_decoded if sig_hex else None,
         "match_raw_vs_sig_hex": sig_hex == expected_raw if sig_hex else None,
+        "ed25519_ok": ed25519_ok,
         "received_hash": received_hash,
         "received_signature": received_signature,
         "expected_decoded": expected_decoded,
