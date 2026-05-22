@@ -53,10 +53,11 @@ async def debug_hmac(
     init_data = init_data.strip()
 
     # Method 1: decode then hash (current approach)
-    parsed = dict(parse_qsl(init_data))
-    received_hash = parsed.pop("hash", "")
+    parsed_full = dict(parse_qsl(init_data))
+    received_hash = parsed_full.pop("hash", "")
+    received_signature = parsed_full.pop("signature", "")
     check_string_decoded = "\n".join(
-        f"{k}={v}" for k, v in sorted(parsed.items())
+        f"{k}={v}" for k, v in sorted(parsed_full.items())
     )
 
     secret_key = hmac.new(
@@ -112,21 +113,26 @@ async def debug_hmac(
         hashlib.sha256,
     ).hexdigest()
 
-    extra_fields = [k for k in parsed.keys() if k not in ("query_id", "user", "auth_date")]
+    extra_fields = [k for k in parsed_full.keys() if k not in ("query_id", "user", "auth_date")]
     return {
         "ok": received_hash == expected_decoded or received_hash == expected_raw,
-        "match_decoded": received_hash == expected_decoded,
-        "match_decoded_no_sig": received_hash == expected_decoded_no_sig,
-        "match_raw": received_hash == expected_raw,
-        "match_raw_no_sig": received_hash == expected_raw_no_sig,
+        "match_decoded_vs_hash": received_hash == expected_decoded,
+        "match_decoded_vs_sig": received_signature == expected_decoded,
+        "match_decoded_no_sig_vs_hash": received_hash == expected_decoded_no_sig,
+        "match_decoded_no_sig_vs_sig": received_signature == expected_decoded_no_sig,
+        "match_raw_vs_hash": received_hash == expected_raw,
+        "match_raw_vs_sig": received_signature == expected_raw,
+        "match_raw_no_sig_vs_hash": received_hash == expected_raw_no_sig,
+        "match_raw_no_sig_vs_sig": received_signature == expected_raw_no_sig,
         "received_hash": received_hash,
+        "received_signature": received_signature,
         "expected_decoded": expected_decoded,
         "expected_decoded_no_sig": expected_decoded_no_sig,
         "expected_raw": expected_raw,
         "expected_raw_no_sig": expected_raw_no_sig,
         "token_prefix": settings.bot_token[:6],
         "token_len": len(settings.bot_token),
-        "keys": list(parsed.keys()),
+        "keys": list(parsed_full.keys()),
         "extra_fields": extra_fields,
         "check_string_decoded": check_string_decoded[:500],
         "check_string_raw": check_string_raw[:500],
