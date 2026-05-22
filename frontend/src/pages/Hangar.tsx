@@ -1,20 +1,35 @@
-import { useEffect } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 
 import { ShipCard } from '../components/ShipCard'
-import { fadeIn, staggerContainer } from '../lib/animations'
+import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 
+const tierLabels = ['', 'T1', 'T2', 'T3', 'T4', 'T5']
+const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green border-neon-green/30', 'text-neon-purple border-neon-purple/30', 'text-neon-amber border-neon-amber/30', 'text-neon-red border-neon-red/30']
+const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
+
 export function Hangar() {
-  const { ships, loadShips, isLoading } = useGameStore()
+  const { ships, shipsContent, loadShips, isLoading } = useGameStore()
+  const [tierFilter, setTierFilter] = useState(1)
 
   useEffect(() => { loadShips() }, [])
+
+  const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
+
+  const shipsWithTier = useMemo(() => ships.map((s) => ({
+    ...s,
+    tier: shipConfigLookup.get(s.ship_config_id)?.tier || 1,
+  })), [ships, shipConfigLookup])
+
+  const availTiers = [...new Set(shipsWithTier.map((s) => s.tier))].sort()
+  const filteredShips = shipsWithTier.filter((s) => s.tier === tierFilter)
 
   const idleCount = ships.filter((s) => s.status === 'idle').length
   const onMission = ships.length - idleCount
 
   return (
-    <div className="p-4 pb-4">
+    <div className="p-4 pb-28">
       <motion.header className="mb-6" variants={fadeIn} initial="hidden" animate="visible">
         <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-cyan">Ангар</h1>
         <div className="flex gap-3 mt-2">
@@ -34,6 +49,29 @@ export function Hangar() {
         </div>
       </motion.header>
 
+      {/* Tier filter */}
+      {availTiers.length > 1 && (
+        <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-4 overflow-x-auto pb-1">
+          {availTiers.map((tier) => {
+            const count = shipsWithTier.filter((s) => s.tier === tier).length
+            const active = tierFilter === tier
+            return (
+              <motion.button
+                key={tier}
+                variants={scaleIn}
+                onClick={() => setTierFilter(tier)}
+                className={`relative px-4 py-2 rounded-xl text-xs font-display uppercase tracking-wider border transition whitespace-nowrap ${
+                  active ? `${tierColors[tier]} ${tierBg[tier]}` : 'text-slate-500 border-white/10 hover:border-white/20'
+                }`}
+              >
+                <span>{tierLabels[tier]}</span>
+                <span className="ml-1.5 opacity-60">{count}</span>
+              </motion.button>
+            )
+          })}
+        </motion.div>
+      )}
+
       {isLoading && ships.length === 0 ? (
         <div className="flex flex-col gap-3">
           {[1, 2, 3].map((i) => (
@@ -47,11 +85,26 @@ export function Hangar() {
           <p className="text-xs text-slate-500">Приобрети корабль, чтобы начать исследования</p>
         </motion.div>
       ) : (
-        <motion.div className="flex flex-col gap-3" variants={staggerContainer} initial="hidden" animate="visible">
-          {ships.map((ship, i) => (
-            <ShipCard key={ship.id} ship={ship} index={i} />
-          ))}
-        </motion.div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={tierFilter}
+            className="flex flex-col gap-3"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.15 } }}
+          >
+            {filteredShips.length === 0 ? (
+              <div className="glass-card p-8 text-center">
+                <p className="text-slate-500 text-xs">Нет кораблей этого тира</p>
+              </div>
+            ) : (
+              filteredShips.map((ship, i) => (
+                <ShipCard key={ship.id} ship={ship} index={i} />
+              ))
+            )}
+          </motion.div>
+        </AnimatePresence>
       )}
     </div>
   )

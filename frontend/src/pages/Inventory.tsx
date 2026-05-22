@@ -19,10 +19,17 @@ const typeLabels: Record<string, string> = {
 }
 
 const elementEmoji: Record<string, string> = {
-  elem_hydrogen: '💧', elem_helium: '🎈', elem_carbon: '💎',
-  elem_iron: '⚙️', elem_silicon: '💻', elem_titanium: '🛡️',
-  elem_uranium: '☢️', elem_quantum_crystal: '🔮',
-  elem_dark_matter: '🕳️', elem_void_essence: '🌀',
+  blue_electrical_tape: '🟦', compressed_luck: '🎲', warp_paper_clip: '📎',
+  frozen_confusion: '💗', the_battery_will_die_tomorrow: '🔋',
+  custom_rivet_set: '🔩', pride_of_cows_liquid_methane: '🐄',
+  the_singular_button: '🔘', quick_no_lubricant: '🛢️', reflector_of_views: '✨',
+  the_dust_of_paradoxes: '🌫️', logic_gate_inverter: '🔄', chrome_nostalgia: '💿',
+  quantum_stabilizer: '⚛️', bergamot_crystal: '🍵',
+  essential_oil_condensate: '💧', the_fractal_of_greatness: '🌀',
+  fragments_of_a_deal: '📜', condensation_of_possibilities: '💫',
+  the_core_of_reality: '🔮',
+  "the_universe's_bug_report": '🐛', "the_demiurge's_ink": '🖋️',
+  absolute_zero: '❄️', the_holy_spoon: '🥄', the_pen_of_laughter: '🪶',
 }
 
 export function Inventory() {

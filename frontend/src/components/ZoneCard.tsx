@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
+import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
 
 interface ZoneCardProps {
@@ -14,6 +15,9 @@ const tierColors = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple',
 const tierBorders = ['', 'border-neon-cyan/20', 'border-neon-green/20', 'border-neon-purple/20', 'border-neon-amber/20', 'border-neon-red/20']
 
 export function ZoneCard({ zone, onSelect, disabled, index = 0 }: ZoneCardProps) {
+  const elementsContent = useGameStore((s) => s.elementsContent)
+  const elementLookup = new Map(elementsContent.map((e) => [e.id, e]))
+
   return (
     <motion.button
       initial={{ opacity: 0, y: 20 }}
@@ -35,11 +39,14 @@ export function ZoneCard({ zone, onSelect, disabled, index = 0 }: ZoneCardProps)
         <span>⚠ {Math.round(zone.risk_factor * 100)}%</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        {zone.loot_table.slice(0, 4).map((loot) => (
-          <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
-            {loot.item_id.replace('elem_', '').replace('_', ' ')}
-          </span>
-        ))}
+        {zone.loot_table.slice(0, 4).map((loot) => {
+          const el = elementLookup.get(loot.item_id)
+          return (
+            <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
+              {el?.name_key || loot.item_id.replace('_', ' ')}
+            </span>
+          )
+        })}
       </div>
     </motion.button>
   )

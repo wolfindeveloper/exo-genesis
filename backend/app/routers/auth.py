@@ -55,4 +55,22 @@ async def validate_auth(
     result = supabase.table("users").insert(new_user).execute()
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to create user")
+
+    # Grant starter ship + initial elements
+    supabase.table("user_ships").insert({
+        "user_id": user_id,
+        "ship_config_id": "stella",
+        "stability": 100,
+        "fuel_current": 50,
+    }).execute()
+
+    starter_elements = ["blue_electrical_tape", "compressed_luck", "warp_paper_clip"]
+    for elem_id in starter_elements:
+        supabase.table("user_inventory").insert({
+            "user_id": user_id,
+            "item_type": "element",
+            "item_config_id": elem_id,
+            "quantity": 3,
+        }).execute()
+
     return AuthResponse(**result.data[0], is_new=True)
