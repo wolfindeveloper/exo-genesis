@@ -74,8 +74,8 @@ async def debug_hmac(
     )
 
     secret_key = hmac.new(
-        settings.bot_token.encode("utf-8"),
         b"WebAppData",
+        settings.bot_token.encode("utf-8"),
         hashlib.sha256,
     ).digest()
 

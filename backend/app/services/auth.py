@@ -44,8 +44,8 @@ def _validate_init_data(init_data_raw: str) -> dict:
             f"{k}={v}" for k, v in sorted(parsed.items())
         )
         secret_key = hmac.new(
-            settings.bot_token.encode("utf-8"),
             b"WebAppData",
+            settings.bot_token.encode("utf-8"),
             hashlib.sha256,
         ).digest()
         expected_hash = hmac.new(
