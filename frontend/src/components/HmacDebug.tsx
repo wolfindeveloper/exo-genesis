@@ -62,24 +62,32 @@ export function HmacDebug() {
 
   return (
     <div className="fixed bottom-16 left-0 right-0 z-[201] bg-gray-900/95 p-2 text-center text-[9px] text-gray-300 font-mono whitespace-pre-wrap break-all">
-      {loading ? 'Checking HMAC...' : result?.error ? `HMAC error: ${result.error}` : (
-        <>
-          <div style={{fontSize:'7px',lineHeight:'1.1'}} className="text-gray-500 text-left mb-1 break-all max-h-24 overflow-y-auto">
-            InitData ({result?.init_data_length}ch):
-            <br/>{result?.init_data_received || result?.init_data || '?'}
-            <button
-              onClick={() => {navigator.clipboard.writeText(result?.init_data_received || result?.init_data || ''); setCopied(true); setTimeout(()=>setCopied(false),2000)}}
-              className="ml-1 text-blue-400 hover:text-blue-300"
-            >{copied ? '✓' : '📋'}</button>
-          </div>
-          {`hash:${(result?.received_hash||'?').slice(0,10)}… sig:${(result?.received_signature||'?').slice(0,10)}…\n` +
-          `dec→h:${result?.match_decoded_vs_hash?'✅':'❌'} nσ→h:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'}\n` +
-          `raw→h:${result?.match_raw_vs_hash?'✅':'❌'} nσ→h:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}\n` +
-          `stp→h:${result?.match_hmac_strip_vs_hash?'✅':'❌'} ednσ→h:${result?.match_ed_strip_vs_hash?'✅':'❌'}\n` +
-          `ed25519:${result?.ed25519_ok === true?'✅':result?.ed25519_ok === false?'❌':'?'}\n` +
-          `sha256|d:${(result?.cs_sha256_decoded||'?').slice(0,8)}…r:${(result?.cs_sha256_raw||'?').slice(0,8)}…s:${(result?.cs_sha256_hmac_strip||'?').slice(0,8)}…e:${(result?.cs_sha256_ed_strip||'?').slice(0,8)}…`
-        </>
-      )}
+      {(() => {
+        if (loading) return 'Checking HMAC...'
+        if (result?.error) return 'HMAC error: ' + result.error
+        if (!result) return null
+        const r = result
+        const ch = (v:boolean|undefined) => v ? 'Y' : 'n'
+        const e = (v:boolean|null|undefined) => v===true ? 'Y' : v===false ? 'n' : '?'
+        return (
+          <>
+            <div style={{fontSize:'7px',lineHeight:'1.1'}} className="text-gray-500 text-left mb-1 break-all max-h-24 overflow-y-auto">
+              ID({r.init_data_length}ch):
+              <br/>{r.init_data_received || r.init_data || '?'}
+              <button
+                onClick={() => {navigator.clipboard.writeText(r.init_data_received || r.init_data || ''); setCopied(true); setTimeout(()=>setCopied(false),2000)}}
+                className="ml-1 text-blue-400 hover:text-blue-300"
+              >{copied ? 'Y' : 'C'}</button>
+            </div>
+            {'hash:'+(r.received_hash||'?').slice(0,10)+' sig:'+(r.received_signature||'?').slice(0,10)+'\n'+
+            'dec:'+ch(r.match_decoded_vs_hash)+'/'+ch(r.match_decoded_no_sig_vs_hash)+' '+
+            'raw:'+ch(r.match_raw_vs_hash)+'/'+ch(r.match_raw_no_sig_vs_hash)+'\n'+
+            'stp:'+ch(r.match_hmac_strip_vs_hash)+'/'+ch(r.match_ed_strip_vs_hash)+' '+
+            'ed:'+e(r.ed25519_ok)+'\n'+
+            's256|d:'+(r.cs_sha256_decoded||'?').slice(0,8)+' r:'+(r.cs_sha256_raw||'?').slice(0,8)+' s:'+(r.cs_sha256_hmac_strip||'?').slice(0,8)+' e:'+(r.cs_sha256_ed_strip||'?').slice(0,8)}
+          </>
+        )
+      })()}
     </div>
   )
 }
