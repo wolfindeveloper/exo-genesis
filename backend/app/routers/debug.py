@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import hmac
 import logging
@@ -122,6 +123,20 @@ async def debug_hmac(
         hashlib.sha256,
     ).hexdigest()
 
+    # Try base64 decoding the signature (new Telegram API format)
+    sig_bytes = None
+    sig_hex = None
+    if received_signature:
+        try:
+            sig_bytes = base64.urlsafe_b64decode(received_signature + "==")
+            sig_hex = sig_bytes.hex()
+        except Exception:
+            try:
+                sig_bytes = base64.b64decode(received_signature + "==")
+                sig_hex = sig_bytes.hex()
+            except Exception:
+                pass
+
     extra_fields = [k for k in parsed_full.keys() if k not in ("query_id", "user", "auth_date")]
     return {
         "ok": received_hash == expected_decoded or received_hash == expected_raw,
@@ -133,6 +148,10 @@ async def debug_hmac(
         "match_raw_vs_sig": received_signature == expected_raw,
         "match_raw_no_sig_vs_hash": received_hash == expected_raw_no_sig,
         "match_raw_no_sig_vs_sig": received_signature == expected_raw_no_sig,
+        "sig_is_base64": bool(sig_hex),
+        "sig_as_hex": sig_hex,
+        "match_decoded_vs_sig_hex": sig_hex == expected_decoded if sig_hex else None,
+        "match_raw_vs_sig_hex": sig_hex == expected_raw if sig_hex else None,
         "received_hash": received_hash,
         "received_signature": received_signature,
         "expected_decoded": expected_decoded,
@@ -143,8 +162,8 @@ async def debug_hmac(
         "token_len": len(settings.bot_token),
         "keys": list(parsed_full.keys()),
         "extra_fields": extra_fields,
-        "check_string_decoded": check_string_decoded[:500],
-        "check_string_raw": check_string_raw[:500],
+        "check_string_decoded": check_string_decoded,
+        "check_string_raw": check_string_raw,
         "init_data_length": len(init_data),
     }
 

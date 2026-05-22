@@ -31,8 +31,7 @@ class InitDataPayload(BaseModel):
 def _validate_init_data(init_data_raw: str) -> dict:
     parsed = dict(parse_qsl(init_data_raw))
     received_hash = parsed.pop("hash", "")
-    if not received_hash:
-        raise HTTPException(status_code=401, detail="Missing hash in initData")
+    received_signature = parsed.pop("signature", "")
 
     check_string = "\n".join(
         f"{k}={v}" for k, v in sorted(parsed.items())
@@ -50,7 +49,11 @@ def _validate_init_data(init_data_raw: str) -> dict:
         hashlib.sha256,
     ).hexdigest()
 
-    if received_hash != expected_hash:
+    if received_hash and received_hash == expected_hash:
+        pass  # standard validation
+    elif received_signature and received_signature == expected_hash:
+        received_hash = received_signature  # newer Telegram API uses "signature"
+    else:
         raise HTTPException(status_code=401, detail="Invalid initData signature")
 
     user_data = parsed.get("user", "{}")
