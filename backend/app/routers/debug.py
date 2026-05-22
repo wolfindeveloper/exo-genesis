@@ -126,9 +126,33 @@ async def debug_hmac(
         hashlib.sha256,
     ).hexdigest()
 
+    # Method 3: remove ONLY &hash= from raw string (keep signature, keep order)
+    cs_hmac_strip = init_data
+    if "&hash=" in cs_hmac_strip:
+        cs_hmac_strip = cs_hmac_strip[:cs_hmac_strip.index("&hash=")]
+    expected_hmac_strip = hmac.new(
+        secret_key,
+        cs_hmac_strip.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    # Method 3b: remove &signature= first, then &hash= from raw string
+    cs_ed_strip = init_data
+    if "&signature=" in cs_ed_strip:
+        cs_ed_strip = cs_ed_strip[:cs_ed_strip.index("&signature=")]
+    if "&hash=" in cs_ed_strip:
+        cs_ed_strip = cs_ed_strip[:cs_ed_strip.index("&hash=")]
+    expected_ed_strip = hmac.new(
+        secret_key,
+        cs_ed_strip.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
     # Log the SHA-256 of check_strings for comparison
     cs_decoded_hash = hashlib.sha256(check_string_decoded.encode()).hexdigest() if check_string_decoded else None
     cs_raw_hash = hashlib.sha256(check_string_raw.encode()).hexdigest() if check_string_raw else None
+    cs_hmac_strip_hash = hashlib.sha256(cs_hmac_strip.encode()).hexdigest() if cs_hmac_strip else None
+    cs_ed_strip_hash = hashlib.sha256(cs_ed_strip.encode()).hexdigest() if cs_ed_strip else None
 
     # Try base64 decoding the signature (new Telegram API format)
     sig_bytes = None
@@ -170,7 +194,10 @@ async def debug_hmac(
                 f"{k}={raw_dict_ed[k]}" for k in sorted(raw_dict_ed.keys())
             )
 
-            for check_str in [ed25519_check_decoded, ed25519_check_raw]:
+            # Try stripped (original-order) check_string
+            ed25519_check_stripped = f"{bot_id}:WebAppData\n" + cs_ed_strip
+
+            for check_str in [ed25519_check_decoded, ed25519_check_raw, ed25519_check_stripped]:
                 for pub_key_hex in TELEGRAM_PUBLIC_KEYS:
                     try:
                         verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
@@ -193,6 +220,10 @@ async def debug_hmac(
         "match_raw_vs_sig": received_signature == expected_raw,
         "match_raw_no_sig_vs_hash": received_hash == expected_raw_no_sig,
         "match_raw_no_sig_vs_sig": received_signature == expected_raw_no_sig,
+        "match_hmac_strip_vs_hash": received_hash == expected_hmac_strip,
+        "match_hmac_strip_vs_sig": received_signature == expected_hmac_strip,
+        "match_ed_strip_vs_hash": received_hash == expected_ed_strip,
+        "match_ed_strip_vs_sig": received_signature == expected_ed_strip,
         "sig_is_base64": bool(sig_hex),
         "sig_as_hex": sig_hex,
         "match_decoded_vs_sig_hex": sig_hex == expected_decoded if sig_hex else None,
@@ -204,14 +235,20 @@ async def debug_hmac(
         "expected_decoded_no_sig": expected_decoded_no_sig,
         "expected_raw": expected_raw,
         "expected_raw_no_sig": expected_raw_no_sig,
+        "expected_hmac_strip": expected_hmac_strip,
+        "expected_ed_strip": expected_ed_strip,
         "token_prefix": settings.bot_token[:6],
         "token_len": len(settings.bot_token),
         "keys": list(parsed_full.keys()),
         "extra_fields": extra_fields,
         "check_string_decoded": check_string_decoded,
         "check_string_raw": check_string_raw,
+        "check_string_hmac_strip": cs_hmac_strip,
+        "check_string_ed_strip": cs_ed_strip,
         "cs_sha256_decoded": cs_decoded_hash,
         "cs_sha256_raw": cs_raw_hash,
+        "cs_sha256_hmac_strip": cs_hmac_strip_hash,
+        "cs_sha256_ed_strip": cs_ed_strip_hash,
         "init_data_length": len(init_data),
     }
 
