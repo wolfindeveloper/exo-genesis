@@ -37,12 +37,18 @@ async def debug_health():
 
 @router.get("/hmac")
 async def debug_hmac(
-    authorization: str = Header(None),
+    authorization: str | None = Header(None),
+    tg_init_data: str | None = None,
 ):
-    if not authorization:
-        return {"ok": False, "error": "Missing Authorization header"}
+    if tg_init_data:
+        init_data = tg_init_data
+    elif authorization:
+        init_data = authorization.removeprefix("tma ").strip()
+    else:
+        return {"ok": False, "error": "Provide Authorization header or ?tg_init_data=..."}
 
-    init_data = authorization.removeprefix("tma ").strip()
+    if not init_data:
+        return {"ok": False, "error": "Empty initData"}
     parsed = dict(parse_qsl(init_data))
     received_hash = parsed.pop("hash", "")
     check_string = "\n".join(
