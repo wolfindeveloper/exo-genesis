@@ -258,6 +258,28 @@ async def debug_hmac(
     }
 
 
+@router.post("/delete-me")
+async def debug_delete_me(
+    authorization: str = Header(None),
+    db: Client = Depends(get_db),
+):
+    if not authorization:
+        return {"ok": False, "error": "Missing Authorization header"}
+    init_data = authorization.removeprefix("tma ").strip()
+    try:
+        payload = _validate_init_data(init_data)
+    except HTTPException as e:
+        return {"ok": False, "error": f"initData validation failed: {e.detail}"}
+    except Exception as e:
+        return {"ok": False, "error": f"initData validation error: {e}"}
+    user_id = str(payload["user"]["id"])
+    try:
+        result = db.table("users").delete().eq("id", user_id).execute()
+        return {"ok": True, "deleted": bool(result.data), "user_id": user_id}
+    except Exception as e:
+        return {"ok": False, "error": f"Supabase delete error: {e}"}
+
+
 @router.get("/raw")
 async def debug_raw_init_data(
     authorization: str = Header(None),
