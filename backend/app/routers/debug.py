@@ -4,15 +4,13 @@ import os
 from fastapi import APIRouter, Depends, Header, HTTPException
 from supabase import Client
 
+from app.core.config import settings
 from app.core.dependencies import get_db
 from app.services.auth import _validate_init_data
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/debug", tags=["debug"])
 
-
-@router.get("/health")
-from app.core.config import settings
 
 @router.get("/health")
 async def debug_health():
