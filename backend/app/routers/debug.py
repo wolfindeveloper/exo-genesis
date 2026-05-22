@@ -250,6 +250,7 @@ async def debug_hmac(
         "cs_sha256_hmac_strip": cs_hmac_strip_hash,
         "cs_sha256_ed_strip": cs_ed_strip_hash,
         "init_data_length": len(init_data),
+        "init_data_received": init_data,
     }
 
 

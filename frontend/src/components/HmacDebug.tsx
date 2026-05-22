@@ -37,11 +37,14 @@ interface HmacResult {
   cs_sha256_hmac_strip?: string
   cs_sha256_ed_strip?: string
   init_data_length?: number
+  init_data?: string
+  init_data_received?: string
 }
 
 export function HmacDebug() {
   const [result, setResult] = useState<HmacResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showFull, setShowFull] = useState(false)
 
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp
@@ -60,12 +63,22 @@ export function HmacDebug() {
   return (
     <div className="fixed bottom-16 left-0 right-0 z-[201] bg-gray-900/95 p-2 text-center text-[9px] text-gray-300 font-mono whitespace-pre-wrap break-all">
       {loading ? 'Checking HMAC...' : result?.error ? `HMAC error: ${result.error}` : (
-        `hash: ${(result?.received_hash||'?').slice(0,10)}...  sig: ${(result?.received_signature||'?').slice(0,10)}...\n` +
-        `dec→h:${result?.match_decoded_vs_hash?'✅':'❌'}  →s:${result?.match_decoded_vs_sig?'✅':'❌'}  nσ→h:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'}  →s:${result?.match_decoded_no_sig_vs_sig?'✅':'❌'}\n` +
-        `raw→h:${result?.match_raw_vs_hash?'✅':'❌'}  →s:${result?.match_raw_vs_sig?'✅':'❌'}  nσ→h:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}  →s:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}\n` +
-        `stp→h:${result?.match_hmac_strip_vs_hash?'✅':'❌'}  →s:${result?.match_hmac_strip_vs_sig?'✅':'❌'}  ednσ→h:${result?.match_ed_strip_vs_hash?'✅':'❌'}  →s:${result?.match_ed_strip_vs_sig?'✅':'❌'}\n` +
-        `ed25519:${result?.ed25519_ok === true?'✅':result?.ed25519_ok === false?'❌':'?'}\n` +
-        `sha256|dec:${(result?.cs_sha256_decoded||'?').slice(0,8)}…|raw:${(result?.cs_sha256_raw||'?').slice(0,8)}…|stp:${(result?.cs_sha256_hmac_strip||'?').slice(0,8)}…|ednσ:${(result?.cs_sha256_ed_strip||'?').slice(0,8)}…`
+        <>
+          <div className="mb-1 text-gray-400" onClick={() => setShowFull(!showFull)} style={{cursor:'pointer'}}>
+            {showFull ? '▼' : '▶'} HMAC
+          </div>
+          {showFull && (
+            <div className="text-[8px] text-gray-500 text-left mb-1 break-all max-h-40 overflow-y-auto">
+              InitData: {result?.init_data_received || result?.init_data || '?'}
+            </div>
+          )}
+          {`hash:${(result?.received_hash||'?').slice(0,10)}…  sig:${(result?.received_signature||'?').slice(0,10)}…\n` +
+          `dec→h:${result?.match_decoded_vs_hash?'✅':'❌'} →s:${result?.match_decoded_vs_sig?'✅':'❌'} nσ→h:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'} →s:${result?.match_decoded_no_sig_vs_sig?'✅':'❌'}\n` +
+          `raw→h:${result?.match_raw_vs_hash?'✅':'❌'} →s:${result?.match_raw_vs_sig?'✅':'❌'} nσ→h:${result?.match_raw_no_sig_vs_hash?'✅':'❌'} →s:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}\n` +
+          `stp→h:${result?.match_hmac_strip_vs_hash?'✅':'❌'} →s:${result?.match_hmac_strip_vs_sig?'✅':'❌'} ednσ→h:${result?.match_ed_strip_vs_hash?'✅':'❌'} →s:${result?.match_ed_strip_vs_sig?'✅':'❌'}\n` +
+          `ed25519:${result?.ed25519_ok === true?'✅':result?.ed25519_ok === false?'❌':'?'}\n` +
+          `sha256|dec:${(result?.cs_sha256_decoded||'?').slice(0,8)}…|raw:${(result?.cs_sha256_raw||'?').slice(0,8)}…|stp:${(result?.cs_sha256_hmac_strip||'?').slice(0,8)}…|ednσ:${(result?.cs_sha256_ed_strip||'?').slice(0,8)}…`
+        </>
       )}
     </div>
   )
