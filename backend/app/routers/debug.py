@@ -84,10 +84,14 @@ async def debug_hmac(
         hashlib.sha256,
     ).hexdigest()
 
-    # Method 2b: raw without signature
-    raw_dict_no_sig = {k: v for k, v in raw_dict.items() if k != "signature"}
-    check_string_raw_no_sig = "\n".join(
-        f"{k}={raw_dict_no_sig[k]}" for k in sorted(raw_dict_no_sig.keys())
+    # Method 2: use raw (encoded) values — parse without URL-decoding
+    raw_pairs = [p.split("=", 1) for p in init_data.split("&") if "=" in p]
+    raw_dict = {}
+    for k, v in raw_pairs:
+        if k != "hash":
+            raw_dict[k] = v
+    check_string_raw = "\n".join(
+        f"{k}={raw_dict[k]}" for k in sorted(raw_dict.keys())
     )
 
     expected_raw = hmac.new(
@@ -95,6 +99,12 @@ async def debug_hmac(
         check_string_raw.encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
+
+    # Method 2b: raw without signature
+    raw_dict_no_sig = {k: v for k, v in raw_dict.items() if k != "signature"}
+    check_string_raw_no_sig = "\n".join(
+        f"{k}={raw_dict_no_sig[k]}" for k in sorted(raw_dict_no_sig.keys())
+    )
 
     expected_raw_no_sig = hmac.new(
         secret_key,
