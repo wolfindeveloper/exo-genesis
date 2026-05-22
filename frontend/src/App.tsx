@@ -75,9 +75,13 @@ function AppContent() {
       </AnimatePresence>
       {error && (
         <div className="fixed top-0 left-0 right-0 z-[200] bg-red-900/90 backdrop-blur-xl p-3 text-center text-xs text-red-200 font-mono">
-          {error}
+          Error: {error}
         </div>
       )}
+      <div className="fixed top-0 left-0 right-0 z-[201] bg-yellow-900/80 p-1 text-center text-[9px] text-yellow-200 font-mono mt-10">
+        TG: {(window as any).Telegram?.WebApp ? '✅' : '❌'} |
+        InitData: {(window as any).Telegram?.WebApp?.initData ? '✅' : '❌'}
+      </div>
       <NavBar />
       <BoxReveal />
     </div>
