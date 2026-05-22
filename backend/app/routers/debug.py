@@ -65,12 +65,16 @@ async def debug_hmac(
 
     init_data = init_data.strip()
 
-    # Method 1: decode then hash (current approach)
+    # Method 1: decode then hash — CORRECT check_string INCLUDES signature
     parsed_full = dict(parse_qsl(init_data))
     received_hash = parsed_full.pop("hash", "")
     received_signature = parsed_full.pop("signature", "")
+    # Build check_string WITH signature (re-add it)
+    cs_dec = parsed_full.copy()
+    if received_signature:
+        cs_dec["signature"] = received_signature
     check_string_decoded = "\n".join(
-        f"{k}={v}" for k, v in sorted(parsed_full.items())
+        f"{k}={v}" for k, v in sorted(cs_dec.items())
     )
 
     secret_key = hmac.new(
@@ -79,7 +83,7 @@ async def debug_hmac(
         hashlib.sha256,
     ).digest()
 
-    # Method 1b: also pop "signature" if present
+    # Method 1b: WITHOUT signature (for Ed25519)
     parsed2 = dict(parse_qsl(init_data))
     parsed2.pop("hash", "")
     parsed2.pop("signature", None)
