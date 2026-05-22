@@ -7,10 +7,15 @@ interface HmacResult {
   error?: string
   received_hash?: string
   expected_decoded?: string
+  expected_decoded_no_sig?: string
   expected_raw?: string
+  expected_raw_no_sig?: string
   match_decoded?: boolean
+  match_decoded_no_sig?: boolean
   match_raw?: boolean
+  match_raw_no_sig?: boolean
   keys?: string[]
+  extra_fields?: string[]
   check_string_decoded?: string
   check_string_raw?: string
   init_data_length?: number
@@ -40,8 +45,10 @@ export function HmacDebug() {
         `→ ${result?.ok ? '✅ MATCH' : '❌ MISMATCH'}\n` +
         `received:    ${result?.received_hash?.slice(0, 16)}...\n` +
         `decoded:     ${result?.expected_decoded?.slice(0, 16)}... ${result?.match_decoded ? '✅' : '❌'}\n` +
+        `dec(no sig): ${result?.expected_decoded_no_sig?.slice(0, 16)}... ${result?.match_decoded_no_sig ? '✅' : '❌'}\n` +
         `raw:         ${result?.expected_raw?.slice(0, 16)}... ${result?.match_raw ? '✅' : '❌'}\n` +
-        `keys: ${result?.keys?.join(', ') || '?'}\n` +
+        `raw(no sig): ${result?.expected_raw_no_sig?.slice(0, 16)}... ${result?.match_raw_no_sig ? '✅' : '❌'}\n` +
+        `extra: ${result?.extra_fields?.join(', ') || 'none'}\n` +
         `len: ${result?.init_data_length || '?'}`
       )}
     </div>
