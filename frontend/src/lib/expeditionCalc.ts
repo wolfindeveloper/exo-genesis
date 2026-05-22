@@ -36,7 +36,7 @@ export function calculateZoneStats(
     effectiveFuelCost: Math.max(0, Math.round(effectiveFuelCost)),
     effectiveDuration: Math.max(0.5, effectiveDuration),
     fuelOk: shipFuelCurrent >= Math.max(0, Math.round(effectiveFuelCost)),
-    estimatedMaxDamage: Math.max(0, effectiveRisk * 15),
+    estimatedMaxDamage: Math.max(0, Math.round(effectiveRisk * 15 * 10) / 10),
     riskPercent: Math.min(100, Math.round(effectiveRisk * 100)),
     durationHours: Math.round(effectiveDuration * 10) / 10,
   }
