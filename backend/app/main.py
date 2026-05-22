@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, content, debug, expeditions, health, lab, system, user
+from app.routers import auth, content, expeditions, health, lab, system, user
 from app.services.content_loader import ContentLoader
 from bot.webhook import delete_webhook, set_webhook, router as bot_router
 
@@ -55,7 +55,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(debug.router)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(user.router)

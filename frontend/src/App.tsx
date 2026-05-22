@@ -3,7 +3,6 @@ import { AnimatePresence } from 'motion/react'
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
 
 import { BoxReveal } from './components/BoxReveal'
-import { HmacDebug } from './components/HmacDebug'
 import { Galaxy } from './pages/Galaxy'
 import { HudBar } from './components/HudBar'
 import { useGameStore } from './store/game'
@@ -82,9 +81,7 @@ function AppContent() {
       <div className="fixed top-0 left-0 right-0 z-[201] bg-yellow-900/80 p-1 text-center text-[9px] text-yellow-200 font-mono mt-10 whitespace-pre-wrap break-all">
         TG: {(window as any).Telegram?.WebApp ? '✅' : '❌'} |
         InitData: {(window as any).Telegram?.WebApp?.initData ? '✅' : '❌'}
-      </div>
-      <HmacDebug />
-      <NavBar />
+      </div>      <NavBar />
       <BoxReveal />
     </div>
   )

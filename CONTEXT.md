@@ -14,7 +14,7 @@
 - [x] Pydantic Settings (.env: supabase, bot, webhook, frontend)
 - [x] ContentLoader — ships (25), zones (25), elements (25), resources (10), boxes (1), artifacts (0)
 - [x] Supabase client + миграция (users, user_ships, user_inventory, expeditions, discoveries)
-- [x] Telegram InitData HMAC-SHA256 валидация
+- [x] Telegram InitData HMAC-SHA256 валидация (+ signature в check_string, Bot API 8.0)
 - [x] GET /user/profile — автосоздание юзера + open_box("nothing_extra_starter_pack") для новых
 - [x] PATCH /user/profile — обновление username
 - [x] GET /user/inventory, /user/ships, /user/stats
@@ -81,8 +81,8 @@
 - **GitHub:** https://github.com/wolfindeveloper/exo-genesis
 
 ## Relevant Files
-- backend/app/main.py: FastAPI entry, lifespan, CORS, 13 routes
-- backend/app/routers/auth.py: TMA валидация (POST /auth/validate)
+- backend/app/main.py: FastAPI entry, lifespan, CORS, 12 routes
+- backend/app/routers/auth.py: TMA валидация (initData HMAC-SHA256 + Ed25519)
 - backend/app/routers/user.py: GET/PATCH /user/profile — создание юзера + открытие бокса для новых
 - backend/app/routers/expeditions.py: старт/завершение экспедиций с calculate_zone_stats
 - backend/app/routers/lab.py: POST /lab/experiment с recipe validation + First Discoverer
