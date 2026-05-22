@@ -1,5 +1,8 @@
+import hashlib
+import hmac
 import logging
 import os
+from urllib.parse import parse_qsl
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from supabase import Client
@@ -29,6 +32,43 @@ async def debug_health():
             "settings_prefix": settings.bot_token[:4],
             "settings_suffix": settings.bot_token[-4:],
         },
+    }
+
+
+@router.get("/hmac")
+async def debug_hmac(
+    authorization: str = Header(None),
+):
+    if not authorization:
+        return {"ok": False, "error": "Missing Authorization header"}
+
+    init_data = authorization.removeprefix("tma ").strip()
+    parsed = dict(parse_qsl(init_data))
+    received_hash = parsed.pop("hash", "")
+    check_string = "\n".join(
+        f"{k}={v}" for k, v in sorted(parsed.items())
+    )
+
+    secret_key = hmac.new(
+        settings.bot_token.encode("utf-8"),
+        b"WebAppData",
+        hashlib.sha256,
+    ).digest()
+
+    expected_hash = hmac.new(
+        secret_key,
+        check_string.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    return {
+        "ok": received_hash == expected_hash,
+        "received_hash": received_hash,
+        "expected_hash": expected_hash,
+        "token_prefix": settings.bot_token[:6],
+        "token_len": len(settings.bot_token),
+        "keys": list(parsed.keys()),
+        "check_string": check_string[:200],
     }
 
 
