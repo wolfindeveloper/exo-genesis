@@ -1,0 +1,24 @@
+[
+  {
+    "id": "nothing_extra_starter_pack",
+    "name_key": "Набор «Ничего лишнего»",
+    "description_key": "Этот бокс был собран кем-то, кто знал, что вы всё равно потеряете половину содержимого в первом же астероидном поле. Мы просто ускорили процесс.",
+    "legend": "«Вы удивлены? Это нормально. Мы удивлены тем, что этот ящик вообще до вас добрался, учитывая, что гравитация в этом секторе работает по четвергам через раз. Внутри — стандартный набор для тех, кто решил, что космос — лучшее место для поиска смысла жизни (спойлер: смысл жизни — это хорошо прикрученная обшивка)».",
+    "icon_path": "/assets/boxes/starter.webp",
+    "tier": 1,
+    "guaranteed": [
+      { "type": "xgen", "quantity": 42 },
+      { "type": "xp", "quantity": 42 },
+      { "type": "ship", "pool": ["stella", "orion", "aurora", "vega", "zenith"], "stability": 100 },
+      { "type": "resource", "item_id": "fuel_t1", "quantity": 42 },
+      { "type": "resource", "item_id": "repair_kit_t1", "quantity": 42 }
+    ],
+    "random_drops": [
+      { "type": "element", "item_id": "blue_electrical_tape", "weight": 42, "min": 2, "max": 4 },
+      { "type": "element", "item_id": "compressed_luck", "weight": 42, "min": 2, "max": 4 },
+      { "type": "element", "item_id": "warp_paper_clip", "weight": 42, "min": 2, "max": 4 },
+      { "type": "element", "item_id": "frozen_confusion", "weight": 42, "min": 2, "max": 4 }
+    ],
+    "random_drops_count": 2
+  }
+]

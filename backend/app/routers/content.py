@@ -43,3 +43,29 @@ async def get_element(element_id: str, content: ContentLoader = Depends(get_cont
     if not element:
         raise HTTPException(status_code=404, detail="Element not found")
     return element
+
+
+@router.get("/resources")
+async def get_resources(content: ContentLoader = Depends(get_content_loader)):
+    return content.resources
+
+
+@router.get("/resources/{resource_id}")
+async def get_resource(resource_id: str, content: ContentLoader = Depends(get_content_loader)):
+    resource = content.get_resource(resource_id)
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    return resource
+
+
+@router.get("/boxes")
+async def get_boxes(content: ContentLoader = Depends(get_content_loader)):
+    return content.boxes
+
+
+@router.get("/boxes/{box_id}")
+async def get_box(box_id: str, content: ContentLoader = Depends(get_content_loader)):
+    box = content.get_box(box_id)
+    if not box:
+        raise HTTPException(status_code=404, detail="Box not found")
+    return box

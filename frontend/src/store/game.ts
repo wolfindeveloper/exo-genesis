@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Element, Expedition, ExperimentResult, InventoryItem, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Element, Expedition, ExperimentResult, InventoryItem, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 interface GameState {
@@ -13,9 +13,12 @@ interface GameState {
   shipsContent: ShipConfig[]
   zonesContent: Zone[]
   elementsContent: Element[]
+  resourcesContent: Resource[]
+  boxRewards: Record<string, unknown> | null
   isLoading: boolean
   error: string | null
 
+  initAuth: () => Promise<void>
   loadProfile: () => Promise<void>
   loadShips: () => Promise<void>
   loadInventory: () => Promise<void>
@@ -24,6 +27,8 @@ interface GameState {
   experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
   loadContent: () => Promise<void>
+  clearBoxRewards: () => void
+  updateNickname: (username: string) => Promise<void>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -36,8 +41,34 @@ export const useGameStore = create<GameState>((set, get) => ({
   shipsContent: [],
   zonesContent: [],
   elementsContent: [],
+  resourcesContent: [],
+  boxRewards: null,
   isLoading: false,
   error: null,
+
+  initAuth: async () => {
+    try {
+      set({ isLoading: true, error: null })
+      const data = await api.authInit()
+      const { is_new, box_rewards, ...rest } = data
+      set({ user: rest as UserProfile, boxRewards: (box_rewards as Record<string, unknown>) || null, isLoading: false })
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  clearBoxRewards: () => {
+    set({ boxRewards: null })
+  },
+
+  updateNickname: async (username: string) => {
+    try {
+      const updated = await api.updateProfile({ username })
+      set({ user: updated })
+    } catch (e) {
+      console.warn('Failed to update nickname:', e)
+    }
+  },
 
   loadProfile: async () => {
     try {
@@ -112,12 +143,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   loadContent: async () => {
     try {
-      const [shipsContent, zonesContent, elementsContent] = await Promise.all([
+      const [shipsContent, zonesContent, elementsContent, resourcesContent] = await Promise.all([
         api.getShipsContent(),
         api.getZonesContent(),
         api.getElementsContent(),
+        api.getResourcesContent(),
       ])
-      set({ shipsContent, zonesContent, elementsContent })
+      set({ shipsContent, zonesContent, elementsContent, resourcesContent })
     } catch (e) {
       console.warn('Content load failed:', e)
     }

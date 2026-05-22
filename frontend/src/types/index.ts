@@ -87,6 +87,15 @@ export interface ExperimentResult {
   xp_gained: number
 }
 
+export interface Resource {
+  id: string
+  name_key: string
+  description_key?: string
+  tier: number
+  resource_type: string
+  icon_path: string
+}
+
 export interface UserStats {
   total_expeditions: number
   completed_expeditions: number

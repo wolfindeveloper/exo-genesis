@@ -4,8 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from supabase import Client
 
+from app.core.dependencies import get_content_loader
 from app.models.user import UserProfile
 from app.services.auth import _validate_init_data
+from app.services.box_opener import open_box
+from app.services.content_loader import ContentLoader
 from app.services.supabase import get_supabase
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -23,6 +26,7 @@ class AuthResponse(UserProfile):
 async def validate_auth(
     body: AuthRequest,
     supabase: Client = Depends(get_supabase),
+    content: ContentLoader = Depends(get_content_loader),
 ):
     payload = _validate_init_data(body.init_data)
     tg_user = payload["user"]
@@ -56,21 +60,6 @@ async def validate_auth(
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to create user")
 
-    # Grant starter ship + initial elements
-    supabase.table("user_ships").insert({
-        "user_id": user_id,
-        "ship_config_id": "stella",
-        "stability": 100,
-        "fuel_current": 50,
-    }).execute()
-
-    starter_elements = ["blue_electrical_tape", "compressed_luck", "warp_paper_clip"]
-    for elem_id in starter_elements:
-        supabase.table("user_inventory").insert({
-            "user_id": user_id,
-            "item_type": "element",
-            "item_config_id": elem_id,
-            "quantity": 3,
-        }).execute()
+    open_box("starter_box", user_id, supabase, content)
 
     return AuthResponse(**result.data[0], is_new=True)

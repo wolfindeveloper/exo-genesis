@@ -1,4 +1,4 @@
-import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
+import type { Expedition, ExperimentResult, InventoryItem, Resource, Ship, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -27,11 +27,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   health: () => request<{ status: string }>('/health'),
 
-  auth: (initData: string) =>
-    request<UserProfile & { is_new: boolean }>('/auth/validate', {
-      method: 'POST',
-      body: JSON.stringify({ init_data: initData }),
-    }),
+  authInit: () =>
+    request<UserProfile & { is_new?: boolean; box_rewards?: Record<string, unknown> }>('/user/profile'),
 
   getProfile: () => request<UserProfile>('/user/profile'),
 
@@ -62,7 +59,14 @@ export const api = {
 
   getStats: () => request<UserStats>('/user/stats'),
 
+  updateProfile: (data: { username?: string }) =>
+    request<UserProfile>('/user/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
   getShipsContent: () => request<ShipConfig[]>('/content/ships'),
   getZonesContent: () => request<Zone[]>('/content/zones'),
   getElementsContent: () => request<Element[]>('/content/elements'),
+  getResourcesContent: () => request<Resource[]>('/content/resources'),
 }

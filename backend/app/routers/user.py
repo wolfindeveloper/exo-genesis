@@ -4,20 +4,64 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from supabase import Client
 
-from app.core.dependencies import get_current_user_id, get_db
+from app.core.dependencies import get_content_loader, get_current_user_id, get_db
 from app.models.user import UserProfile
+from app.services.box_opener import open_box
+from app.services.content_loader import ContentLoader
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.get("/profile", response_model=UserProfile)
+class ProfileResponse(UserProfile):
+    is_new: bool = False
+    box_rewards: dict | None = None
+
+
+class ProfileUpdate(BaseModel):
+    username: str | None = None
+
+
+@router.get("/profile", response_model=ProfileResponse)
 async def get_profile(
     user_id: str = Depends(get_current_user_id),
     db: Client = Depends(get_db),
+    content: ContentLoader = Depends(get_content_loader),
 ):
     result = db.table("users").select("*").eq("id", user_id).execute()
+    if result.data:
+        return ProfileResponse(**result.data[0], is_new=False)
+
+    now = datetime.now(timezone.utc).isoformat()
+    new_user = {
+        "id": user_id,
+        "balance_xgen": 0,
+        "balance_stars": 0,
+        "level": 1,
+        "xp": 0,
+        "streak_days": 0,
+        "created_at": now,
+        "last_login": now,
+    }
+    result = db.table("users").insert(new_user).execute()
     if not result.data:
-        return UserProfile(id=user_id)
+        return ProfileResponse(id=user_id, is_new=True)
+
+    rewards = open_box("nothing_extra_starter_pack", user_id, db, content)
+    return ProfileResponse(**result.data[0], is_new=True, box_rewards=rewards)
+
+
+@router.patch("/profile", response_model=UserProfile)
+async def patch_profile(
+    body: ProfileUpdate,
+    user_id: str = Depends(get_current_user_id),
+    db: Client = Depends(get_db),
+):
+    updates = {}
+    if body.username is not None:
+        updates["username"] = body.username
+    if updates:
+        db.table("users").update(updates).eq("id", user_id).execute()
+    result = db.table("users").select("*").eq("id", user_id).execute()
     return UserProfile(**result.data[0])
 
 

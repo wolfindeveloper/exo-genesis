@@ -1,16 +1,35 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { fadeIn, staggerContainer, xpBarVariants } from '../lib/animations'
 import { useGameStore } from '../store/game'
 
 export function Profile() {
-  const { user, stats, loadProfile, loadStats } = useGameStore()
+  const { user, stats, loadProfile, loadStats, updateNickname } = useGameStore()
+  const [editing, setEditing] = useState(false)
+  const [nick, setNick] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadProfile()
     loadStats()
   }, [])
+
+  useEffect(() => {
+    if (user) setNick(user.username || '')
+  }, [user])
+
+  const saveNick = useCallback(async () => {
+    const trimmed = nick.trim()
+    if (trimmed && trimmed !== user?.username) {
+      await updateNickname(trimmed)
+    }
+    setEditing(false)
+  }, [nick, user, updateNickname])
+
+  const tg = (window as any).Telegram?.WebApp
+  const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
+  const first = tg?.initDataUnsafe?.user?.first_name
 
   if (!user) return <div className="p-4 pb-28"><div className="shimmer rounded-xl h-40" /></div>
 
@@ -23,8 +42,51 @@ export function Profile() {
     <div className="p-4 pb-28">
       <motion.header className="mb-6" variants={fadeIn} initial="hidden" animate="visible">
         <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-cyan">Профиль</h1>
-        <p className="text-xs text-slate-500 mt-1">{user.username || 'Без имени'}</p>
       </motion.header>
+
+      {/* Avatar + Nickname */}
+      <motion.div
+        className="glass-card p-5 mb-4 text-center"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple mx-auto mb-3 overflow-hidden">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xl font-display text-white">
+              {(first || '?')[0]}
+            </div>
+          )}
+        </div>
+
+        {editing ? (
+          <div className="flex items-center justify-center gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={nick}
+              onChange={(e) => setNick(e.target.value)}
+              onBlur={saveNick}
+              onKeyDown={(e) => { if (e.key === 'Enter') saveNick() }}
+              className="bg-space-600 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center text-slate-200 outline-none focus:border-neon-cyan/50 w-48"
+              maxLength={32}
+              autoFocus
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-sm text-slate-200">{user.username || first || 'Капитан'}</span>
+            <button
+              onClick={() => { setEditing(true); setTimeout(() => inputRef.current?.focus(), 0) }}
+              className="text-slate-500 hover:text-slate-300 transition-colors text-xs"
+            >
+              ✏️
+            </button>
+          </div>
+        )}
+      </motion.div>
 
       {/* Level & XP */}
       <motion.div

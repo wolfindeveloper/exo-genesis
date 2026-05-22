@@ -1,0 +1,25 @@
+# Lock files — their package entries drown out real code relationships
+**/package-lock.json
+**/pnpm-lock.yaml
+**/yarn.lock
+**/bun.lock
+
+# node_modules — third-party deps, not our code
+**/node_modules/
+
+# Build artifacts and generated files
+**/dist/
+**/build/
+**/.next/
+**/__pycache__/
+**/*.pyc
+**/out/
+
+# Git internals
+.git/
+
+# .opencode tooling (not project code)
+.opencode/
+
+# Graphify output (circular — don't re-analyze our own graph)
+graphify-out/
