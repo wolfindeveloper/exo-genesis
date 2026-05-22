@@ -44,7 +44,7 @@ interface HmacResult {
 export function HmacDebug() {
   const [result, setResult] = useState<HmacResult | null>(null)
   const [loading, setLoading] = useState(false)
-  const [showFull, setShowFull] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp
@@ -64,20 +64,20 @@ export function HmacDebug() {
     <div className="fixed bottom-16 left-0 right-0 z-[201] bg-gray-900/95 p-2 text-center text-[9px] text-gray-300 font-mono whitespace-pre-wrap break-all">
       {loading ? 'Checking HMAC...' : result?.error ? `HMAC error: ${result.error}` : (
         <>
-          <div className="mb-1 text-gray-400" onClick={() => setShowFull(!showFull)} style={{cursor:'pointer'}}>
-            {showFull ? '▼' : '▶'} HMAC
+          <div style={{fontSize:'7px',lineHeight:'1.1'}} className="text-gray-500 text-left mb-1 break-all max-h-24 overflow-y-auto">
+            InitData ({result?.init_data_length}ch):
+            <br/>{result?.init_data_received || result?.init_data || '?'}
+            <button
+              onClick={() => {navigator.clipboard.writeText(result?.init_data_received || result?.init_data || ''); setCopied(true); setTimeout(()=>setCopied(false),2000)}}
+              className="ml-1 text-blue-400 hover:text-blue-300"
+            >{copied ? '✓' : '📋'}</button>
           </div>
-          {showFull && (
-            <div className="text-[8px] text-gray-500 text-left mb-1 break-all max-h-40 overflow-y-auto">
-              InitData: {result?.init_data_received || result?.init_data || '?'}
-            </div>
-          )}
-          {`hash:${(result?.received_hash||'?').slice(0,10)}…  sig:${(result?.received_signature||'?').slice(0,10)}…\n` +
-          `dec→h:${result?.match_decoded_vs_hash?'✅':'❌'} →s:${result?.match_decoded_vs_sig?'✅':'❌'} nσ→h:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'} →s:${result?.match_decoded_no_sig_vs_sig?'✅':'❌'}\n` +
-          `raw→h:${result?.match_raw_vs_hash?'✅':'❌'} →s:${result?.match_raw_vs_sig?'✅':'❌'} nσ→h:${result?.match_raw_no_sig_vs_hash?'✅':'❌'} →s:${result?.match_raw_no_sig_vs_sig?'✅':'❌'}\n` +
-          `stp→h:${result?.match_hmac_strip_vs_hash?'✅':'❌'} →s:${result?.match_hmac_strip_vs_sig?'✅':'❌'} ednσ→h:${result?.match_ed_strip_vs_hash?'✅':'❌'} →s:${result?.match_ed_strip_vs_sig?'✅':'❌'}\n` +
+          {`hash:${(result?.received_hash||'?').slice(0,10)}… sig:${(result?.received_signature||'?').slice(0,10)}…\n` +
+          `dec→h:${result?.match_decoded_vs_hash?'✅':'❌'} nσ→h:${result?.match_decoded_no_sig_vs_hash?'✅':'❌'}\n` +
+          `raw→h:${result?.match_raw_vs_hash?'✅':'❌'} nσ→h:${result?.match_raw_no_sig_vs_hash?'✅':'❌'}\n` +
+          `stp→h:${result?.match_hmac_strip_vs_hash?'✅':'❌'} ednσ→h:${result?.match_ed_strip_vs_hash?'✅':'❌'}\n` +
           `ed25519:${result?.ed25519_ok === true?'✅':result?.ed25519_ok === false?'❌':'?'}\n` +
-          `sha256|dec:${(result?.cs_sha256_decoded||'?').slice(0,8)}…|raw:${(result?.cs_sha256_raw||'?').slice(0,8)}…|stp:${(result?.cs_sha256_hmac_strip||'?').slice(0,8)}…|ednσ:${(result?.cs_sha256_ed_strip||'?').slice(0,8)}…`
+          `sha256|d:${(result?.cs_sha256_decoded||'?').slice(0,8)}…r:${(result?.cs_sha256_raw||'?').slice(0,8)}…s:${(result?.cs_sha256_hmac_strip||'?').slice(0,8)}…e:${(result?.cs_sha256_ed_strip||'?').slice(0,8)}…`
         </>
       )}
     </div>
