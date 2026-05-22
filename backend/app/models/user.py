@@ -6,13 +6,13 @@ from pydantic import BaseModel
 class UserCreate(BaseModel):
     id: str
     username: str | None = None
-    language_code: str = "en"
+    language_code: str | None = "en"
 
 
 class UserProfile(BaseModel):
     id: str
     username: str | None = None
-    language_code: str = "en"
+    language_code: str | None = "en"
     balance_xgen: int = 0
     balance_stars: int = 0
     level: int = 1

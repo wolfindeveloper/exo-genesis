@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from supabase import Client
 
-from app.core.dependencies import get_content_loader, get_current_user_id, get_db
+from app.core.dependencies import get_content_loader, get_current_user_id, get_db, get_init_data_payload
 from app.models.user import UserProfile
 from app.services.box_opener import open_box
 from app.services.content_loader import ContentLoader
@@ -24,16 +24,25 @@ class ProfileUpdate(BaseModel):
 @router.get("/profile", response_model=ProfileResponse)
 async def get_profile(
     user_id: str = Depends(get_current_user_id),
+    payload: dict = Depends(get_init_data_payload),
     db: Client = Depends(get_db),
     content: ContentLoader = Depends(get_content_loader),
 ):
+    now = datetime.now(timezone.utc).isoformat()
+    tg_user = payload["user"]
+
     result = db.table("users").select("*").eq("id", user_id).execute()
     if result.data:
+        db.table("users").update({
+            "last_login": now,
+            "username": tg_user.get("username", result.data[0].get("username", "")),
+        }).eq("id", user_id).execute()
         return ProfileResponse(**result.data[0], is_new=False)
 
-    now = datetime.now(timezone.utc).isoformat()
     new_user = {
         "id": user_id,
+        "username": tg_user.get("username", ""),
+        "language_code": tg_user.get("language_code", "en"),
         "balance_xgen": 0,
         "balance_stars": 0,
         "level": 1,

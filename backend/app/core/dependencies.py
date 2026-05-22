@@ -16,13 +16,18 @@ async def get_settings():
     return settings
 
 
-async def get_current_user_id(
+async def get_init_data_payload(
     authorization: str = Header(None),
-) -> str:
+) -> dict:
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing Authorization header")
     init_data = authorization.removeprefix("tma ").strip()
-    payload = _validate_init_data(init_data)
+    return _validate_init_data(init_data)
+
+
+async def get_current_user_id(
+    payload: dict = Depends(get_init_data_payload),
+) -> str:
     return str(payload["user"]["id"])
 
 
