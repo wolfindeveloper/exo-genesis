@@ -53,6 +53,7 @@ function AppContent() {
   const location = useLocation()
   const loadContent = useGameStore((s) => s.loadContent)
   const initAuth = useGameStore((s) => s.initAuth)
+  const error = useGameStore((s) => s.error)
 
   useEffect(() => {
     initAuth()
@@ -72,6 +73,11 @@ function AppContent() {
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         </Routes>
       </AnimatePresence>
+      {error && (
+        <div className="fixed top-0 left-0 right-0 z-[200] bg-red-900/90 backdrop-blur-xl p-3 text-center text-xs text-red-200 font-mono">
+          {error}
+        </div>
+      )}
       <NavBar />
       <BoxReveal />
     </div>
