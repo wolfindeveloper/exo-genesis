@@ -45,6 +45,7 @@ export function HmacDebug() {
   const [result, setResult] = useState<HmacResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp
@@ -78,6 +79,28 @@ export function HmacDebug() {
                 onClick={() => {navigator.clipboard.writeText(r.init_data_received || r.init_data || ''); setCopied(true); setTimeout(()=>setCopied(false),2000)}}
                 className="ml-1 text-blue-400 hover:text-blue-300"
               >{copied ? 'Y' : 'C'}</button>
+              {' '}<button
+                disabled={deleting}
+                onClick={async () => {
+                  if (!confirm('Delete user?')) return
+                  setDeleting(true)
+                  try {
+                    const tg = (window as any).Telegram?.WebApp
+                    if (!tg?.initData) return
+                    await fetch(BASE_URL+'/debug/delete-me', {
+                      method:'POST',
+                      headers:{'Authorization':'tma '+tg.initData}
+                    })
+                    alert('Deleted! Close & reopen Mini App')
+                    window.location.reload()
+                  } catch(e) {
+                    alert('Delete failed')
+                  } finally {
+                    setDeleting(false)
+                  }
+                }}
+                className="text-red-400 hover:text-red-300"
+              >{deleting ? '...' : 'DEL'}</button>
             </div>
             {'hash:'+(r.received_hash||'?').slice(0,10)+' sig:'+(r.received_signature||'?').slice(0,10)+'\n'+
             'dec:'+ch(r.match_decoded_vs_hash)+'/'+ch(r.match_decoded_no_sig_vs_hash)+' '+
