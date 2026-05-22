@@ -253,6 +253,16 @@ async def debug_hmac(
     }
 
 
+@router.get("/raw")
+async def debug_raw_init_data(
+    authorization: str = Header(None),
+):
+    if not authorization:
+        return {"error": "Missing Authorization header"}
+    init_data = authorization.removeprefix("tma ").strip()
+    return {"init_data": init_data}
+
+
 @router.get("/validate")
 async def debug_validate(
     authorization: str = Header(None),
