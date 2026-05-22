@@ -11,6 +11,34 @@ def _rng(seed_base: str, zone_id: str, user_id: str) -> random.Random:
     return random.Random(int(digest[:8], 16))
 
 
+def calculate_zone_stats(
+    zone_config: dict,
+    ship_stability: float,
+    ship_speed_mod: float,
+    ship_fuel_current: int,
+    artifact_bonuses: list[dict] | None = None,
+) -> dict:
+    total_speed_bonus = sum(a.get("speed_mod", 0) for a in (artifact_bonuses or []))
+    total_stability_bonus = sum(a.get("stability_bonus", 0) for a in (artifact_bonuses or []))
+    total_fuel_efficiency = sum(a.get("fuel_efficiency", 0) for a in (artifact_bonuses or []))
+
+    risk_factor = zone_config.get("risk_factor", 0.1)
+    fuel_cost = zone_config.get("fuel_cost", 10)
+    duration_hours = zone_config.get("duration_hours", 4)
+
+    effective_risk = risk_factor * (1 - ship_stability / 200) - total_stability_bonus
+    effective_fuel_cost = fuel_cost * (1 - total_fuel_efficiency)
+    effective_duration = duration_hours / ship_speed_mod * (1 - total_speed_bonus)
+
+    return {
+        "effective_risk": round(max(0, effective_risk), 4),
+        "effective_fuel_cost": max(0, round(effective_fuel_cost)),
+        "effective_duration": max(0.5, round(effective_duration, 1)),
+        "fuel_ok": ship_fuel_current >= max(0, round(effective_fuel_cost)),
+        "estimated_max_damage": round(max(0, effective_risk * 15), 1),
+    }
+
+
 def calculate_loot(
     zone_config: dict,
     user_id: str,

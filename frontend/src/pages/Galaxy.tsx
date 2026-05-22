@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { ZoneCard } from '../components/ZoneCard'
+import { ZoneModal } from '../components/ZoneModal'
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
@@ -11,81 +12,25 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Galaxy() {
-  const { ships: userShips, zonesContent: zones, shipsContent, startExpedition, isLoading } = useGameStore()
-  const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
-  const [showShipPicker, setShowShipPicker] = useState(false)
+  const { zonesContent: zones, startExpedition, isLoading } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
+  const [zoneModal, setZoneModal] = useState<Zone | null>(null)
 
-  const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
-  const idleShips = userShips.filter((s) => s.status === 'idle')
-  const selectedShip = idleShips.find((s) => s.id === selectedShipId)
   const maxTier = Math.max(...zones.map((z) => z.tier), 1)
-
   const filteredZones = zones.filter((z) => z.tier === tierFilter)
 
-  const handleSelectZone = async (zone: Zone) => {
-    if (!selectedShipId) return
-    await startExpedition(selectedShipId, zone.id)
+  const handleStartFromModal = async (shipId: string) => {
+    if (!zoneModal) return
+    await startExpedition(shipId, zoneModal.id)
+    setZoneModal(null)
   }
 
   return (
     <div className="p-4 pb-28">
       <motion.header className="mb-5" variants={fadeIn} initial="hidden" animate="visible">
         <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-purple">Галактика</h1>
-        <p className="text-xs text-slate-500 mt-1">Выбери зону для исследования</p>
+        <p className="text-xs text-slate-500 mt-1">Нажми на зону для просмотра</p>
       </motion.header>
-
-      {/* Ship selector */}
-      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="mb-5">
-        <label className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 block">Корабль</label>
-        {idleShips.length === 0 ? (
-          <div className="glass-card p-3 text-center">
-            <p className="text-[11px] text-neon-amber/70">Нет свободных кораблей</p>
-          </div>
-        ) : (
-          <>
-            <button
-              onClick={() => setShowShipPicker(!showShipPicker)}
-              className="w-full glass-card p-3 text-left flex items-center justify-between"
-            >
-              {selectedShip ? (
-                <div>
-                  <p className="text-sm font-medium">{shipConfigLookup.get(selectedShip.ship_config_id)?.name_key || selectedShip.ship_config_id}</p>
-                  <p className="text-[10px] text-slate-500">⛽ {selectedShip.fuel_current} · ⚡ {selectedShip.stability}%</p>
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500">Нажми, чтобы выбрать...</p>
-              )}
-              <span className={`transition-transform ${showShipPicker ? 'rotate-180' : ''}`}>▾</span>
-            </button>
-            <AnimatePresence>
-              {showShipPicker && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: 'auto' }}
-                  exit={{ opacity: 0, y: -8, height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="glass-card mt-1 p-1 flex flex-col">
-                    {idleShips.map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => { setSelectedShipId(s.id); setShowShipPicker(false) }}
-                        className={`text-left p-2.5 rounded-lg text-sm transition ${
-                          selectedShipId === s.id ? 'bg-neon-purple/20' : 'hover:bg-space-600/80'
-                        }`}
-                      >
-                        <span className="font-medium">{shipConfigLookup.get(s.ship_config_id)?.name_key || s.ship_config_id}</span>
-                        <span className="text-slate-500 ml-2 text-xs">⛽ {s.fuel_current} · ⚡ {Math.round(s.stability)}%</span>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
-      </motion.div>
 
       {/* Tier filter */}
       <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-4 overflow-x-auto pb-1">
@@ -124,10 +69,22 @@ export function Galaxy() {
             </div>
           ) : (
             filteredZones.map((zone, i) => (
-              <ZoneCard key={zone.id} zone={zone} onSelect={handleSelectZone} disabled={!selectedShipId || isLoading} index={i} />
+              <ZoneCard key={zone.id} zone={zone} onSelect={() => setZoneModal(zone)} index={i} />
             ))
           )}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Zone modal */}
+      <AnimatePresence>
+        {zoneModal && (
+          <ZoneModal
+            zone={zoneModal}
+            onClose={() => setZoneModal(null)}
+            onStart={handleStartFromModal}
+            isLoading={isLoading}
+          />
+        )}
       </AnimatePresence>
     </div>
   )

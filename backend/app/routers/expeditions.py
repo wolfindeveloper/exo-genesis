@@ -12,7 +12,7 @@ from app.core.dependencies import (
 )
 from app.models.expedition import Expedition
 from app.services.content_loader import ContentLoader
-from app.services.expedition_logic import calculate_damage, calculate_loot
+from app.services.expedition_logic import calculate_damage, calculate_loot, calculate_zone_stats
 
 router = APIRouter(prefix="/expeditions", tags=["expeditions"])
 
@@ -37,24 +37,6 @@ async def start_expedition(
     if not zone_config:
         raise HTTPException(status_code=404, detail="Zone not found")
 
-    ship_config = content.get_ship(
-        next(
-            (
-                s["ship_config_id"]
-                for s in (
-                    db.table("user_ships")
-                    .select("ship_config_id")
-                    .eq("id", body.ship_id)
-                    .eq("user_id", user_id)
-                    .execute()
-                ).data
-            ),
-            "",
-        )
-    )
-    if not ship_config:
-        raise HTTPException(status_code=404, detail="Ship not found")
-
     ships_result = (
         db.table("user_ships")
         .select("*")
@@ -70,18 +52,35 @@ async def start_expedition(
     if ship["status"] != "idle":
         raise HTTPException(status_code=400, detail="Ship is not idle")
 
-    fuel_cost = zone_config.get("fuel_cost", 10)
-    if ship["fuel_current"] < fuel_cost:
-        raise HTTPException(status_code=400, detail="Insufficient fuel")
+    ship_config = content.get_ship(ship["ship_config_id"])
+    if not ship_config:
+        raise HTTPException(status_code=404, detail="Ship config not found")
 
-    duration = timedelta(hours=zone_config.get("duration_hours", 4))
-    now = datetime.now(timezone.utc)
-    end_time = now + duration
+    # Resolve artifact bonuses from equipped artifacts
+    artifacts = []
+    for a_id in ship.get("equipped_artifacts", []):
+        a = content.get_artifact(a_id)
+        if a and "stats_modifiers" in a:
+            artifacts.append(a["stats_modifiers"])
+
+    stats = calculate_zone_stats(
+        zone_config=zone_config,
+        ship_stability=ship["stability"],
+        ship_speed_mod=ship_config["stats"]["speed_mod"],
+        ship_fuel_current=ship["fuel_current"],
+        artifact_bonuses=artifacts,
+    )
+
+    if not stats["fuel_ok"]:
+        raise HTTPException(status_code=400, detail="Insufficient fuel")
 
     db.table("user_ships").update({
         "status": "expedition",
-        "fuel_current": ship["fuel_current"] - fuel_cost,
+        "fuel_current": ship["fuel_current"] - stats["effective_fuel_cost"],
     }).eq("id", body.ship_id).execute()
+
+    now = datetime.now(timezone.utc)
+    end_time = now + timedelta(hours=stats["effective_duration"])
 
     expedition_data = {
         "user_id": user_id,
