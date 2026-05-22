@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Expedition, ExperimentResult, InventoryItem, Ship, UserProfile, UserStats } from '../types'
+import type { Element, Expedition, ExperimentResult, InventoryItem, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 interface GameState {
@@ -10,6 +10,9 @@ interface GameState {
   activeExpedition: Expedition | null
   lastExperiment: ExperimentResult | null
   stats: UserStats | null
+  shipsContent: ShipConfig[]
+  zonesContent: Zone[]
+  elementsContent: Element[]
   isLoading: boolean
   error: string | null
 
@@ -20,6 +23,7 @@ interface GameState {
   claimExpedition: (expeditionId: string) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
+  loadContent: () => Promise<void>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -29,6 +33,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeExpedition: null,
   lastExperiment: null,
   stats: null,
+  shipsContent: [],
+  zonesContent: [],
+  elementsContent: [],
   isLoading: false,
   error: null,
 
@@ -100,6 +107,19 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ stats })
     } catch (e) {
       set({ error: (e as Error).message })
+    }
+  },
+
+  loadContent: async () => {
+    try {
+      const [shipsContent, zonesContent, elementsContent] = await Promise.all([
+        api.getShipsContent(),
+        api.getZonesContent(),
+        api.getElementsContent(),
+      ])
+      set({ shipsContent, zonesContent, elementsContent })
+    } catch (e) {
+      console.warn('Content load failed:', e)
     }
   },
 }))

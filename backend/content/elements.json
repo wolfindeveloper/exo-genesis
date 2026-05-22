@@ -1,82 +1,202 @@
 [
   {
-    "id": "elem_hydrogen",
-    "name_key": "Водород",
-    "description_key": "Самый распространённый элемент во вселенной. Основа звёздного топлива.",
+    "id": "blue_electrical_tape",
+    "name_key": "Синяя Изолента «Вечность»",
+    "description_key": "Изначально разработана для удержания галактик вместе, но потом кто-то решил, что дешевле просто клеить ею бамперы",
     "tier": 1,
     "rarity": "common",
-    "icon_path": "/assets/elements/hydrogen.webp"
+    "icon_path": "/assets/elements/blue_electrical_tape.webp"
   },
   {
-    "id": "elem_helium",
-    "name_key": "Гелий",
-    "description_key": "Инертный газ, побочный продукт звёздного синтеза. Используется в системах охлаждения.",
+    "id": "compressed_luck",
+    "name_key": "Спрессованная Удача",
+    "description_key": "Кубик, который всегда выпадает шестеркой, если вы не смотрите на него. Если смотрите — он просто делает вид, что он камень.",
     "tier": 1,
     "rarity": "common",
-    "icon_path": "/assets/elements/helium.webp"
+    "icon_path": "/assets/elements/compressed_luck.webp"
   },
   {
-    "id": "elem_carbon",
-    "name_key": "Углерод",
-    "description_key": "Основа органической жизни. Кристаллические формы ценятся в нанотехнологиях.",
+    "id": "warp_paper_clip",
+    "name_key": "Канцелярская Скрепка «Варп»",
+    "description_key": "Найдена в кармане конструктора, который создавал систему прыжков. Она идеально держит двигатель, пока вы не начнете верить, что он может сломаться.",
     "tier": 1,
     "rarity": "common",
-    "icon_path": "/assets/elements/carbon.webp"
+    "icon_path": "/assets/elements/warp_paper_clip.webp"
   },
   {
-    "id": "elem_iron",
-    "name_key": "Железо",
-    "description_key": "Прочный конструкционный материал. Используется в корпусах кораблей и станций.",
+    "id": "frozen_confusion",
+    "name_key": "Застывшее Смущение",
+    "description_key": "Розовые кристаллы. Появляются, когда планеты совершают глупые ошибки. Эффективны против врагов, так как смущают их сенсоры до перезагрузки.",
     "tier": 1,
     "rarity": "common",
-    "icon_path": "/assets/elements/iron.webp"
+    "icon_path": "/assets/elements/frozen_confusion.webp"
   },
   {
-    "id": "elem_silicon",
-    "name_key": "Кремний",
-    "description_key": "Полупроводниковый элемент. Ключевой компонент корабельных процессоров и сенсоров.",
+    "id": "the_battery_will_die_tomorrow",
+    "name_key": "Батарейка «Сядет завтра»",
+    "description_key": "Постоянно утверждает, что у неё осталось 1% заряда, уже 400 лет подряд. Самый надежный источник энергии в секторе.",
     "tier": 1,
     "rarity": "common",
-    "icon_path": "/assets/elements/silicon.webp"
+    "icon_path": "/assets/elements/the_battery_will_die_tomorrow.webp"
   },
   {
-    "id": "elem_titanium",
-    "name_key": "Титан",
-    "description_key": "Лёгкий и невероятно прочный металл. Используется в броне высокого класса.",
+    "id": "custom_rivet_set",
+    "name_key": "Набор Кастомных Заклепок",
+    "description_key": "Были сняты со старых стиральных машин, которые научились летать в другой реальности.",
     "tier": 2,
     "rarity": "uncommon",
-    "icon_path": "/assets/elements/titanium.webp"
+    "icon_path": "/assets/elements/custom_rivet_set.webp"
   },
   {
-    "id": "elem_uranium",
-    "name_key": "Уран",
-    "description_key": "Тяжёлый радиоактивный элемент. Источник энергии для реакторов дальнего действия.",
+    "id": "pride_of_cows_liquid_methane",
+    "name_key": "Жидкий Метан «Гордость Коров»",
+    "description_key": "Добывается на фермерских планетах. Корабли на нем не просто летят, они «чувствуют себя счастливыми» (по крайней мере, так думают коровы).",
     "tier": 2,
     "rarity": "uncommon",
-    "icon_path": "/assets/elements/uranium.webp"
+    "icon_path": "/assets/elements/pride_of_cows_liquid_methane.webp"
   },
   {
-    "id": "elem_quantum_crystal",
-    "name_key": "Квантовый Кристалл",
-    "description_key": "Кристаллическая структура с уникальными квантовыми свойствами. Позволяет создавать стабильные червоточины.",
+    "id": "the_singular_button",
+    "name_key": "Сингулярная Пуговица",
+    "description_key": "Если её пришить к обшивке, корабль становится визуально тяжелее, даже если внутри пусто. Очень престижно.",
+    "tier": 2,
+    "rarity": "uncommon",
+    "icon_path": "/assets/elements/the_singular_button.webp"
+  },
+  {
+    "id": "quick_no_lubricant",
+    "name_key": "Смазка «Быстрое НЕТ»",
+    "description_key": "Идеальна для поршней. При попытке поломки поршень просто «говорит» нет, и поломка отменяется.",
+    "tier": 2,
+    "rarity": "uncommon",
+    "icon_path": "/assets/elements/quick_no_lubricant.webp"
+  },
+  {
+    "id": "reflector_of_views",
+    "name_key": "Отражатель Взглядов",
+    "description_key": "Пластина, которая делает ваш корабль невидимым, потому что наблюдателю становится скучно на него смотреть.",
+    "tier": 2,
+    "rarity": "uncommon",
+    "icon_path": "/assets/elements/reflector_of_views.webp"
+  },
+  {
+    "id": "the_dust_of_paradoxes",
+    "name_key": "Пыль Парадоксов",
+    "description_key": "Она одновременно есть, её нет, и она должна была быть здесь вчера. Лучший материал для щитов.",
     "tier": 3,
     "rarity": "rare",
-    "icon_path": "/assets/elements/quantum_crystal.webp"
+    "icon_path": "/assets/elements/dust_of_paradoxes.webp"
   },
   {
-    "id": "elem_dark_matter",
-    "name_key": "Тёмная Материя",
-    "description_key": "Загадочная субстанция, составляющая большую часть массы вселенной. Крайне нестабильна в обычном пространстве.",
+    "id": "logic_gate_inverter",
+    "name_key": "Логический Вентиль-Отказник",
+    "description_key": "Компонент, который принципиально не понимает, почему корабль должен ломаться, если он исправен.",
+    "tier": 3,
+    "rarity": "rare",
+    "icon_path": "/assets/elements/logic_gate_inverter.webp"
+  },
+  {
+    "id": "chrome_nostalgia",
+    "name_key": "Хромированная Ностальгия",
+    "description_key": "Делает корабль таким блестящим, что враги забывают, зачем они прилетели — они просто любуются отражением.",
+    "tier": 3,
+    "rarity": "rare",
+    "icon_path": "/assets/elements/chrome_nostalgia.webp"
+  },
+  {
+    "id": "quantum_stabilizer",
+    "name_key": "Квантовый Стабилизатор",
+    "description_key": "Единственная деталь, которая знает, где находится ваш корабль в пространстве (даже если вы сами не знаете).",
+    "tier": 3,
+    "rarity": "rare",
+    "icon_path": "/assets/elements/quantum_stabilizer.webp"
+  },
+  {
+    "id": "bergamot_crystal",
+    "name_key": "Кристалл Бергамота",
+    "description_key": "Осадок из Туманности «Тёплый Чай». Позволяет двигателю работать на «уютной тяге», издавая звук кипящего чайника.",
+    "tier": 3,
+    "rarity": "rare",
+    "icon_path": "/assets/elements/bergamot_crystal.webp"
+  },
+  {
+    "id": "essential_oil_condensate",
+    "name_key": "Эфирный Конденсат",
+    "description_key": "Жидкость, собранная из пустоты. Пахнет дорогими кредитами и чужим успехом.",
     "tier": 4,
     "rarity": "epic",
-    "icon_path": "/assets/elements/dark_matter.webp"
+    "icon_path": "/assets/elements/essential_oil_condensate.webp"
   },
   {
-    "id": "elem_void_essence",
-    "name_key": "Эссенция Пустоты",
-    "description_key": "Материя из межвселенского пространства. Считается ключом к пониманию фундаментальных законов реальности.",
+    "id": "the_fractal_of_greatness",
+    "name_key": "Фрактал Величия",
+    "description_key": "Если смотреть на него долго, можно увидеть, как вы становитесь королем сектора. Но только в своем воображении.",
+    "tier": 4,
+    "rarity": "epic",
+    "icon_path": "/assets/elements/the_fractal_of_greatness.webp"
+  },
+  {
+    "id": "fragments_of_a_deal",
+    "name_key": "Осколки Сделки",
+    "description_key": "Фрагменты контракта, по которому Вселенная обязалась работать исправно. Позволяет «договориться» с законом физики.",
+    "tier": 4,
+    "rarity": "epic",
+    "icon_path": "/assets/elements/fragments_of_a_deal.webp"
+  },
+  {
+    "id": "condensation_of_possibilities",
+    "name_key": "Конденсат Возможностей",
+    "description_key": "Позволяет восстановить обшивку, просто убедив атомы металла, что они не были повреждены.",
+    "tier": 4,
+    "rarity": "epic",
+    "icon_path": "/assets/elements/condensation_of_possibilities.webp"
+  },
+  {
+    "id": "the_core_of_reality",
+    "name_key": "Ядро Реальности",
+    "description_key": "Плотный сгусток, из которого строят миры, но капитан 4-го тира решил, что из него выйдет отличный двигатель.",
+    "tier": 4,
+    "rarity": "epic",
+    "icon_path": "/assets/elements/the_core_of_reality.webp"
+  },
+  {
+    "id": "the_universe's_bug_report",
+    "name_key": "Баг-репорт Мироздания",
+    "description_key": "Если вставить это в ядро, вы становитесь «багом», который система просто боится удалять.",
     "tier": 5,
     "rarity": "legendary",
-    "icon_path": "/assets/elements/void_essence.webp"
+    "icon_path": "/assets/elements/the_universe's_bug_report.webp"
+  },
+  {
+    "id": "the_demiurge's_ink",
+    "name_key": "Чернила Демиурга",
+    "description_key": "Любое слово, написанное ими на корпусе, становится законом для физики этого сектора.",
+    "tier": 5,
+    "rarity": "legendary",
+    "icon_path": "/assets/elements/the_demiurge's_ink.webp"
+  },
+  {
+    "id": "absolute_zero",
+    "name_key": "Абсолютный Ноль",
+    "description_key": "Кнопка «Выключить» для всей реальности вокруг. Позволяет взять паузу, пока Вселенная перезагружается.",
+    "tier": 5,
+    "rarity": "legendary",
+    "icon_path": "/assets/elements/absolute_zero.webp"
+  },
+  {
+    "id": "the_holy_spoon",
+    "name_key": "Святая Ложка",
+    "description_key": "Единственный предмет, способный выдержать Темную энергию. Именно ей Создатель размешивал первородный бульон.",
+    "tier": 5,
+    "rarity": "legendary",
+    "icon_path": "/assets/elements/the_holy_spoon.webp"
+  },
+  {
+    "id": "the_pen_of_laughter",
+    "name_key": "Перо Смеха",
+    "description_key": "Выпало из хвоста Космической Утки. Любой корабль с этим элементом неуязвим, потому что Вселенной слишком смешно пытаться его уничтожить.",
+    "tier": 5,
+    "rarity": "legendary",
+    "icon_path": "/assets/elements/the_pen_of_laughter.webp"
   }
 ]

@@ -6,65 +6,7 @@ import { fadeIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
 
-const ZONES: Zone[] = [
-  {
-    id: 'zone_nebula_alpha', name_key: 'Туманность Альфа',
-    description_key: 'Разреженное облако ионизированного газа на окраине сектора. Безопасная зона для начинающих исследователей.',
-    tier: 1, risk_factor: 0.1, duration_hours: 4, fuel_cost: 10,
-    loot_table: [
-      { item_id: 'elem_hydrogen', weight: 40, min: 1, max: 3 },
-      { item_id: 'elem_helium', weight: 30, min: 1, max: 2 },
-      { item_id: 'fuel_refined', weight: 30, min: 5, max: 15 },
-    ],
-  },
-  {
-    id: 'zone_asteroid_belt', name_key: 'Пояс Астероидов',
-    description_key: 'Густое скопление каменных и металлических астероидов. Богатый источник редкоземельных элементов.',
-    tier: 1, risk_factor: 0.15, duration_hours: 6, fuel_cost: 15,
-    loot_table: [
-      { item_id: 'elem_iron', weight: 40, min: 1, max: 4 },
-      { item_id: 'elem_silicon', weight: 30, min: 1, max: 3 },
-      { item_id: 'fuel_refined', weight: 20, min: 5, max: 10 },
-      { item_id: 'elem_carbon', weight: 10, min: 1, max: 2 },
-    ],
-  },
-  {
-    id: 'zone_void_expanse', name_key: 'Пустота',
-    description_key: 'Аномальная область пространства с пониженной гравитацией. Здесь найдены следы древних цивилизаций.',
-    tier: 2, risk_factor: 0.25, duration_hours: 8, fuel_cost: 25,
-    loot_table: [
-      { item_id: 'elem_titanium', weight: 35, min: 1, max: 3 },
-      { item_id: 'elem_iron', weight: 25, min: 2, max: 5 },
-      { item_id: 'fuel_refined', weight: 20, min: 10, max: 20 },
-      { item_id: 'scr_ancient_chip', weight: 20, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'zone_crystal_caverns', name_key: 'Кристальные Пещеры',
-    description_key: 'Сеть гигантских пещер в астероиде, стены которых состоят из чистых квантовых кристаллов.',
-    tier: 2, risk_factor: 0.3, duration_hours: 10, fuel_cost: 30,
-    loot_table: [
-      { item_id: 'elem_quantum_crystal', weight: 25, min: 1, max: 2 },
-      { item_id: 'elem_silicon', weight: 30, min: 2, max: 5 },
-      { item_id: 'elem_uranium', weight: 20, min: 1, max: 2 },
-      { item_id: 'fuel_refined', weight: 25, min: 10, max: 25 },
-    ],
-  },
-  {
-    id: 'zone_quantum_storm', name_key: 'Квантовый Шторм',
-    description_key: 'Зона пространственно-временной нестабильности. Только самые отважные пилоты рискуют войти сюда.',
-    tier: 3, risk_factor: 0.45, duration_hours: 14, fuel_cost: 50,
-    loot_table: [
-      { item_id: 'elem_dark_matter', weight: 20, min: 1, max: 2 },
-      { item_id: 'elem_void_essence', weight: 15, min: 1, max: 1 },
-      { item_id: 'elem_quantum_crystal', weight: 25, min: 1, max: 3 },
-      { item_id: 'elem_uranium', weight: 25, min: 2, max: 4 },
-      { item_id: 'fuel_refined', weight: 15, min: 20, max: 40 },
-    ],
-  },
-]
-
-const ships: Record<string, string> = {
+const shipNames: Record<string, string> = {
   ship_scout_t1: 'Разведчик MK-I',
   ship_freighter_t2: 'Грузовой «Баржа»',
   ship_corvette_t3: 'Корвет «Молния»',
@@ -73,7 +15,7 @@ const ships: Record<string, string> = {
 }
 
 export function Galaxy() {
-  const { ships: userShips, startExpedition, isLoading } = useGameStore()
+  const { ships: userShips, zonesContent: zones, startExpedition, isLoading } = useGameStore()
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
   const [showShipPicker, setShowShipPicker] = useState(false)
 
@@ -107,7 +49,7 @@ export function Galaxy() {
             >
               {selectedShip ? (
                 <div>
-                  <p className="text-sm font-medium">{ships[selectedShip.ship_config_id] || selectedShip.ship_config_id}</p>
+                  <p className="text-sm font-medium">{shipNames[selectedShip.ship_config_id] || selectedShip.ship_config_id}</p>
                   <p className="text-[10px] text-slate-500">⛽ {selectedShip.fuel_current} · ⚡ {selectedShip.stability}%</p>
                 </div>
               ) : (
@@ -132,7 +74,7 @@ export function Galaxy() {
                           selectedShipId === s.id ? 'bg-neon-purple/20' : 'hover:bg-space-600/80'
                         }`}
                       >
-                        <span className="font-medium">{ships[s.ship_config_id] || s.ship_config_id}</span>
+                        <span className="font-medium">{shipNames[s.ship_config_id] || s.ship_config_id}</span>
                         <span className="text-slate-500 ml-2 text-xs">⛽ {s.fuel_current} · ⚡ {Math.round(s.stability)}%</span>
                       </button>
                     ))}
@@ -145,11 +87,17 @@ export function Galaxy() {
       </motion.div>
 
       {/* Zone list */}
-      <motion.div className="flex flex-col gap-3" variants={staggerContainer} initial="hidden" animate="visible">
-        {ZONES.map((zone, i) => (
-          <ZoneCard key={zone.id} zone={zone} onSelect={handleSelectZone} disabled={!selectedShipId || isLoading} index={i} />
-        ))}
-      </motion.div>
+      {zones.length === 0 ? (
+        <div className="glass-card p-8 text-center">
+          <p className="text-slate-500 text-xs">Загрузка карты...</p>
+        </div>
+      ) : (
+        <motion.div className="flex flex-col gap-3" variants={staggerContainer} initial="hidden" animate="visible">
+          {zones.map((zone, i) => (
+            <ZoneCard key={zone.id} zone={zone} onSelect={handleSelectZone} disabled={!selectedShipId || isLoading} index={i} />
+          ))}
+        </motion.div>
+      )}
     </div>
   )
 }

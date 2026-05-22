@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
 
 import { Galaxy } from './pages/Galaxy'
+import { useGameStore } from './store/game'
 import { Hangar } from './pages/Hangar'
 import { Inventory } from './pages/Inventory'
 import { Lab } from './pages/Lab'
@@ -47,6 +49,9 @@ function NavBar() {
 
 function AppContent() {
   const location = useLocation()
+  const loadContent = useGameStore((s) => s.loadContent)
+
+  useEffect(() => { loadContent() }, [])
 
   return (
     <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">

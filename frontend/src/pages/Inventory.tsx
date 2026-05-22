@@ -5,19 +5,6 @@ import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
 import type { InventoryItem } from '../types'
 
-const elementData: Record<string, { name: string; emoji: string; rarity: string }> = {
-  elem_hydrogen: { name: 'Водород', emoji: '💧', rarity: 'common' },
-  elem_helium: { name: 'Гелий', emoji: '🎈', rarity: 'common' },
-  elem_carbon: { name: 'Углерод', emoji: '💎', rarity: 'common' },
-  elem_iron: { name: 'Железо', emoji: '⚙️', rarity: 'common' },
-  elem_silicon: { name: 'Кремний', emoji: '💻', rarity: 'common' },
-  elem_titanium: { name: 'Титан', emoji: '🛡️', rarity: 'uncommon' },
-  elem_uranium: { name: 'Уран', emoji: '☢️', rarity: 'uncommon' },
-  elem_quantum_crystal: { name: 'Квантовый Кристалл', emoji: '🔮', rarity: 'rare' },
-  elem_dark_matter: { name: 'Тёмная Материя', emoji: '🕳️', rarity: 'epic' },
-  elem_void_essence: { name: 'Эссенция Пустоты', emoji: '🌀', rarity: 'legendary' },
-}
-
 const rarityColors: Record<string, { border: string; bg: string; text: string }> = {
   common: { border: 'border-slate-500/20', bg: 'bg-slate-500/5', text: 'text-slate-300' },
   uncommon: { border: 'border-neon-green/20', bg: 'bg-neon-green/5', text: 'text-neon-green' },
@@ -31,12 +18,20 @@ const typeLabels: Record<string, string> = {
   all: 'Всё', element: 'Элементы', resource: 'Ресурсы', artifact: 'Артефакты', consumable: 'Расходники',
 }
 
+const elementEmoji: Record<string, string> = {
+  elem_hydrogen: '💧', elem_helium: '🎈', elem_carbon: '💎',
+  elem_iron: '⚙️', elem_silicon: '💻', elem_titanium: '🛡️',
+  elem_uranium: '☢️', elem_quantum_crystal: '🔮',
+  elem_dark_matter: '🕳️', elem_void_essence: '🌀',
+}
+
 export function Inventory() {
-  const { inventory, loadInventory } = useGameStore()
+  const { inventory, loadInventory, elementsContent } = useGameStore()
   const [filter, setFilter] = useState<string>('all')
 
   useEffect(() => { loadInventory() }, [])
 
+  const elementLookup = new Map(elementsContent.map((e) => [e.id, e]))
   const filtered = filter === 'all' ? inventory : inventory.filter((i) => i.item_type === filter)
   const types = ['all', ...new Set(inventory.map((i) => i.item_type))]
 
@@ -47,7 +42,7 @@ export function Inventory() {
         <p className="text-xs text-slate-500 mt-1">{inventory.length} предметов</p>
       </motion.header>
 
-      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-none">
+      <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-4 overflow-x-auto pb-1">
         {types.map((t) => (
           <button
             key={t}
@@ -68,14 +63,9 @@ export function Inventory() {
           <p className="text-slate-500 text-xs font-display uppercase tracking-wider">Пусто</p>
         </motion.div>
       ) : (
-        <motion.div
-          className="flex flex-col gap-2"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div className="flex flex-col gap-2" variants={staggerContainer} initial="hidden" animate="visible">
           {filtered.map((item) => (
-            <InventoryRow key={item.id} item={item} />
+            <InventoryRow key={item.id} item={item} elementLookup={elementLookup} />
           ))}
         </motion.div>
       )}
@@ -83,8 +73,8 @@ export function Inventory() {
   )
 }
 
-function InventoryRow({ item }: { item: InventoryItem }) {
-  const ed = elementData[item.item_config_id]
+function InventoryRow({ item, elementLookup }: { item: InventoryItem; elementLookup: Map<string, { name_key: string; rarity: string }> }) {
+  const ed = elementLookup.get(item.item_config_id)
   const rarity = ed?.rarity || (item.metadata?.rarity as string) || 'common'
   const rc = rarityColors[rarity] || rarityColors.common
   const meta = item.metadata || {}
@@ -94,13 +84,11 @@ function InventoryRow({ item }: { item: InventoryItem }) {
       variants={scaleIn}
       whileHover={{ x: 4, transition: { type: 'spring', stiffness: 300 } }}
       className={`glass-card p-3 flex items-center gap-3 ${rc.border} ${rc.bg}`}
-      style={{ borderLeft: '3px solid', borderLeftColor: rc.border.includes('slate') ? '#64748b' : rc.border.includes('green') ? '#22c55e' : rc.border.includes('purple') ? '#a855f7' : rc.border.includes('amber') ? '#f59e0b' : '#ef4444' }}
+      style={{ borderLeft: '3px solid', borderLeftColor: rarity === 'common' ? '#64748b' : rarity === 'uncommon' ? '#22c55e' : rarity === 'rare' ? '#a855f7' : rarity === 'epic' ? '#f59e0b' : '#ef4444' }}
     >
-      <div className="text-xl">{ed?.emoji || typeIcons[item.item_type] || '📦'}</div>
+      <div className="text-xl">{elementEmoji[item.item_config_id] || typeIcons[item.item_type] || '📦'}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">
-          {ed?.name || item.item_config_id.replace(/_/g, ' ')}
-        </p>
+        <p className="text-sm font-medium truncate">{ed?.name_key || item.item_config_id.replace(/_/g, ' ')}</p>
         <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
         {item.item_type === 'artifact' && Object.keys(meta).length > 0 && (
           <div className="flex gap-2 mt-1">
@@ -110,12 +98,7 @@ function InventoryRow({ item }: { item: InventoryItem }) {
           </div>
         )}
       </div>
-      <motion.div
-        className="text-right"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-      >
+      <motion.div className="text-right" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }}>
         <span className={`text-lg font-display ${rc.text}`}>{item.quantity}</span>
       </motion.div>
     </motion.div>

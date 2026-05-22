@@ -12,6 +12,7 @@ export interface Ship {
 export interface ShipConfig {
   id: string
   name_key: string
+  description_key: string
   tier: number
   stats: { stability: number; fuel_capacity: number; speed_mod: number }
   required_level: number
@@ -64,6 +65,15 @@ export interface Expedition {
   end_time: string
   status: string
   result_data: Record<string, unknown> | null
+}
+
+export interface Element {
+  id: string
+  name_key: string
+  description_key?: string
+  tier: number
+  rarity: string
+  icon_path: string
 }
 
 export interface ExperimentResult {

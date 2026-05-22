@@ -1,17 +1,8 @@
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
+import { useGameStore } from '../store/game'
 import type { Ship } from '../types'
-
-const ships: Record<string, { name: string; desc: string }> = {
-  ship_scout_t1: { name: 'Разведчик MK-I', desc: 'Лёгкий разведывательный корабль' },
-  ship_freighter_t2: { name: 'Грузовой «Баржа»', desc: 'Прочный транспортировщик' },
-  ship_corvette_t3: { name: 'Корвет «Молния»', desc: 'Быстрый маневренный корвет' },
-  ship_cruiser_t4: { name: 'Крейсер «Горизонт»', desc: 'Тяжёлый крейсер дальнего радиуса' },
-  ship_dreadnought_t5: { name: 'Дредноут «Творец»', desc: 'Легендарный флагманский дредноут' },
-}
-
-const tierColors = ['', '#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
 
 const statusConfig: Record<string, { label: string; cls: string }> = {
   idle: { label: 'Готов', cls: 'bg-neon-green/10 text-neon-green border border-neon-green/20' },
@@ -19,9 +10,15 @@ const statusConfig: Record<string, { label: string; cls: string }> = {
   repair: { label: 'Ремонт', cls: 'bg-neon-amber/10 text-neon-amber border border-neon-amber/20' },
 }
 
+const tierColors = ['', '#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
+
 export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
-  const tier = parseInt(ship.ship_config_id.match(/t(\d)/)?.[1] || '1')
-  const sd = ships[ship.ship_config_id]
+  const { shipsContent } = useGameStore()
+  const config = shipsContent.find((s) => s.id === ship.ship_config_id)
+
+  const tier = config?.tier || parseInt(ship.ship_config_id.match(/t(\d)/)?.[1] || '1')
+  const name = config?.name_key || ship.ship_config_id.replace(/_/g, ' ')
+  const desc = config?.description_key || ''
   const st = statusConfig[ship.status] || statusConfig.idle
 
   return (
@@ -35,8 +32,8 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
     >
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="font-display text-sm uppercase tracking-wider text-slate-300">{sd?.name || ship.ship_config_id}</h3>
-          <p className="text-[10px] text-slate-500 mt-0.5">{sd?.desc || ''}</p>
+          <h3 className="font-display text-sm uppercase tracking-wider text-slate-300">{name}</h3>
+          {desc && <p className="text-[10px] text-slate-500 mt-0.5">{desc}</p>}
           <div className="flex gap-1 mt-1.5">
             {Array.from({ length: tier }, (_, i) => (
               <span key={i} className="text-xs" style={{ color: tierColors[tier] }}>★</span>
