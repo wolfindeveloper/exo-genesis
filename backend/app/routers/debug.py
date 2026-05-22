@@ -35,6 +35,15 @@ async def debug_health():
     }
 
 
+@router.get("/hmac-test")
+async def debug_hmac_test():
+    test_key = "test_key_123"
+    test_msg = "test_message"
+    secret = hashlib.sha256(test_key.encode()).hexdigest()[:32]
+    result = hmac.new(secret.encode(), test_msg.encode(), hashlib.sha256).hexdigest()
+    return {"result": result, "algorithm": "HMAC-SHA256", "python_version": __import__("sys").version}
+
+
 @router.get("/hmac")
 async def debug_hmac(
     authorization: str | None = Header(None),
