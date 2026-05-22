@@ -12,16 +12,25 @@ router = APIRouter(prefix="/debug", tags=["debug"])
 
 
 @router.get("/health")
+from app.core.config import settings
+
+@router.get("/health")
 async def debug_health():
     return {
         "env": {
             "app_name": os.environ.get("APP_NAME", ""),
             "supabase_url_set": bool(os.environ.get("SUPABASE_URL", "")),
             "supabase_key_set": bool(os.environ.get("SUPABASE_KEY", "")),
-            "bot_token_set": bool(os.environ.get("BOT_TOKEN", "")),
-            "bot_token_len": len(os.environ.get("BOT_TOKEN", "")),
             "frontend_url": os.environ.get("FRONTEND_URL", ""),
-        }
+        },
+        "bot_token": {
+            "os_environ_len": len(os.environ.get("BOT_TOKEN", "")),
+            "os_environ_prefix": os.environ.get("BOT_TOKEN", "")[:4],
+            "os_environ_suffix": os.environ.get("BOT_TOKEN", "")[-4:],
+            "settings_len": len(settings.bot_token),
+            "settings_prefix": settings.bot_token[:4],
+            "settings_suffix": settings.bot_token[-4:],
+        },
     }
 
 
