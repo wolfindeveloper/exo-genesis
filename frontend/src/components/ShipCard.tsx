@@ -22,6 +22,8 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
   const name = config?.name_key || ship.ship_config_id.replace(/_/g, ' ')
   const desc = config?.description_key || ''
   const st = statusConfig[ship.status] || statusConfig.idle
+  const fuelMax = config?.stats?.fuel_capacity || 50
+  const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
 
   return (
     <motion.div
@@ -79,7 +81,19 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
           </div>
           <div>
             <span className="text-[10px] text-slate-500 uppercase tracking-wider">Топливо</span>
-            <p className="font-display text-sm mt-0.5">{ship.fuel_current}</p>
+            <div className="relative h-6 bg-space-500 rounded-full mt-1.5 overflow-hidden">
+              <motion.div
+                className="h-full rounded-full flex items-center justify-end pr-2"
+                style={{ background: `linear-gradient(90deg, #f59e0b, ${tierColors[tier]})` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${fuelPct}%` }}
+                transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+              >
+                <span className="text-[9px] font-display text-space-900 font-bold drop-shadow-sm">
+                  {ship.fuel_current}/{fuelMax}
+                </span>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
