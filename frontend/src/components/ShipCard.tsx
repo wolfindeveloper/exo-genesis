@@ -69,14 +69,18 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
         <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
           <div>
             <span className="text-[10px] text-slate-500 uppercase tracking-wider">Прочность</span>
-            <div className="h-1.5 bg-space-500 rounded-full mt-1.5 overflow-hidden">
+            <div className="relative h-6 bg-space-500 rounded-full mt-1.5 overflow-hidden">
               <motion.div
-                className="h-full rounded-full"
+                className="h-full rounded-full flex items-center justify-end pr-2"
                 style={{ background: `linear-gradient(90deg, #22c55e, ${tierColors[tier]})` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${ship.stability}%` }}
                 transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-              />
+              >
+                <span className="text-[9px] font-display text-space-900 font-bold drop-shadow-sm">
+                  {ship.stability}%
+                </span>
+              </motion.div>
             </div>
           </div>
           <div>
