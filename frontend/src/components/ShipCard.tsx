@@ -64,7 +64,7 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mt-3 text-sm">
+        <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
           <div>
             <span className="text-[10px] text-slate-500 uppercase tracking-wider">Прочность</span>
             <div className="h-1.5 bg-space-500 rounded-full mt-1.5 overflow-hidden">
@@ -80,10 +80,6 @@ export function ShipCard({ ship, index = 0 }: { ship: Ship; index?: number }) {
           <div>
             <span className="text-[10px] text-slate-500 uppercase tracking-wider">Топливо</span>
             <p className="font-display text-sm mt-0.5">{ship.fuel_current}</p>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider">ID</span>
-            <p className="font-mono text-[10px] text-slate-400 mt-0.5 truncate">{ship.id.slice(0, 8)}</p>
           </div>
         </div>
       </div>
