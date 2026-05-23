@@ -142,7 +142,7 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
           </div>
         </div>
 
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-5 pb-24">
           {/* Description */}
           <p className="text-xs text-slate-400 leading-relaxed">{zone.description_key}</p>
 

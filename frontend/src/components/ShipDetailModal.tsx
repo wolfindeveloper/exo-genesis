@@ -104,7 +104,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
           )}
         </div>
 
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-5 pb-24">
           {/* Description */}
           {config?.description_key && (
             <p className="text-xs text-slate-400 leading-relaxed">{config.description_key}</p>
