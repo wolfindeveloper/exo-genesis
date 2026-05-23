@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useNavigate } from 'react-router-dom'
 
 import { ShipCard } from '../components/ShipCard'
+import { ShipDetailModal } from '../components/ShipDetailModal'
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
+import type { Ship, ShipConfig } from '../types'
 
 const tierLabels = ['', 'T1', 'T2', 'T3', 'T4', 'T5']
 const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green border-neon-green/30', 'text-neon-purple border-neon-purple/30', 'text-neon-amber border-neon-amber/30', 'text-neon-red border-neon-red/30']
@@ -12,6 +15,8 @@ const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 
 export function Hangar() {
   const { ships, shipsContent, loadShips, isLoading } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
+  const [selectedShip, setSelectedShip] = useState<Ship | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => { loadShips() }, [])
 
@@ -22,11 +27,28 @@ export function Hangar() {
     tier: shipConfigLookup.get(s.ship_config_id)?.tier || 1,
   })), [ships, shipConfigLookup])
 
-  const availTiers = [...new Set(shipsWithTier.map((s) => s.tier))].sort()
-  const filteredShips = shipsWithTier.filter((s) => s.tier === tierFilter)
+  const availTiers = useMemo(
+    () => [...new Set(shipsWithTier.map((s) => s.tier))].sort(),
+    [shipsWithTier],
+  )
+  const filteredShips = useMemo(
+    () => shipsWithTier.filter((s) => s.tier === tierFilter),
+    [shipsWithTier, tierFilter],
+  )
 
-  const idleCount = ships.filter((s) => s.status === 'idle').length
-  const onMission = ships.length - idleCount
+  const idleCount = useMemo(() => ships.filter((s) => s.status === 'idle').length, [ships])
+  const onMission = useMemo(() => ships.length - idleCount, [ships.length, idleCount])
+
+  const handleShipTap = useCallback((ship: Ship) => setSelectedShip(ship), [])
+  const handleCloseModal = useCallback(() => setSelectedShip(null), [])
+
+  const filteredShipConfigs = useMemo(() => {
+    const m = new Map<string, ShipConfig | undefined>()
+    for (const s of filteredShips) {
+      m.set(s.id, shipConfigLookup.get(s.ship_config_id))
+    }
+    return m
+  }, [filteredShips, shipConfigLookup])
 
   return (
     <div className="p-4 pb-28">
@@ -100,12 +122,30 @@ export function Hangar() {
               </div>
             ) : (
               filteredShips.map((ship, i) => (
-                <ShipCard key={ship.id} ship={ship} index={i} />
+                <ShipCard
+                  key={ship.id}
+                  ship={ship}
+                  config={filteredShipConfigs.get(ship.id) || null}
+                  index={i}
+                  onTap={handleShipTap}
+                />
               ))
             )}
           </motion.div>
         </AnimatePresence>
       )}
+
+      {/* Ship detail modal */}
+      <AnimatePresence>
+        {selectedShip && (
+          <ShipDetailModal
+            ship={selectedShip}
+            config={shipConfigLookup.get(selectedShip.ship_config_id) || null}
+            onClose={handleCloseModal}
+            onSend={() => { handleCloseModal(); navigate('/galaxy') }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
