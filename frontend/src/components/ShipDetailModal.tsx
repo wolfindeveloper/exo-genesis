@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'motion/react'
 
 import type { Ship, ShipConfig } from '../types'
@@ -31,6 +32,7 @@ interface ShipDetailModalProps {
 }
 
 export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailModalProps) {
+  const [imgError, setImgError] = useState(false)
   const tier = config?.tier || 1
   const name = config?.name_key || ship.ship_config_id.replace(/_/g, ' ')
   const st = statusConfig[ship.status] || statusConfig.idle
@@ -63,22 +65,43 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
         </button>
 
         {/* Art header */}
-        <div className={`relative h-48 bg-gradient-to-br ${tierGradients[tier]} flex items-center justify-center overflow-hidden`}>
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 60%)' }} />
-          <div className="text-center">
-            <motion.div
-              className="text-6xl mb-2"
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-            >
-              🚀
-            </motion.div>
-            <h2 className="font-display text-lg uppercase tracking-[0.15em]" style={{ color: tierColors[tier] }}>{name}</h2>
-            <span className={`text-[10px] text-white/40 font-display uppercase tracking-wider mt-1 block`}>
-              Tier {tier} · {st.label}
-            </span>
-          </div>
+        <div className={`relative h-48 ${config?.art_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[tier]}`} overflow-hidden`}>
+          {config?.art_path && !imgError ? (
+            <img
+              src={config.art_path}
+              alt={name}
+              className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className={`w-full h-full bg-gradient-to-br ${tierGradients[tier]} flex items-center justify-center`}>
+              <div className="text-center">
+                <motion.div
+                  className="text-6xl mb-2"
+                  initial={{ scale: 0, rotate: -20 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                >
+                  🚀
+                </motion.div>
+                <h2 className="font-display text-lg uppercase tracking-[0.15em]" style={{ color: tierColors[tier] }}>{name}</h2>
+                <span className="text-[10px] text-white/40 font-display uppercase tracking-wider mt-1 block">
+                  Tier {tier} · {st.label}
+                </span>
+              </div>
+            </div>
+          )}
+          {config?.art_path && !imgError && (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-space-900/10 to-transparent" />
+              <div className="absolute bottom-4 left-5">
+                <h2 className="font-display text-lg uppercase tracking-[0.15em] drop-shadow-lg" style={{ color: tierColors[tier] }}>{name}</h2>
+                <span className="text-[10px] text-white/50 font-display uppercase tracking-wider mt-0.5 block drop-shadow">
+                  Tier {tier} · {st.label}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="p-5 space-y-5">
