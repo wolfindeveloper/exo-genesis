@@ -78,10 +78,7 @@ function AppContent() {
           Error: {error}
         </div>
       )}
-      <div className="fixed top-0 left-0 right-0 z-[201] bg-yellow-900/80 p-1 text-center text-[9px] text-yellow-200 font-mono mt-10 whitespace-pre-wrap break-all">
-        TG: {(window as any).Telegram?.WebApp ? '✅' : '❌'} |
-        InitData: {(window as any).Telegram?.WebApp?.initData ? '✅' : '❌'}
-      </div>      <NavBar />
+      <NavBar />
       <BoxReveal />
     </div>
   )
