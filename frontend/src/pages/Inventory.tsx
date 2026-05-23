@@ -33,12 +33,15 @@ const elementEmoji: Record<string, string> = {
 }
 
 export function Inventory() {
-  const { inventory, loadInventory, elementsContent } = useGameStore()
+  const { inventory, loadInventory, elementsContent, resourcesContent } = useGameStore()
   const [filter, setFilter] = useState<string>('all')
 
   useEffect(() => { loadInventory() }, [])
 
-  const elementLookup = new Map(elementsContent.map((e) => [e.id, e]))
+  const nameLookup = new Map([
+    ...elementsContent.map((e) => [e.id, { name_key: e.name_key, rarity: e.rarity }] as const),
+    ...resourcesContent.map((r) => [r.id, { name_key: r.name_key, rarity: '' }] as const),
+  ])
   const filtered = filter === 'all' ? inventory : inventory.filter((i) => i.item_type === filter)
   const types = ['all', ...new Set(inventory.map((i) => i.item_type))]
 
@@ -72,7 +75,7 @@ export function Inventory() {
       ) : (
         <motion.div className="flex flex-col gap-2" variants={staggerContainer} initial="hidden" animate="visible">
           {filtered.map((item) => (
-            <InventoryRow key={item.id} item={item} elementLookup={elementLookup} />
+            <InventoryRow key={item.id} item={item} nameLookup={nameLookup} />
           ))}
         </motion.div>
       )}
@@ -80,9 +83,9 @@ export function Inventory() {
   )
 }
 
-function InventoryRow({ item, elementLookup }: { item: InventoryItem; elementLookup: Map<string, { name_key: string; rarity: string }> }) {
-  const ed = elementLookup.get(item.item_config_id)
-  const rarity = ed?.rarity || (item.metadata?.rarity as string) || 'common'
+function InventoryRow({ item, nameLookup }: { item: InventoryItem; nameLookup: Map<string, { name_key: string; rarity: string }> }) {
+  const entry = nameLookup.get(item.item_config_id)
+  const rarity = entry?.rarity || (item.metadata?.rarity as string) || 'common'
   const rc = rarityColors[rarity] || rarityColors.common
   const meta = item.metadata || {}
 
@@ -95,7 +98,7 @@ function InventoryRow({ item, elementLookup }: { item: InventoryItem; elementLoo
     >
       <div className="text-xl">{elementEmoji[item.item_config_id] || typeIcons[item.item_type] || '📦'}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{ed?.name_key || item.item_config_id.replace(/_/g, ' ')}</p>
+        <p className="text-sm font-medium truncate">{entry?.name_key || item.item_config_id.replace(/_/g, ' ')}</p>
         <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
         {item.item_type === 'artifact' && Object.keys(meta).length > 0 && (
           <div className="flex gap-2 mt-1">
