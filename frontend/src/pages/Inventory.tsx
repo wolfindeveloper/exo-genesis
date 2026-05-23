@@ -39,8 +39,8 @@ export function Inventory() {
   useEffect(() => { loadInventory() }, [])
 
   const nameLookup = new Map([
-    ...elementsContent.map((e) => [e.id, { name_key: e.name_key, rarity: e.rarity }] as const),
-    ...resourcesContent.map((r) => [r.id, { name_key: r.name_key, rarity: '' }] as const),
+    ...elementsContent.map((e) => [e.id, { name_key: e.name_key, rarity: e.rarity, icon_path: e.icon_path }] as const),
+    ...resourcesContent.map((r) => [r.id, { name_key: r.name_key, rarity: '', icon_path: r.icon_path }] as const),
   ])
   const filtered = filter === 'all' ? inventory : inventory.filter((i) => i.item_type === filter)
   const types = ['all', ...new Set(inventory.map((i) => i.item_type))]
@@ -83,11 +83,13 @@ export function Inventory() {
   )
 }
 
-function InventoryRow({ item, nameLookup }: { item: InventoryItem; nameLookup: Map<string, { name_key: string; rarity: string }> }) {
+function InventoryRow({ item, nameLookup }: { item: InventoryItem; nameLookup: Map<string, { name_key: string; rarity: string; icon_path: string }> }) {
+  const [imgError, setImgError] = useState(false)
   const entry = nameLookup.get(item.item_config_id)
   const rarity = entry?.rarity || (item.metadata?.rarity as string) || 'common'
   const rc = rarityColors[rarity] || rarityColors.common
   const meta = item.metadata || {}
+  const hasIcon = entry?.icon_path && !imgError
 
   return (
     <motion.div
@@ -96,7 +98,16 @@ function InventoryRow({ item, nameLookup }: { item: InventoryItem; nameLookup: M
       className={`glass-card p-3 flex items-center gap-3 ${rc.border} ${rc.bg}`}
       style={{ borderLeft: '3px solid', borderLeftColor: rarity === 'common' ? '#64748b' : rarity === 'uncommon' ? '#22c55e' : rarity === 'rare' ? '#a855f7' : rarity === 'epic' ? '#f59e0b' : '#ef4444' }}
     >
-      <div className="text-xl">{elementEmoji[item.item_config_id] || typeIcons[item.item_type] || '📦'}</div>
+      {hasIcon ? (
+        <img
+          src={entry.icon_path}
+          alt={entry?.name_key || item.item_config_id}
+          className="w-8 h-8 object-contain"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="text-xl">{elementEmoji[item.item_config_id] || typeIcons[item.item_type] || '📦'}</div>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{entry?.name_key || item.item_config_id.replace(/_/g, ' ')}</p>
         <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
