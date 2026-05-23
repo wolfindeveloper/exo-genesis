@@ -65,12 +65,12 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
         </button>
 
         {/* Art header */}
-        <div className={`relative h-48 ${config?.art_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[tier]}`} overflow-hidden`}>
+        <div className={`relative aspect-[32/11] ${config?.art_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[tier]}`} overflow-hidden`}>
           {config?.art_path && !imgError ? (
             <img
               src={config.art_path}
               alt={name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               onError={() => setImgError(true)}
             />
           ) : (
@@ -93,9 +93,9 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
           )}
           {config?.art_path && !imgError && (
             <>
-              <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-space-900/10 to-transparent" />
-              <div className="absolute bottom-4 left-5">
-                <h2 className="font-display text-lg uppercase tracking-[0.15em] drop-shadow-lg" style={{ color: tierColors[tier] }}>{name}</h2>
+              <div className="absolute inset-0 bg-gradient-to-t from-space-900/80 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-5">
+                <h2 className="font-display text-base uppercase tracking-[0.15em] drop-shadow-lg" style={{ color: tierColors[tier] }}>{name}</h2>
                 <span className="text-[10px] text-white/50 font-display uppercase tracking-wider mt-0.5 block drop-shadow">
                   Tier {tier} · {st.label}
                 </span>
