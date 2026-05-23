@@ -142,7 +142,7 @@ export function Hangar() {
             ship={selectedShip}
             config={shipConfigLookup.get(selectedShip.ship_config_id) || null}
             onClose={handleCloseModal}
-            onSend={() => { handleCloseModal(); navigate('/galaxy') }}
+            onSend={() => { handleCloseModal(); navigate(`/galaxy?ship=${selectedShip.id}`) }}
           />
         )}
       </AnimatePresence>

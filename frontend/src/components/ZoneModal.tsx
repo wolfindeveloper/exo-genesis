@@ -3,7 +3,7 @@ import { motion } from 'motion/react'
 
 import { calculateZoneStats } from '../lib/expeditionCalc'
 import { useGameStore } from '../store/game'
-import type { Zone } from '../types'
+import type { Ship, Zone } from '../types'
 
 // ---------------------------------------------------------------------------
 // Emoji helpers
@@ -69,17 +69,20 @@ interface ZoneModalProps {
   onClose: () => void
   onStart: (shipId: string) => void
   isLoading: boolean
+  preselectedShipId?: string
 }
 
-export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps) {
+export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId }: ZoneModalProps) {
   const { ships, shipsContent, elementsContent } = useGameStore()
-  const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
+  const [selectedShipId, setSelectedShipId] = useState<string | null>(preselectedShipId || null)
+  const [confirming, setConfirming] = useState(false)
 
   const elementLookup = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
 
-  const idleShips = ships.filter((s) => s.status === 'idle')
-  const selectedShip = idleShips.find((s) => s.id === selectedShipId) || null
+  const shipMap = useMemo(() => new Map(ships.map((s) => [s.id, s])), [ships])
+  const idleShips = useMemo(() => ships.filter((s) => s.status === 'idle'), [ships])
+  const selectedShip: Ship | null = selectedShipId ? shipMap.get(selectedShipId) || null : null
 
   const calcedStats = useMemo(() => {
     if (!selectedShip) return null
@@ -213,7 +216,7 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
                   return (
                     <button
                       key={s.id}
-                      onClick={() => setSelectedShipId(s.id)}
+                      onClick={() => { setSelectedShipId(s.id); setConfirming(false) }}
                       className={`text-left p-3 rounded-xl text-sm border transition ${
                         active
                           ? `${tierAccent[zone.tier]} border-current bg-white/5`
@@ -238,24 +241,49 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
           </div>
 
           {/* Launch button */}
-          <button
-            disabled={!canLaunch || isLoading}
-            onClick={() => selectedShipId && onStart(selectedShipId)}
-            className="btn-glow w-full py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 hover:from-neon-purple hover:to-neon-cyan"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>◌</motion.span>
-                Старт...
-              </span>
-            ) : !selectedShipId ? (
-              'Выбери корабль'
-            ) : !calcedStats?.fuelOk ? (
-              'Недостаточно ⛽'
-            ) : (
-              '🚀 Запуск'
-            )}
-          </button>
+          {confirming && canLaunch ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirming(false)}
+                className="flex-1 py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition border border-white/10 text-slate-400 hover:bg-space-700/50"
+              >
+                ← Отмена
+              </button>
+              <button
+                disabled={isLoading}
+                onClick={() => selectedShipId && onStart(selectedShipId)}
+                className="flex-[2] py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 hover:from-neon-purple hover:to-neon-cyan"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>◌</motion.span>
+                    Старт...
+                  </span>
+                ) : (
+                  '🚀 Точно запустить'
+                )}
+              </button>
+            </div>
+          ) : (
+            <button
+              disabled={!canLaunch || isLoading}
+              onClick={() => setConfirming(true)}
+              className="btn-glow w-full py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 hover:from-neon-purple hover:to-neon-cyan"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>◌</motion.span>
+                  Старт...
+                </span>
+              ) : !selectedShipId ? (
+                'Выбери корабль'
+              ) : !calcedStats?.fuelOk ? (
+                'Недостаточно ⛽'
+              ) : (
+                '🚀 Запуск'
+              )}
+            </button>
+          )}
         </div>
       </motion.div>
     </motion.div>

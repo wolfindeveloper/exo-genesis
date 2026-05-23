@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useSearchParams } from 'react-router-dom'
 
 import { ZoneCard } from '../components/ZoneCard'
 import { ZoneModal } from '../components/ZoneModal'
@@ -12,17 +13,32 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Galaxy() {
-  const { zonesContent: zones, startExpedition, isLoading } = useGameStore()
+  const { zonesContent: zones, elementsContent, startExpedition, isLoading } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
   const [zoneModal, setZoneModal] = useState<Zone | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
 
+  const elementLookup = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const maxTier = Math.max(...zones.map((z) => z.tier), 1)
   const filteredZones = zones.filter((z) => z.tier === tierFilter)
+
+  // Pre-selected ship from Hangar flow
+  const preselectedShipId = searchParams.get('ship') || undefined
 
   const handleStartFromModal = async (shipId: string) => {
     if (!zoneModal) return
     await startExpedition(shipId, zoneModal.id)
     setZoneModal(null)
+    setSearchParams({}, { replace: true })
+  }
+
+  const handleZoneSelect = (zone: Zone) => {
+    setZoneModal(zone)
+  }
+
+  const handleCloseModal = () => {
+    setZoneModal(null)
+    setSearchParams({}, { replace: true })
   }
 
   return (
@@ -69,7 +85,7 @@ export function Galaxy() {
             </div>
           ) : (
             filteredZones.map((zone, i) => (
-              <ZoneCard key={zone.id} zone={zone} onSelect={() => setZoneModal(zone)} index={i} />
+              <ZoneCard key={zone.id} zone={zone} onSelect={() => handleZoneSelect(zone)} index={i} elementLookup={elementLookup} />
             ))
           )}
         </motion.div>
@@ -80,9 +96,10 @@ export function Galaxy() {
         {zoneModal && (
           <ZoneModal
             zone={zoneModal}
-            onClose={() => setZoneModal(null)}
+            onClose={handleCloseModal}
             onStart={handleStartFromModal}
             isLoading={isLoading}
+            preselectedShipId={preselectedShipId}
           />
         )}
       </AnimatePresence>
