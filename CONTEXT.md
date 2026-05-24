@@ -10,7 +10,7 @@
 - **Infrastructure:** Vercel (frontend), HostingGuru (backend), GitHub
 
 ## ✅ Done — Backend
-- [x] FastAPI entry point w/ lifespan + CORS + 10 routes
+- [x] FastAPI entry point w/ lifespan + CORS + 11 routes
 - [x] Pydantic Settings (.env: supabase, bot, webhook, frontend)
 - [x] ContentLoader — ships (25), zones (25), elements (25), resources (10), boxes (1), artifacts (0)
 - [x] Supabase client + миграция (users, user_ships, user_inventory, expeditions, discoveries)
@@ -19,6 +19,7 @@
 - [x] PATCH /user/profile — обновление username
 - [x] GET /user/inventory, /user/ships, /user/stats
 - [x] POST /expeditions/start, POST /expeditions/claim
+- [x] **GET /expeditions/active** — список активных экспедиций юзера
 - [x] Expedition logic: calculate_zone_stats() — динамический расчёт с учётом статов корабля + артефактов
 - [x] Recipe Generator (weekly seed, 2-3 elem → artifact, deterministic cache)
 - [x] POST /lab/experiment — крафтинг, First Discoverer, XP
@@ -36,10 +37,12 @@
 - [x] 1 box: nothing_extra_starter_pack (5 guaranteed + 2 random T1 elements)
 - [x] Все ID переименованы (нет elem_hydrogen, ship_scout_t1 и т.д.)
 - [x] Связи целы: все item_id в loot_table существуют в elements.json
+- [x] `icon_path` добавлен в zones.json, elements.json, resources.json
+- [x] 3 баннера зон загружены: scrap_yard, nebula_warm_tea, the_outskirts_of_sanity
 
 ## ✅ Done — Frontend
 - [x] Vite + React 19 + TypeScript strict + Tailwind v4
-- [x] Zustand store (user, ships, inventory, expeditions, experiment, stats, resourcesContent, boxRewards)
+- [x] Zustand store (user, ships, inventory, activeExpeditions[], experiment, stats, resourcesContent, boxRewards)
 - [x] API client с VITE_API_URL + TMA initData auth
 - [x] 5 страниц: Hangar, Galaxy, Lab, Inventory, Profile
 - [x] Нижняя навигация (🚀 🌌 🔬 🎒 👤)
@@ -48,12 +51,20 @@
 - [x] BoxReveal — анимация открытия бокса для новых игроков (opening → rewards → close)
 - [x] Snapshot тесты: calculateZoneStats (4 кейса, vitest)
 - [x] vitest + vitest.config.ts
+- [x] **Galaxy**: memo(ZoneCard) + elementLookup пропом, confirmation step, pre-select ship из Hangar
+- [x] **Inventory**: иконки ресурсов/элементов из icon_path с fallback на emoji
+- [x] **ShipDetailModal**: aspect-[3/2] для крупного арта, экспедиционный блок с прогресс-баром + таймер + claim
+- [x] **ShipCard**: live countdown для кораблей в экспедиции
+- [x] **ZoneModal**: aspect-[3/2] object-cover для баннеров зон
+- [x] **useExpeditionTimer hook**: live timer с setInterval(1s), {display, pct, isComplete}
+- [x] **Haptic feedback**: impactOccurred('medium') на claim, notificationOccurred('success') при завершении
 
 ## ✅ Done — Infrastructure
 - [x] GitHub: wolfindeveloper/exo-genesis
 - [x] Vercel: exo-genesis.vercel.app (auto-deploy on push)
 - [x] HostingGuru: exo-genesis-1ac1.apps.hostingguru.io (manual redeploy)
 - [x] .gitignore + .git/info/exclude (SPEC.md, AGENTS.md, CONTEXT.md, skills-lock.json, .opencode/, graphify-out/)
+- [x] frontend/public/assets/zones/ — директория для баннеров зон
 
 ## 📋 Next Steps
 ### Monetization
@@ -99,14 +110,18 @@
 - backend/content/zones.json: 25 зон с loot tables, tier 1-5
 - backend/content/resources.json: 10 ресурсов (fuel_t1–t5, repair_kit_t1–t5)
 - backend/content/boxes.json: starter_box (5 guaranteed + 2 random element rolls)
-- frontend/src/pages/Galaxy.tsx: табы по тирам, открытие ZoneModal при клике на зону
-- frontend/src/pages/Hangar.tsx: табы по тирам (из доступных кораблей)
+- frontend/src/pages/Galaxy.tsx: табы по тирам, elementLookup пропом для ZoneCard, pre-select ship из URL
+- frontend/src/pages/Hangar.tsx: табы по тирам (из доступных кораблей), loadActiveExpeditions()
 - frontend/src/pages/Lab.tsx: крафт 3 слота + emoji на 25 элементов
-- frontend/src/pages/Inventory.tsx: type фильтры + emoji на 25 элементов
-- frontend/src/components/ZoneModal.tsx: модалка с арт-шапкой (градиент), выбор корабля, динамические статы
-- frontend/src/components/ZoneCard.tsx: карточка зоны с name_key из стора
+- frontend/src/pages/Inventory.tsx: type фильтры + иконки из icon_path с fallback на emoji
+- frontend/src/components/ZoneModal.tsx: модалка с баннером зоны (aspect-[3/2] object-cover), выбор корабля, confirmation, пресет корабля
+- frontend/src/components/ZoneCard.tsx: memo + useMemo lookup + loot overflow +N
+- frontend/src/components/ShipCard.tsx: memo, live countdown для expedition кораблей
+- frontend/src/components/ShipDetailModal.tsx: aspect-[3/2] арт, экспедиционный блок с таймером + прогресс + claim
 - frontend/src/components/BoxReveal.tsx: анимация открытия бокса (opening → rewards)
 - frontend/src/components/HudBar.tsx: верхняя панель с аватаркой, XP баром, XGEN
+- frontend/src/hooks/useTimer.ts: useExpeditionTimer — live countdown хук (setInterval 1s)
 - frontend/src/lib/expeditionCalc.ts: функция calculateZoneStats (дубль бэкенд-логики на фронте)
 - frontend/src/lib/__tests__/expeditionCalc.test.ts: 4 snapshot теста (совпадают с backend)
-- frontend/src/store/game.ts: Zustand store с кешем контента (shipsContent, zonesContent, elementsContent)
+- frontend/src/store/game.ts: Zustand store с activeExpeditions[], loadActiveExpeditions()
+- frontend/src/types/index.ts: Zone.icon_path, Element/Resource.icon_path
