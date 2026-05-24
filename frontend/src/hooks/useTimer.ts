@@ -8,17 +8,19 @@ export interface TimerData {
 }
 
 export function useExpeditionTimer(
-  startTimeIso: string,
-  endTimeIso: string,
-): TimerData {
+  startTimeIso: string | null,
+  endTimeIso: string | null,
+): TimerData | null {
   const [now, setNow] = useState(Date.now())
 
   useEffect(() => {
+    if (!startTimeIso || !endTimeIso) return
     const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [startTimeIso, endTimeIso])
 
   return useMemo(() => {
+    if (!startTimeIso || !endTimeIso) return null
     const start = new Date(startTimeIso).getTime()
     const end = new Date(endTimeIso).getTime()
     const elapsed = now - start

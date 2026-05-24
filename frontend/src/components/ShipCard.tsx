@@ -47,11 +47,9 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   // Live timer for expedition ships
   const activeExpeditions = useGameStore((s) => s.activeExpeditions)
   const myExp = ship.status === 'expedition'
-    ? activeExpeditions.find((e) => e.ship_id === ship.id)
+    ? (activeExpeditions.find((e) => e.ship_id === ship.id) ?? null)
     : null
-  const timer = myExp
-    ? useExpeditionTimer(myExp.start_time, myExp.end_time)
-    : null
+  const timer = useExpeditionTimer(myExp?.start_time ?? null, myExp?.end_time ?? null)
 
   return (
     <motion.div

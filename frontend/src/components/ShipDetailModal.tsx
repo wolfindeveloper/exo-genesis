@@ -45,7 +45,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
   const myExp = ship.status === 'expedition'
     ? activeExpeditions.find((e) => e.ship_id === ship.id)
     : null
-  const expTimer = myExp ? useExpeditionTimer(myExp.start_time, myExp.end_time) : null
+  const expTimer = useExpeditionTimer(myExp?.start_time ?? null, myExp?.end_time ?? null)
   const expZone = myExp ? zonesContent.find((z) => z.id === myExp.zone_config_id) : null
 
   const handleClaim = useCallback(() => {
