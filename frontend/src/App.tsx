@@ -56,6 +56,7 @@ function AppContent() {
   const isAuthReady = useGameStore((s) => s.isAuthReady)
   const isContentReady = useGameStore((s) => s.isContentReady)
   const error = useGameStore((s) => s.error)
+  const initFailed = useGameStore((s) => s.initFailed)
 
   useEffect(() => {
     initAuth()
@@ -65,17 +66,37 @@ function AppContent() {
   if (!isAuthReady || !isContentReady) {
     return (
       <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
-        <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <div className="flex flex-col items-center justify-center h-screen gap-4 px-6">
           <motion.div
             className="text-5xl"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            animate={initFailed ? { opacity: 0.3 } : { rotate: 360 }}
+            transition={initFailed ? {} : { duration: 2, repeat: Infinity, ease: 'linear' }}
           >
-            🚀
+            {initFailed ? '🌑' : '🚀'}
           </motion.div>
-          <p className="text-slate-500 text-xs font-display uppercase tracking-widest">
-            Загрузка галактики...
-          </p>
+          {initFailed ? (
+            <>
+              <p className="text-slate-400 text-xs font-display uppercase tracking-widest text-center">
+                Не удалось подключиться к серверу
+              </p>
+              <p className="text-slate-600 text-[10px] text-center max-w-xs">
+                {error || 'Проверьте соединение и попробуйте снова'}
+              </p>
+              <button
+                onClick={() => {
+                  useGameStore.getState().initAuth()
+                  useGameStore.getState().loadContent()
+                }}
+                className="mt-4 px-6 py-2.5 rounded-xl bg-neon-cyan/10 text-neon-cyan text-xs font-display uppercase tracking-wider border border-neon-cyan/20 active:bg-neon-cyan/20 transition-colors"
+              >
+                Повторить
+              </button>
+            </>
+          ) : (
+            <p className="text-slate-500 text-xs font-display uppercase tracking-widest">
+              Загрузка галактики...
+            </p>
+          )}
         </div>
       </div>
     )

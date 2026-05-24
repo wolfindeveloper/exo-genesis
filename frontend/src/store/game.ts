@@ -20,6 +20,7 @@ interface GameState {
   isLoading: boolean
   isAuthReady: boolean
   isContentReady: boolean
+  initFailed: boolean
   error: string | null
 
   initAuth: () => Promise<void>
@@ -51,19 +52,28 @@ export const useGameStore = create<GameState>((set, get) => ({
   isLoading: false,
   isAuthReady: false,
   isContentReady: false,
+  initFailed: false,
   error: null,
 
   initAuth: async () => {
     if (_initStarted) return
     _initStarted = true
-    try {
-      set({ isLoading: true, error: null })
-      const data = await api.authInit()
-      const { is_new, box_rewards, ...rest } = data
-      set({ user: rest as UserProfile, boxRewards: (box_rewards as Record<string, unknown>) || null, isLoading: false, isAuthReady: true })
-    } catch (e) {
-      set({ error: (e as Error).message, isLoading: false, isAuthReady: true })
-      _initStarted = false
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        set({ isLoading: true, error: null, initFailed: false })
+        const data = await api.authInit()
+        const { is_new, box_rewards, ...rest } = data
+        set({ user: rest as UserProfile, boxRewards: (box_rewards as Record<string, unknown>) || null, isLoading: false, isAuthReady: true })
+        return
+      } catch (e) {
+        const isLast = attempt >= 4
+        if (isLast) {
+          set({ error: (e as Error).message, isLoading: false, initFailed: true })
+          _initStarted = false
+          return
+        }
+        await new Promise((r) => setTimeout(r, 1500))
+      }
     }
   },
 
@@ -160,9 +170,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   loadContent: async () => {
-    let attempts = 0
-    while (attempts < 3) {
+    for (let attempt = 0; attempt < 5; attempt++) {
       try {
+        set({ initFailed: false })
         const [shipsContent, zonesContent, elementsContent, resourcesContent] = await Promise.all([
           api.getShipsContent(),
           api.getZonesContent(),
@@ -172,13 +182,13 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ shipsContent, zonesContent, elementsContent, resourcesContent, isContentReady: true })
         return
       } catch (e) {
-        attempts++
-        if (attempts >= 3) {
-          console.warn('Content load failed after 3 attempts:', e)
-          set({ isContentReady: true })
+        const isLast = attempt >= 4
+        if (isLast) {
+          console.warn('Content load failed after 5 attempts:', e)
+          set({ error: (e as Error).message, initFailed: true })
           return
         }
-        await new Promise((r) => setTimeout(r, 2000))
+        await new Promise((r) => setTimeout(r, 1500))
       }
     }
   },
