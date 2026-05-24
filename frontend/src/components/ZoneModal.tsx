@@ -133,12 +133,12 @@ export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId
         </button>
 
         {/* Art header */}
-        <div className={`relative aspect-[32/11] ${zone.icon_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[zone.tier]}`} overflow-hidden`}>
+        <div className={`relative aspect-[3/2] ${zone.icon_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[zone.tier]}`} overflow-hidden`}>
           {zone.icon_path && !imgError ? (
             <img
               src={zone.icon_path}
               alt={zone.name_key}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               onError={() => setImgError(true)}
             />
           ) : (

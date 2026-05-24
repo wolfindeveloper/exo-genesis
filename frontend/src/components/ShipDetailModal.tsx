@@ -65,7 +65,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
         </button>
 
         {/* Art header */}
-        <div className={`relative aspect-[32/11] ${config?.art_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[tier]}`} overflow-hidden`}>
+        <div className={`relative aspect-[3/2] ${config?.art_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[tier]}`} overflow-hidden`}>
           {config?.art_path && !imgError ? (
             <img
               src={config.art_path}
