@@ -27,6 +27,7 @@ export interface Zone {
   risk_factor: number
   duration_hours: number
   fuel_cost: number
+  icon_path: string
   loot_table: LootEntry[]
 }
 

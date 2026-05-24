@@ -6,6 +6,20 @@ import { useGameStore } from '../store/game'
 import type { Ship, Zone } from '../types'
 
 // ---------------------------------------------------------------------------
+// Art helpers
+// ---------------------------------------------------------------------------
+const tierGradients = [
+  '',
+  'from-neon-cyan/30 via-space-800 to-space-950',
+  'from-neon-green/30 via-space-800 to-space-950',
+  'from-neon-purple/30 via-space-800 to-space-950',
+  'from-neon-amber/30 via-space-800 to-space-950',
+  'from-neon-red/30 via-space-800 to-space-950',
+]
+
+const tierAccent = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple', 'text-neon-amber', 'text-neon-red']
+
+// ---------------------------------------------------------------------------
 // Emoji helpers
 // ---------------------------------------------------------------------------
 const elementEmoji: Record<string, string> = {
@@ -50,17 +64,6 @@ const zoneEmoji: Record<string, string> = {
   the_end_of_shift_station: '🌆',
 }
 
-const tierGradients = [
-  '',
-  'from-neon-cyan/30 via-space-800 to-space-950',
-  'from-neon-green/30 via-space-800 to-space-950',
-  'from-neon-purple/30 via-space-800 to-space-950',
-  'from-neon-amber/30 via-space-800 to-space-950',
-  'from-neon-red/30 via-space-800 to-space-950',
-]
-
-const tierAccent = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple', 'text-neon-amber', 'text-neon-red']
-
 // ---------------------------------------------------------------------------
 // ZoneModal
 // ---------------------------------------------------------------------------
@@ -76,6 +79,7 @@ export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId
   const { ships, shipsContent, elementsContent } = useGameStore()
   const [selectedShipId, setSelectedShipId] = useState<string | null>(preselectedShipId || null)
   const [confirming, setConfirming] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   const elementLookup = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
@@ -129,20 +133,40 @@ export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId
         </button>
 
         {/* Art header */}
-        <div className={`relative h-44 bg-gradient-to-br ${tierGradients[zone.tier]} flex items-center justify-center overflow-hidden`}>
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 60%)' }} />
-          <div className="text-center">
-            <motion.div
-              className="text-6xl mb-2"
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-            >
-              {zoneEmoji[zone.id] || '🌌'}
-            </motion.div>
-            <h2 className={`font-display text-lg uppercase tracking-[0.15em] ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
-            <span className="text-[10px] text-white/40 font-display uppercase tracking-wider mt-1 block">Tier {zone.tier}</span>
-          </div>
+        <div className={`relative aspect-[32/11] ${zone.icon_path && !imgError ? '' : `bg-gradient-to-br ${tierGradients[zone.tier]}`} overflow-hidden`}>
+          {zone.icon_path && !imgError ? (
+            <img
+              src={zone.icon_path}
+              alt={zone.name_key}
+              className="w-full h-full object-contain"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className={`w-full h-full bg-gradient-to-br ${tierGradients[zone.tier]} flex items-center justify-center`}>
+              <div className="text-center">
+                <motion.div
+                  className="text-5xl mb-1"
+                  initial={{ scale: 0, rotate: -20 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                >
+                  {zoneEmoji[zone.id] || '🌌'}
+                </motion.div>
+                <h2 className={`font-display text-sm uppercase tracking-[0.15em] ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
+                <span className="text-[10px] text-white/40 font-display uppercase tracking-wider mt-0.5 block">Tier {zone.tier}</span>
+              </div>
+            </div>
+          )}
+          {zone.icon_path && !imgError && (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-space-900/80 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-5">
+                <h2 className={`font-display text-sm uppercase
+tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
+                <span className="text-[10px] text-white/50 font-display uppercase tracking-wider mt-0.5 block drop-shadow">Tier {zone.tier}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="p-5 space-y-5 pb-24">
