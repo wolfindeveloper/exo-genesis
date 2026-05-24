@@ -13,12 +13,12 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Hangar() {
-  const { ships, shipsContent, loadShips, isLoading } = useGameStore()
+  const { ships, shipsContent, loadShips, loadActiveExpeditions, isLoading } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
   const [selectedShip, setSelectedShip] = useState<Ship | null>(null)
   const navigate = useNavigate()
 
-  useEffect(() => { loadShips() }, [])
+  useEffect(() => { loadShips(); loadActiveExpeditions() }, [])
 
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
 

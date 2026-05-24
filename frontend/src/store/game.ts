@@ -7,7 +7,7 @@ interface GameState {
   user: UserProfile | null
   ships: Ship[]
   inventory: InventoryItem[]
-  activeExpedition: Expedition | null
+  activeExpeditions: Expedition[]
   lastExperiment: ExperimentResult | null
   stats: UserStats | null
   shipsContent: ShipConfig[]
@@ -22,6 +22,7 @@ interface GameState {
   loadProfile: () => Promise<void>
   loadShips: () => Promise<void>
   loadInventory: () => Promise<void>
+  loadActiveExpeditions: () => Promise<void>
   startExpedition: (shipId: string, zoneId: string) => Promise<void>
   claimExpedition: (expeditionId: string) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
@@ -35,7 +36,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   user: null,
   ships: [],
   inventory: [],
-  activeExpedition: null,
+  activeExpeditions: [],
   lastExperiment: null,
   stats: null,
   shipsContent: [],
@@ -99,11 +100,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
+  loadActiveExpeditions: async () => {
+    try {
+      const activeExpeditions = await api.getActiveExpeditions()
+      set({ activeExpeditions })
+    } catch {
+      // non-critical
+    }
+  },
+
   startExpedition: async (shipId, zoneId) => {
     try {
       set({ isLoading: true, error: null })
       const expedition = await api.startExpedition(shipId, zoneId)
-      set({ activeExpedition: expedition, isLoading: false })
+      set({ activeExpeditions: [...get().activeExpeditions, expedition], isLoading: false })
       await get().loadShips()
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
@@ -114,7 +124,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     try {
       set({ isLoading: true, error: null })
       await api.claimExpedition(expeditionId)
-      set({ activeExpedition: null, isLoading: false })
+      set({ activeExpeditions: get().activeExpeditions.filter((e) => e.id !== expeditionId), isLoading: false })
       await Promise.all([get().loadShips(), get().loadInventory()])
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })

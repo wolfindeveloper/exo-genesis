@@ -17,6 +17,21 @@ from app.services.expedition_logic import calculate_damage, calculate_loot, calc
 router = APIRouter(prefix="/expeditions", tags=["expeditions"])
 
 
+@router.get("/active", response_model=list[Expedition])
+async def get_active_expeditions(
+    user_id: str = Depends(get_current_user_id),
+    db: Client = Depends(get_db),
+):
+    result = (
+        db.table("expeditions")
+        .select("*")
+        .eq("user_id", user_id)
+        .eq("status", "active")
+        .execute()
+    )
+    return [Expedition(**row) for row in result.data]
+
+
 class StartExpeditionRequest(BaseModel):
     ship_id: str
     zone_id: str

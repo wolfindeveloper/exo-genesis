@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { motion } from 'motion/react'
 
+import { useExpeditionTimer } from '../hooks/useTimer'
+import { useGameStore } from '../store/game'
 import type { Ship, ShipConfig } from '../types'
 
 const tierColors = ['', '#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
@@ -38,6 +40,20 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
   const st = statusConfig[ship.status] || statusConfig.idle
   const fuelMax = config?.stats?.fuel_capacity || 50
   const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
+
+  const { activeExpeditions, zonesContent, claimExpedition, isLoading } = useGameStore()
+  const myExp = ship.status === 'expedition'
+    ? activeExpeditions.find((e) => e.ship_id === ship.id)
+    : null
+  const expTimer = myExp ? useExpeditionTimer(myExp.start_time, myExp.end_time) : null
+  const expZone = myExp ? zonesContent.find((z) => z.id === myExp.zone_config_id) : null
+
+  const handleClaim = useCallback(() => {
+    if (!myExp) return
+    const tg = (window as any).Telegram?.WebApp
+    tg?.HapticFeedback?.impactOccurred('medium')
+    claimExpedition(myExp.id)
+  }, [myExp, claimExpedition])
 
   return (
     <motion.div
@@ -181,9 +197,44 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
               🔧 Корабль на ремонте
             </div>
           )}
-          {ship.status === 'expedition' && (
-            <div className="w-full py-3 rounded-xl text-center text-xs text-neon-cyan/70 bg-neon-cyan/5 border border-neon-cyan/10 font-display uppercase tracking-wider">
-              🌌 В полёте
+          {ship.status === 'expedition' && myExp && expTimer && (
+            <div className="glass-card p-4 border border-neon-cyan/20 bg-neon-cyan/5">
+              <h4 className="text-[10px] font-display uppercase tracking-wider text-neon-cyan/70 mb-3">🌌 Экспедиция</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Зона</span>
+                  <span className="text-slate-300 font-medium">{expZone?.name_key || myExp.zone_config_id.replace(/_/g, ' ')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Старт</span>
+                  <span className="text-slate-300 font-mono">{new Date(myExp.start_time).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Осталось</span>
+                  <span className={`font-mono font-medium ${expTimer.isComplete ? 'text-neon-green' : 'text-neon-cyan'}`}>
+                    {expTimer.isComplete ? 'Готово к забору!' : expTimer.display}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="relative h-2 bg-space-500 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${expTimer.pct}%` }}
+                    style={{ background: expTimer.isComplete ? 'linear-gradient(90deg, #22c55e, #16a34a)' : 'linear-gradient(90deg, #22d3ee, #06b6d4)' }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+              {expTimer.isComplete && (
+                <button
+                  disabled={isLoading}
+                  onClick={handleClaim}
+                  className="btn-glow w-full mt-3 py-3 rounded-xl font-display text-xs uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-green/80 to-neon-cyan/80 hover:from-neon-green hover:to-neon-cyan"
+                >
+                  {isLoading ? 'Забираем...' : '🎁 Забрать награду'}
+                </button>
+              )}
             </div>
           )}
         </div>

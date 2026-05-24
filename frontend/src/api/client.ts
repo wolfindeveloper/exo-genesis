@@ -36,6 +36,8 @@ export const api = {
 
   getShips: () => request<Ship[]>('/user/ships'),
 
+  getActiveExpeditions: () => request<Expedition[]>('/expeditions/active'),
+
   startExpedition: (ship_id: string, zone_id: string) =>
     request<Expedition>('/expeditions/start', {
       method: 'POST',

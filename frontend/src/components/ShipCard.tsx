@@ -2,6 +2,8 @@ import { memo, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
+import { useExpeditionTimer } from '../hooks/useTimer'
+import { useGameStore } from '../store/game'
 import type { Ship, ShipConfig } from '../types'
 
 const statusConfig: Record<string, { label: string; cls: string }> = {
@@ -42,6 +44,15 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   const fuelMax = config?.stats?.fuel_capacity || 50
   const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
 
+  // Live timer for expedition ships
+  const activeExpeditions = useGameStore((s) => s.activeExpeditions)
+  const myExp = ship.status === 'expedition'
+    ? activeExpeditions.find((e) => e.ship_id === ship.id)
+    : null
+  const timer = myExp
+    ? useExpeditionTimer(myExp.start_time, myExp.end_time)
+    : null
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -70,7 +81,7 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-space-900/20 to-transparent" />
         <span className={`absolute top-2 right-2 text-[10px] font-medium px-2.5 py-1 rounded-full uppercase tracking-wider ${st.cls}`}>
-          {st.label}
+          {timer ? timer.display : st.label}
         </span>
         <div className="absolute bottom-2 left-3 flex gap-1">
           {Array.from({ length: tier }, (_, i) => (
