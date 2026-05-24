@@ -13,12 +13,15 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Hangar() {
-  const { ships, shipsContent, loadShips, loadActiveExpeditions, isLoading } = useGameStore()
+  const { ships, shipsContent, loadShips, loadActiveExpeditions } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
   const [selectedShip, setSelectedShip] = useState<Ship | null>(null)
+  const [shipsLoaded, setShipsLoaded] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => { loadShips(); loadActiveExpeditions() }, [])
+  useEffect(() => {
+    Promise.all([loadShips(), loadActiveExpeditions()]).finally(() => setShipsLoaded(true))
+  }, [])
 
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
 
@@ -94,7 +97,7 @@ export function Hangar() {
         </motion.div>
       )}
 
-      {isLoading && ships.length === 0 ? (
+      {!shipsLoaded && ships.length === 0 ? (
         <div className="flex flex-col gap-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="shimmer rounded-xl h-28" />

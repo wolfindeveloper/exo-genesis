@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { AnimatePresence } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
 
 import { BoxReveal } from './components/BoxReveal'
@@ -53,12 +53,33 @@ function AppContent() {
   const location = useLocation()
   const loadContent = useGameStore((s) => s.loadContent)
   const initAuth = useGameStore((s) => s.initAuth)
+  const isAuthReady = useGameStore((s) => s.isAuthReady)
+  const isContentReady = useGameStore((s) => s.isContentReady)
   const error = useGameStore((s) => s.error)
 
   useEffect(() => {
     initAuth()
     loadContent()
   }, [])
+
+  if (!isAuthReady || !isContentReady) {
+    return (
+      <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
+        <div className="flex flex-col items-center justify-center h-screen gap-4">
+          <motion.div
+            className="text-5xl"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          >
+            🚀
+          </motion.div>
+          <p className="text-slate-500 text-xs font-display uppercase tracking-widest">
+            Загрузка галактики...
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
