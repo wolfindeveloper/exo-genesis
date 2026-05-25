@@ -15,7 +15,7 @@
     "tier": 1,
     "stats": { "stability": 100, "fuel_capacity": 50, "speed_mod": 1.2 },
     "required_level": 1,
-    "art_path": "/assets/ships/orion.webp"
+    "art_path": "/assets/ships/orion.svg"
   },
   {
     "id": "aurora",
