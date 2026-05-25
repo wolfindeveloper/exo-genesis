@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
@@ -11,6 +11,8 @@ const statusConfig: Record<string, { label: string; cls: string }> = {
   expedition: { label: 'В полёте', cls: 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20' },
   repair: { label: 'Ремонт', cls: 'bg-neon-amber/10 text-neon-amber border border-neon-amber/20' },
 }
+
+const completeBadge = { label: '🎁 Забрать', cls: 'bg-neon-green text-black border border-neon-green font-bold' }
 
 const tierColors = ['', '#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
 const tierGradients = [
@@ -37,6 +39,7 @@ interface ShipCardProps {
 
 export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap }: ShipCardProps) {
   const [imgError, setImgError] = useState(false)
+  const wasComplete = useRef(false)
 
   const tier = config?.tier || parseInt(ship.ship_config_id.match(/t(\d)/)?.[1] || '1')
   const name = config?.name_key || ship.ship_config_id.replace(/_/g, ' ')
@@ -46,19 +49,44 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
 
   // Live timer for expedition ships
   const activeExpeditions = useGameStore((s) => s.activeExpeditions)
+  const addPendingClaim = useGameStore((s) => s.addPendingClaim)
   const myExp = ship.status === 'expedition'
     ? (activeExpeditions.find((e) => e.ship_id === ship.id) ?? null)
     : null
   const timer = useExpeditionTimer(myExp?.start_time ?? null, myExp?.end_time ?? null)
+  const isComplete = timer?.isComplete ?? false
+
+  // Auto-detect first transition to complete — add to pending claims
+  useEffect(() => {
+    if (isComplete && !wasComplete.current) {
+      wasComplete.current = true
+      addPendingClaim(ship.id, name)
+    }
+    if (!isComplete) wasComplete.current = false
+  }, [isComplete, ship.id, name, addPendingClaim])
+
+  const badge = isComplete ? completeBadge : st
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, type: 'spring', stiffness: 300, damping: 24 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        boxShadow: isComplete
+          ? ['0 0 12px rgba(34,197,94,0.15), inset 0 0 12px rgba(34,197,94,0.08)', '0 0 24px rgba(34,197,94,0.3), inset 0 0 20px rgba(34,197,94,0.12)', '0 0 12px rgba(34,197,94,0.15), inset 0 0 12px rgba(34,197,94,0.08)']
+          : `${tierColors[tier]}33`,
+      }}
+      transition={{
+        opacity: { delay: index * 0.08, type: 'spring', stiffness: 300, damping: 24 },
+        y: { delay: index * 0.08, type: 'spring', stiffness: 300, damping: 24 },
+        boxShadow: { duration: 2, repeat: isComplete ? Infinity : 0, ease: 'easeInOut' },
+      }}
       {...cardHover}
       className="glass-card overflow-hidden cursor-pointer"
-      style={{ borderColor: `${tierColors[tier]}33`, boxShadow: `0 0 12px ${tierColors[tier]}15, inset 0 0 12px ${tierColors[tier]}08` }}
+      style={{
+        borderColor: isComplete ? '#22c55e66' : `${tierColors[tier]}33`,
+      }}
       onClick={() => onTap(ship)}
     >
       <div className="relative h-32 bg-space-900/60 overflow-hidden">
@@ -78,9 +106,13 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-space-900 via-space-900/20 to-transparent" />
-        <span className={`absolute top-2 right-2 text-[10px] font-medium px-2.5 py-1 rounded-full uppercase tracking-wider ${st.cls}`}>
+        <motion.span
+          animate={isComplete ? { scale: [1, 1.06, 1] } : {}}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className={`absolute top-2 right-2 text-[10px] font-medium px-2.5 py-1 rounded-full uppercase tracking-wider ${badge.cls}`}
+        >
           {timer ? timer.display : st.label}
-        </span>
+        </motion.span>
         <div className="absolute bottom-2 left-3 flex gap-1">
           {Array.from({ length: tier }, (_, i) => (
             <span key={i} className="text-xs drop-shadow-lg" style={{ color: tierColors[tier] }}>★</span>

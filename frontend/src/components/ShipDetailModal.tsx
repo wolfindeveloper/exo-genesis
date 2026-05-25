@@ -52,8 +52,8 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
     if (!myExp) return
     const tg = (window as any).Telegram?.WebApp
     tg?.HapticFeedback?.impactOccurred('medium')
-    claimExpedition(myExp.id)
-  }, [myExp, claimExpedition])
+    claimExpedition(myExp.id, name)
+  }, [myExp, name, claimExpedition])
 
   return (
     <motion.div
@@ -121,6 +121,36 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
         </div>
 
         <div className="p-5 space-y-5 pb-24">
+          {/* Expedition block — shown FIRST when complete */}
+          {ship.status === 'expedition' && myExp && expTimer?.isComplete && (
+            <div className="glass-card p-4 border border-neon-green/30 bg-neon-green/5">
+              <h4 className="text-[10px] font-display uppercase tracking-wider text-neon-green/80 mb-3">✅ Экспедиция завершена</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Зона</span>
+                  <span className="text-slate-300 font-medium">{expZone?.name_key || myExp.zone_config_id.replace(/_/g, ' ')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Старт</span>
+                  <span className="text-slate-300 font-mono">{new Date(myExp.start_time).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Статус</span>
+                  <span className="font-mono font-medium text-neon-green">Готово к забору!</span>
+                </div>
+              </div>
+              <motion.button
+                disabled={isLoading}
+                onClick={handleClaim}
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="btn-glow w-full mt-3 py-3 rounded-xl font-display text-xs uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-green/80 to-neon-cyan/80 hover:from-neon-green hover:to-neon-cyan"
+              >
+                {isLoading ? 'Забираем...' : '🎁 Забрать награду'}
+              </motion.button>
+            </div>
+          )}
+
           {/* Description */}
           {config?.description_key && (
             <p className="text-xs text-slate-400 leading-relaxed">{config.description_key}</p>
@@ -183,21 +213,8 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
             )}
           </div>
 
-          {/* Action button */}
-          {ship.status === 'idle' && (
-            <button
-              onClick={onSend}
-              className="btn-glow w-full py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 hover:from-neon-purple hover:to-neon-cyan"
-            >
-              🚀 Отправить в полёт
-            </button>
-          )}
-          {ship.status === 'repair' && (
-            <div className="w-full py-3 rounded-xl text-center text-xs text-neon-amber/70 bg-neon-amber/5 border border-neon-amber/10 font-display uppercase tracking-wider">
-              🔧 Корабль на ремонте
-            </div>
-          )}
-          {ship.status === 'expedition' && myExp && expTimer && (
+          {/* Expedition block — informational when timer is still running */}
+          {ship.status === 'expedition' && myExp && expTimer && !expTimer.isComplete && (
             <div className="glass-card p-4 border border-neon-cyan/20 bg-neon-cyan/5">
               <h4 className="text-[10px] font-display uppercase tracking-wider text-neon-cyan/70 mb-3">🌌 Экспедиция</h4>
               <div className="space-y-2 text-xs">
@@ -211,30 +228,33 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Осталось</span>
-                  <span className={`font-mono font-medium ${expTimer.isComplete ? 'text-neon-green' : 'text-neon-cyan'}`}>
-                    {expTimer.isComplete ? 'Готово к забору!' : expTimer.display}
-                  </span>
+                  <span className="font-mono font-medium text-neon-cyan">{expTimer.display}</span>
                 </div>
-                {/* Progress bar */}
                 <div className="relative h-2 bg-space-500 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${expTimer.pct}%` }}
-                    style={{ background: expTimer.isComplete ? 'linear-gradient(90deg, #22c55e, #16a34a)' : 'linear-gradient(90deg, #22d3ee, #06b6d4)' }}
+                    style={{ background: 'linear-gradient(90deg, #22d3ee, #06b6d4)' }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
               </div>
-              {expTimer.isComplete && (
-                <button
-                  disabled={isLoading}
-                  onClick={handleClaim}
-                  className="btn-glow w-full mt-3 py-3 rounded-xl font-display text-xs uppercase tracking-wider transition disabled:opacity-30 bg-gradient-to-r from-neon-green/80 to-neon-cyan/80 hover:from-neon-green hover:to-neon-cyan"
-                >
-                  {isLoading ? 'Забираем...' : '🎁 Забрать награду'}
-                </button>
-              )}
+            </div>
+          )}
+
+          {/* Action button for idle ships */}
+          {ship.status === 'idle' && (
+            <button
+              onClick={onSend}
+              className="btn-glow w-full py-3.5 rounded-xl font-display text-sm uppercase tracking-wider transition bg-gradient-to-r from-neon-purple/80 to-neon-cyan/80 hover:from-neon-purple hover:to-neon-cyan"
+            >
+              🚀 Отправить в полёт
+            </button>
+          )}
+          {ship.status === 'repair' && (
+            <div className="w-full py-3 rounded-xl text-center text-xs text-neon-amber/70 bg-neon-amber/5 border border-neon-amber/10 font-display uppercase tracking-wider">
+              🔧 Корабль на ремонте
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Element, Expedition, ExperimentResult, InventoryItem, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Element, Expedition, ExperimentResult, InventoryItem, LootItem, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -17,6 +17,8 @@ interface GameState {
   elementsContent: Element[]
   resourcesContent: Resource[]
   boxRewards: Record<string, unknown> | null
+  pendingClaims: { shipId: string; shipName: string }[]
+  lastLoot: { shipName: string; loot: LootItem[]; shipStability: number } | null
   isLoading: boolean
   isAuthReady: boolean
   isContentReady: boolean
@@ -24,12 +26,15 @@ interface GameState {
   error: string | null
 
   initAuth: () => Promise<void>
+  addPendingClaim: (shipId: string, shipName: string) => void
+  removePendingClaim: (shipId: string) => void
+  clearLastLoot: () => void
   loadProfile: () => Promise<void>
   loadShips: () => Promise<void>
   loadInventory: () => Promise<void>
   loadActiveExpeditions: () => Promise<void>
   startExpedition: (shipId: string, zoneId: string) => Promise<void>
-  claimExpedition: (expeditionId: string) => Promise<void>
+  claimExpedition: (expeditionId: string, shipName?: string) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
   loadContent: () => Promise<void>
@@ -49,6 +54,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   elementsContent: [],
   resourcesContent: [],
   boxRewards: null,
+  pendingClaims: [],
+  lastLoot: null,
   isLoading: false,
   isAuthReady: false,
   isContentReady: false,
@@ -79,6 +86,22 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   clearBoxRewards: () => {
     set({ boxRewards: null })
+  },
+
+  addPendingClaim: (shipId, shipName) => {
+    set((s) => ({
+      pendingClaims: s.pendingClaims.some((c) => c.shipId === shipId)
+        ? s.pendingClaims
+        : [...s.pendingClaims, { shipId, shipName }],
+    }))
+  },
+
+  removePendingClaim: (shipId) => {
+    set((s) => ({ pendingClaims: s.pendingClaims.filter((c) => c.shipId !== shipId) }))
+  },
+
+  clearLastLoot: () => {
+    set({ lastLoot: null })
   },
 
   updateNickname: async (username: string) => {
@@ -138,11 +161,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  claimExpedition: async (expeditionId) => {
+  claimExpedition: async (expeditionId, shipName) => {
     try {
       set({ isLoading: true, error: null })
-      await api.claimExpedition(expeditionId)
-      set({ activeExpeditions: get().activeExpeditions.filter((e) => e.id !== expeditionId), isLoading: false })
+      const result = await api.claimExpedition(expeditionId)
+      set({
+        activeExpeditions: get().activeExpeditions.filter((e) => e.id !== expeditionId),
+        lastLoot: { shipName: shipName || 'Корабль', loot: result.loot, shipStability: result.ship_stability },
+        isLoading: false,
+      })
       await Promise.all([get().loadShips(), get().loadInventory()])
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })

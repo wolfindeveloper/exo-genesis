@@ -106,3 +106,14 @@ export interface UserStats {
   total_elements: number
   joined_days: number
 }
+
+export interface LootItem {
+  item_config_id: string
+  quantity: number
+}
+
+export interface ClaimResult {
+  status: string
+  loot: LootItem[]
+  ship_stability: number
+}

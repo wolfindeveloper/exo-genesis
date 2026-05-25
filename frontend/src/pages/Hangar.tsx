@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { ShipCard } from '../components/ShipCard'
 import { ShipDetailModal } from '../components/ShipDetailModal'
@@ -18,10 +18,22 @@ export function Hangar() {
   const [selectedShip, setSelectedShip] = useState<Ship | null>(null)
   const [shipsLoaded, setShipsLoaded] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const claimShipId = searchParams.get('claim')
 
   useEffect(() => {
     Promise.all([loadShips(), loadActiveExpeditions()]).finally(() => setShipsLoaded(true))
   }, [])
+
+  // Auto-open ShipDetailModal from notification banner
+  useEffect(() => {
+    if (ships.length === 0 || !claimShipId) return
+    const ship = ships.find((s) => s.id === claimShipId)
+    if (ship) setSelectedShip(ship)
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('claim')
+    navigate({ search: params.toString() }, { replace: true })
+  }, [ships, claimShipId, searchParams, navigate])
 
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
 

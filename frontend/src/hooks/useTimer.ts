@@ -15,7 +15,13 @@ export function useExpeditionTimer(
 
   useEffect(() => {
     if (!startTimeIso || !endTimeIso) return
-    const id = setInterval(() => setNow(Date.now()), 1000)
+    const endMs = new Date(endTimeIso).getTime()
+    if (Date.now() >= endMs) return
+    const id = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      if (n >= endMs) clearInterval(id)
+    }, 1000)
     return () => clearInterval(id)
   }, [startTimeIso, endTimeIso])
 

@@ -1,4 +1,4 @@
-import type { Expedition, ExperimentResult, InventoryItem, Resource, Ship, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
+import type { ClaimResult, Expedition, ExperimentResult, InventoryItem, Resource, Ship, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -45,7 +45,7 @@ export const api = {
     }),
 
   claimExpedition: (expedition_id: string) =>
-    request<{ status: string; loot: unknown[]; ship_stability: number }>(
+    request<ClaimResult>(
       '/expeditions/claim',
       {
         method: 'POST',
