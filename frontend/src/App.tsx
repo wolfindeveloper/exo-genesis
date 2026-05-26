@@ -5,7 +5,6 @@ import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-do
 import { BoxReveal } from './components/BoxReveal'
 import { Galaxy } from './pages/Galaxy'
 import { HudBar } from './components/HudBar'
-import { NotificationBanner } from './components/NotificationBanner'
 import { RewardSheet } from './components/RewardSheet'
 import { useGameStore } from './store/game'
 import { Hangar } from './pages/Hangar'
@@ -107,7 +106,6 @@ function AppContent() {
   return (
     <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
       <HudBar />
-      <NotificationBanner />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Hangar /></PageTransition>} />
