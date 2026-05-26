@@ -20,6 +20,7 @@ async def _process_pending(content: ContentLoader) -> None:
 
     result = db.table("expeditions").select("*").eq("status", "active").execute()
     now = datetime.now(timezone.utc)
+    sent = 0
 
     for row in result.data or []:
         end = datetime.fromisoformat(row["end_time"])
@@ -31,10 +32,14 @@ async def _process_pending(content: ContentLoader) -> None:
             continue
 
         user_id = row["user_id"]
+
         if is_recently_active(user_id):
+            logger.info("skip notify for active user %s", user_id)
             continue
+
         user_res = db.table("users").select("id").eq("id", user_id).execute()
         if not user_res.data:
+            logger.warning("user %s not found", user_id)
             continue
         chat_id = int(user_res.data[0]["id"])
 
@@ -68,13 +73,21 @@ async def _process_pending(content: ContentLoader) -> None:
         db.table("expeditions").update({"result_data": result_data}).eq(
             "id", row["id"]
         ).execute()
+        sent += 1
+
+    if sent:
+        logger.info("notifier: sent %d notifications", sent)
 
 
 async def run_notifier(content: ContentLoader) -> None:
     logger.info("background notifier started (interval=%ds)", _POLL_INTERVAL)
+    await asyncio.sleep(15)
     while True:
         try:
             await _process_pending(content)
         except Exception as e:
             logger.warning("notifier cycle error: %s", e)
+            import traceback
+
+            logger.warning(traceback.format_exc())
         await asyncio.sleep(_POLL_INTERVAL)
