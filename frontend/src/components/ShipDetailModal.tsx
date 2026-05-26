@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { useExpeditionTimer } from '../hooks/useTimer'
@@ -41,7 +41,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
   const fuelMax = config?.stats?.fuel_capacity || 50
   const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
 
-  const { activeExpeditions, zonesContent, claimExpedition, isLoading } = useGameStore()
+  const { activeExpeditions, zonesContent, claimExpedition, isLoading, inventory, resourcesContent, refuelShip, repairShip } = useGameStore()
   const myExp = ship.status === 'expedition'
     ? activeExpeditions.find((e) => e.ship_id === ship.id)
     : null
@@ -54,6 +54,42 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
     tg?.HapticFeedback?.impactOccurred('medium')
     claimExpedition(myExp.id, name)
   }, [myExp, name, claimExpedition])
+
+  // Smart refuel / repair helpers
+  const isIdle = ship.status === 'idle'
+  const matches = useMemo(() => {
+    const fuelRes = resourcesContent.find((r) => r.id === `fuel_t${tier}`)
+    const repairRes = resourcesContent.find((r) => r.id === `repair_kit_t${tier}`)
+    const fuelInv = fuelRes ? inventory.find((i) => i.item_config_id === fuelRes.id) : null
+    const repairInv = repairRes ? inventory.find((i) => i.item_config_id === repairRes.id) : null
+    const fuelQty = fuelInv?.quantity ?? 0
+    const repairQty = repairInv?.quantity ?? 0
+    const restorePerUnit = tier * 10
+
+    // Refuel
+    const fuelNeeded = fuelMax - ship.fuel_current
+    const fuelUnits = fuelNeeded > 0 ? Math.ceil(fuelNeeded / restorePerUnit) : 0
+    const fuelUsable = Math.min(fuelUnits, fuelQty)
+    const fuelWillRestore = fuelUsable * restorePerUnit
+    const fuelAfter = Math.min(fuelMax, ship.fuel_current + fuelWillRestore)
+
+    // Repair
+    const repairNeeded = 100 - ship.stability
+    const repairUnits = repairNeeded > 0 ? Math.ceil(repairNeeded / restorePerUnit) : 0
+    const repairUsable = Math.min(repairUnits, repairQty)
+    const repairWillRestore = repairUsable * restorePerUnit
+    const repairAfter = Math.min(100, ship.stability + repairWillRestore)
+
+    return { fuelRes, fuelQty, fuelUnits, fuelUsable, fuelAfter, repairRes, repairQty, repairUnits, repairUsable, repairAfter }
+  }, [resourcesContent, inventory, tier, fuelMax, ship.fuel_current, ship.stability])
+
+  const handleRefuel = useCallback(() => {
+    if (matches.fuelRes) refuelShip(ship.id, matches.fuelRes.id)
+  }, [matches.fuelRes, refuelShip, ship.id])
+
+  const handleRepair = useCallback(() => {
+    if (matches.repairRes) repairShip(ship.id, matches.repairRes.id)
+  }, [matches.repairRes, repairShip, ship.id])
 
   return (
     <motion.div
@@ -174,6 +210,15 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
                     style={{ backgroundColor: stabilityColor(ship.stability) }}
                   />
                 </div>
+                {isIdle && ship.stability < 100 && matches.repairUsable > 0 && (
+                  <button
+                    disabled={isLoading}
+                    onClick={handleRepair}
+                    className="mt-1.5 w-full text-[10px] py-1.5 rounded-lg bg-neon-amber/10 text-neon-amber border border-neon-amber/20 hover:bg-neon-amber/20 transition disabled:opacity-30"
+                  >
+                    🔧 Починить до {matches.repairAfter}% ({matches.repairUsable}× {matches.repairRes?.id.replace(/_/g, ' ') || ''})
+                  </button>
+                )}
               </div>
               <div>
                 <div className="flex justify-between text-xs mb-1">
@@ -189,6 +234,15 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
                     style={{ backgroundColor: '#f59e0b' }}
                   />
                 </div>
+                {isIdle && ship.fuel_current < fuelMax && matches.fuelUsable > 0 && (
+                  <button
+                    disabled={isLoading}
+                    onClick={handleRefuel}
+                    className="mt-1.5 w-full text-[10px] py-1.5 rounded-lg bg-neon-amber/10 text-neon-amber border border-neon-amber/20 hover:bg-neon-amber/20 transition disabled:opacity-30"
+                  >
+                    ⛽ Заправить до {matches.fuelAfter}/{fuelMax} ({matches.fuelUsable}× {matches.fuelRes?.id.replace(/_/g, ' ') || ''})
+                  </button>
+                )}
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Скорость</span>

@@ -1,4 +1,4 @@
-import type { ClaimResult, Expedition, ExperimentResult, InventoryItem, Resource, Ship, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
+import type { ClaimResult, Expedition, ExperimentResult, InventoryItem, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -65,6 +65,18 @@ export const api = {
     request<UserProfile>('/user/profile', {
       method: 'PATCH',
       body: JSON.stringify(data),
+    }),
+
+  refuelShip: (shipId: string, resourceId: string) =>
+    request<ShipActionResponse>(`/user/ships/${shipId}/refuel`, {
+      method: 'POST',
+      body: JSON.stringify({ resource_id: resourceId }),
+    }),
+
+  repairShip: (shipId: string, resourceId: string) =>
+    request<ShipActionResponse>(`/user/ships/${shipId}/repair`, {
+      method: 'POST',
+      body: JSON.stringify({ resource_id: resourceId }),
     }),
 
   getShipsContent: () => request<ShipConfig[]>('/content/ships'),

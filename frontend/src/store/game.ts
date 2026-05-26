@@ -35,6 +35,8 @@ interface GameState {
   loadActiveExpeditions: () => Promise<void>
   startExpedition: (shipId: string, zoneId: string) => Promise<void>
   claimExpedition: (expeditionId: string, shipName?: string) => Promise<void>
+  refuelShip: (shipId: string, resourceId: string) => Promise<void>
+  repairShip: (shipId: string, resourceId: string) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
   loadContent: () => Promise<void>
@@ -156,6 +158,26 @@ export const useGameStore = create<GameState>((set, get) => ({
       const expedition = await api.startExpedition(shipId, zoneId)
       set({ activeExpeditions: [...get().activeExpeditions, expedition], isLoading: false })
       await get().loadShips()
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  refuelShip: async (shipId, resourceId) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.refuelShip(shipId, resourceId)
+      set({ ships: get().ships.map((s) => (s.id === shipId ? result.ship : s)), inventory: result.inventory, isLoading: false })
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  repairShip: async (shipId, resourceId) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.repairShip(shipId, resourceId)
+      set({ ships: get().ships.map((s) => (s.id === shipId ? result.ship : s)), inventory: result.inventory, isLoading: false })
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
     }

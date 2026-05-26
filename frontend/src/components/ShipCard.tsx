@@ -1,10 +1,10 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
 import { useExpeditionTimer } from '../hooks/useTimer'
 import { useGameStore } from '../store/game'
-import type { Ship, ShipConfig } from '../types'
+import type { Resource, Ship, ShipConfig } from '../types'
 
 const statusConfig: Record<string, { label: string; cls: string }> = {
   idle: { label: 'Готов', cls: 'bg-neon-green/10 text-neon-green border border-neon-green/20' },
@@ -46,6 +46,40 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   const st = statusConfig[ship.status] || statusConfig.idle
   const fuelMax = config?.stats?.fuel_capacity || 50
   const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
+
+  // Pills for refuel / repair
+  const inventory = useGameStore((s) => s.inventory)
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
+  const doRefuel = useGameStore((s) => s.refuelShip)
+  const doRepair = useGameStore((s) => s.repairShip)
+
+  const isIdle = ship.status === 'idle'
+  const repairResource: Resource | undefined = useMemo(() => {
+    if (!isIdle || !config) return undefined
+    return resourcesContent.find((r) => r.id === `repair_kit_t${tier}`)
+  }, [isIdle, config, resourcesContent, tier])
+  const fuelResource: Resource | undefined = useMemo(() => {
+    if (!isIdle || !config) return undefined
+    return resourcesContent.find((r) => r.id === `fuel_t${tier}`)
+  }, [isIdle, config, resourcesContent, tier])
+  const hasRepairKit = useMemo(() => {
+    if (!repairResource) return false
+    return inventory.some((i) => i.item_config_id === repairResource.id && i.quantity > 0)
+  }, [repairResource, inventory])
+  const hasFuel = useMemo(() => {
+    if (!fuelResource) return false
+    return inventory.some((i) => i.item_config_id === fuelResource.id && i.quantity > 0)
+  }, [fuelResource, inventory])
+
+  const handleRepair = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (repairResource) doRepair(ship.id, repairResource.id)
+  }, [repairResource, doRepair, ship.id])
+
+  const handleRefuel = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (fuelResource) doRefuel(ship.id, fuelResource.id)
+  }, [fuelResource, doRefuel, ship.id])
 
   // Live timer for expedition ships
   const activeExpeditions = useGameStore((s) => s.activeExpeditions)
@@ -134,7 +168,12 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
           <div>
             <div className="flex justify-between text-[10px] mb-1">
               <span className="text-slate-500 uppercase tracking-wider">Прочность</span>
-              <span className="font-mono text-slate-400">{ship.stability}%</span>
+              <span className="font-mono text-slate-400 flex items-center gap-1.5">
+                {ship.stability}%
+                {isIdle && ship.stability < 100 && hasRepairKit && (
+                  <button onClick={handleRepair} className="text-[10px] px-1.5 py-0.5 rounded-full bg-neon-amber/15 text-neon-amber border border-neon-amber/30 hover:bg-neon-amber/25 leading-none">+🔧</button>
+                )}
+              </span>
             </div>
             <div className="relative h-5 bg-space-500 rounded-full overflow-hidden">
               <motion.div
@@ -149,7 +188,12 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
           <div>
             <div className="flex justify-between text-[10px] mb-1">
               <span className="text-slate-500 uppercase tracking-wider">Топливо</span>
-              <span className="font-mono text-slate-400">{ship.fuel_current}/{fuelMax}</span>
+              <span className="font-mono text-slate-400 flex items-center gap-1.5">
+                {ship.fuel_current}/{fuelMax}
+                {isIdle && ship.fuel_current < fuelMax && hasFuel && (
+                  <button onClick={handleRefuel} className="text-[10px] px-1.5 py-0.5 rounded-full bg-neon-amber/15 text-neon-amber border border-neon-amber/30 hover:bg-neon-amber/25 leading-none">+⛽</button>
+                )}
+              </span>
             </div>
             <div className="relative h-5 bg-space-500 rounded-full overflow-hidden">
               <motion.div

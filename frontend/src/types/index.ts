@@ -112,6 +112,11 @@ export interface LootItem {
   quantity: number
 }
 
+export interface ShipActionResponse {
+  ship: Ship
+  inventory: InventoryItem[]
+}
+
 export interface ClaimResult {
   status: string
   loot: LootItem[]
