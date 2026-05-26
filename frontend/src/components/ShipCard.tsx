@@ -102,8 +102,7 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   useEffect(() => {
     if (isComplete && !wasComplete.current) {
       wasComplete.current = true
-      const completedDuringSession =
-        myExp && new Date(myExp.end_time).getTime() > mountTime.current
+      const completedDuringSession = !!(myExp && new Date(myExp.end_time).getTime() > mountTime.current)
       addPendingClaim(ship.id, name, completedDuringSession)
     }
     if (!isComplete) wasComplete.current = false
