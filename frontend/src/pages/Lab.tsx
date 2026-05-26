@@ -99,7 +99,7 @@ export function Lab() {
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
                   <div className="text-2xl mb-1">{elementEmoji[slot.item_config_id] || '?'}</div>
-                  <div className="text-[10px] leading-tight text-slate-300">{ed?.name_key || slot.item_config_id}</div>
+                  <div className="text-[10px] leading-tight text-slate-300">{ed?.name_key || '?'}</div>
                 </motion.div>
               ) : (
                 <span className="text-white/20 font-display text-sm">{i + 1}</span>
@@ -170,7 +170,7 @@ export function Lab() {
                   <motion.span className="text-xl" animate={{ rotate: [0, -10, 10, -5, 0] }} transition={{ duration: 0.5 }}>✨</motion.span>
                   <h3 className="font-display text-sm uppercase tracking-wider text-neon-green">Артефакт создан!</h3>
                 </div>
-                <p className="text-sm text-slate-300 mb-1">{lastExperiment.artifact_name_key?.replace(/_/g, ' ') || 'Неизвестный артефакт'}</p>
+                <p className="text-sm text-slate-300 mb-1">{lastExperiment.artifact_name_key || 'Неизвестный артефакт'}</p>
                 <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
                   <span className="font-display text-[10px]">TIER {lastExperiment.artifact_tier}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-600" />
@@ -218,7 +218,7 @@ export function Lab() {
                 } ${isSelected ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'} bg-space-700/50 hover:bg-space-600/80`}
               >
                 <span className="mr-1">{elementEmoji[item.item_config_id] || '?'}</span>
-                {ed?.name_key || item.item_config_id}
+                {ed?.name_key || '?'}
                 <span className="ml-1 text-slate-600">x{item.quantity}</span>
               </motion.button>
             )

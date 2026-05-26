@@ -88,6 +88,15 @@ export interface ExperimentResult {
   xp_gained: number
 }
 
+export interface Artifact {
+  id: string
+  name_key: string
+  description_key?: string
+  tier: number
+  rarity: string
+  stats_modifiers?: Record<string, number>
+}
+
 export interface Resource {
   id: string
   name_key: string

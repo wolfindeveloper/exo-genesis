@@ -1,4 +1,4 @@
-import type { ClaimResult, Expedition, ExperimentResult, InventoryItem, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
+import type { Artifact, ClaimResult, Expedition, ExperimentResult, InventoryItem, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -83,4 +83,5 @@ export const api = {
   getZonesContent: () => request<Zone[]>('/content/zones'),
   getElementsContent: () => request<Element[]>('/content/elements'),
   getResourcesContent: () => request<Resource[]>('/content/resources'),
+  getArtifactsContent: () => request<Artifact[]>('/content/artifacts'),
 }

@@ -220,7 +220,7 @@ tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
                 const el = elementLookup.get(loot.item_id)
                 return (
                   <span key={loot.item_id} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-slate-400 border border-white/5">
-                    {elementEmoji[loot.item_id] || '📦'} {el?.name_key || loot.item_id.replace(/_/g, ' ')} {loot.min}–{loot.max}
+                    {elementEmoji[loot.item_id] || '📦'} {el?.name_key || 'Неизвестный предмет'} {loot.min}–{loot.max}
                   </span>
                 )
               })}
@@ -248,7 +248,7 @@ tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{cfg?.name_key || s.ship_config_id}</span>
+                        <span className="font-medium">{cfg?.name_key || 'Неизвестный корабль'}</span>
                         <div className="flex gap-2 text-[10px] text-slate-500">
                           <span>⛽ {s.fuel_current}</span>
                           <span>⚡ {Math.round(s.stability)}%</span>

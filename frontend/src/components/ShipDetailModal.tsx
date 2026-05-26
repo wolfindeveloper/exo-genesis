@@ -41,7 +41,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
   const fuelMax = config?.stats?.fuel_capacity || 50
   const fuelPct = Math.min((ship.fuel_current / fuelMax) * 100, 100)
 
-  const { activeExpeditions, zonesContent, claimExpedition, isLoading, inventory, resourcesContent, refuelShip, repairShip } = useGameStore()
+  const { activeExpeditions, zonesContent, claimExpedition, isLoading, inventory, resourcesContent, artifactsContent, refuelShip, repairShip } = useGameStore()
   const myExp = ship.status === 'expedition'
     ? activeExpeditions.find((e) => e.ship_id === ship.id)
     : null
@@ -57,6 +57,8 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
 
   // Smart refuel / repair helpers
   const isIdle = ship.status === 'idle'
+  const artifactLookup = useMemo(() => new Map(artifactsContent.map((a) => [a.id, a])), [artifactsContent])
+
   const matches = useMemo(() => {
     const fuelRes = resourcesContent.find((r) => r.id === `fuel_t${tier}`)
     const repairRes = resourcesContent.find((r) => r.id === `repair_kit_t${tier}`)
@@ -216,7 +218,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
                     onClick={handleRepair}
                     className="mt-1.5 w-full text-[10px] py-1.5 rounded-lg bg-neon-amber/10 text-neon-amber border border-neon-amber/20 hover:bg-neon-amber/20 transition disabled:opacity-30"
                   >
-                    🔧 Починить до {matches.repairAfter}% ({matches.repairUsable}× {matches.repairRes?.id.replace(/_/g, ' ') || ''})
+                    🔧 Починить до {matches.repairAfter}% ({matches.repairUsable}× {matches.repairRes?.name_key || ''})
                   </button>
                 )}
               </div>
@@ -240,7 +242,7 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
                     onClick={handleRefuel}
                     className="mt-1.5 w-full text-[10px] py-1.5 rounded-lg bg-neon-amber/10 text-neon-amber border border-neon-amber/20 hover:bg-neon-amber/20 transition disabled:opacity-30"
                   >
-                    ⛽ Заправить до {matches.fuelAfter}/{fuelMax} ({matches.fuelUsable}× {matches.fuelRes?.id.replace(/_/g, ' ') || ''})
+                    ⛽ Заправить до {matches.fuelAfter}/{fuelMax} ({matches.fuelUsable}× {matches.fuelRes?.name_key || ''})
                   </button>
                 )}
               </div>
@@ -258,11 +260,14 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
               <p className="text-xs text-slate-600">Не установлены</p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
-                {ship.equipped_artifacts.map((artId) => (
-                  <span key={artId} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-neon-purple/80 border border-neon-purple/10">
-                    ✦ {artId.replace(/_/g, ' ')}
-                  </span>
-                ))}
+                {ship.equipped_artifacts.map((artId) => {
+                  const art = artifactLookup.get(artId)
+                  return (
+                    <span key={artId} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-neon-purple/80 border border-neon-purple/10">
+                      ✦ {art?.name_key || 'Неизвестный артефакт'}
+                    </span>
+                  )
+                })}
               </div>
             )}
           </div>

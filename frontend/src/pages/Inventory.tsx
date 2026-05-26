@@ -109,8 +109,8 @@ function InventoryRow({ item, nameLookup }: { item: InventoryItem; nameLookup: M
         <div className="text-xl">{elementEmoji[item.item_config_id] || typeIcons[item.item_type] || '📦'}</div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{entry?.name_key || item.item_config_id.replace(/_/g, ' ')}</p>
-        <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || item.item_type}</p>
+        <p className="text-sm font-medium truncate">{entry?.name_key || 'Неизвестный предмет'}</p>
+        <p className="text-[10px] text-slate-500">{typeLabels[item.item_type] || 'Неизвестный тип'}</p>
         {item.item_type === 'artifact' && Object.keys(meta).length > 0 && (
           <div className="flex gap-2 mt-1">
             {(meta.speed_mod as number) && <span className="text-[9px] text-neon-cyan/70">⚡ +{(meta.speed_mod as number).toFixed(2)}</span>}

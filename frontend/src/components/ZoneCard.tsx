@@ -48,7 +48,7 @@ export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index
           const el = elementLookup.get(loot.item_id)
           return (
             <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
-              {el?.name_key || loot.item_id.replace('_', ' ')}
+              {el?.name_key || 'Неизвестный предмет'}
             </span>
           )
         })}

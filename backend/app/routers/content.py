@@ -58,6 +58,11 @@ async def get_resource(resource_id: str, content: ContentLoader = Depends(get_co
     return resource
 
 
+@router.get("/artifacts")
+async def get_artifacts(content: ContentLoader = Depends(get_content_loader)):
+    return content.artifacts
+
+
 @router.get("/boxes")
 async def get_boxes(content: ContentLoader = Depends(get_content_loader)):
     return content.boxes
