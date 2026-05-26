@@ -71,14 +71,20 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
     return inventory.some((i) => i.item_config_id === fuelResource.id && i.quantity > 0)
   }, [fuelResource, inventory])
 
+  const actionLock = useRef(false)
+
   const handleRepair = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    if (repairResource) doRepair(ship.id, repairResource.id)
+    if (actionLock.current || !repairResource) return
+    actionLock.current = true
+    doRepair(ship.id, repairResource.id).finally(() => { actionLock.current = false })
   }, [repairResource, doRepair, ship.id])
 
   const handleRefuel = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    if (fuelResource) doRefuel(ship.id, fuelResource.id)
+    if (actionLock.current || !fuelResource) return
+    actionLock.current = true
+    doRefuel(ship.id, fuelResource.id).finally(() => { actionLock.current = false })
   }, [fuelResource, doRefuel, ship.id])
 
   // Live timer for expedition ships
@@ -90,11 +96,19 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   const timer = useExpeditionTimer(myExp?.start_time ?? null, myExp?.end_time ?? null)
   const isComplete = timer?.isComplete ?? false
 
-  // Auto-detect first transition to complete — add to pending claims
+  // Auto-detect first transition to complete — add to pending claims + Telegram popup
   useEffect(() => {
     if (isComplete && !wasComplete.current) {
       wasComplete.current = true
       addPendingClaim(ship.id, name)
+      const tg = (window as any).Telegram?.WebApp
+      if (tg?.showPopup) {
+        tg.showPopup({
+          title: '🚀 Экспедиция завершена!',
+          message: `Корабль «${name}» вернулся из полёта.\nЗабери награду в Ангаре.`,
+          buttons: [{ type: 'close' }],
+        })
+      }
     }
     if (!isComplete) wasComplete.current = false
   }, [isComplete, ship.id, name, addPendingClaim])

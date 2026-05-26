@@ -51,7 +51,7 @@ async def get_active_expeditions(
         ship_name = ship_cfg.get("name_key", ship_config_id.replace("_", " ")) if ship_cfg else ship_config_id.replace("_", " ")
         zone_name = zone_cfg.get("name_key", row["zone_config_id"].replace("_", " ")) if zone_cfg else row["zone_config_id"].replace("_", " ")
         chat_id = int(payload["user"]["id"])
-        await notify_expedition_complete(settings.bot_token, chat_id, ship_name, zone_name)
+        await notify_expedition_complete(settings.bot_token, chat_id, ship_name, zone_name, settings.frontend_url)
         result_data["notified"] = True
         db.table("expeditions").update({"result_data": result_data}).eq("id", row["id"]).execute()
 

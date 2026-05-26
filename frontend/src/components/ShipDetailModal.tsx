@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { useExpeditionTimer } from '../hooks/useTimer'
@@ -85,12 +85,18 @@ export function ShipDetailModal({ ship, config, onClose, onSend }: ShipDetailMod
     return { fuelRes, fuelQty, fuelUnits, fuelUsable, fuelAfter, repairRes, repairQty, repairUnits, repairUsable, repairAfter }
   }, [resourcesContent, inventory, tier, fuelMax, ship.fuel_current, ship.stability])
 
+  const actionLock = useRef(false)
+
   const handleRefuel = useCallback(() => {
-    if (matches.fuelRes) refuelShip(ship.id, matches.fuelRes.id)
+    if (actionLock.current || !matches.fuelRes) return
+    actionLock.current = true
+    refuelShip(ship.id, matches.fuelRes.id).finally(() => { actionLock.current = false })
   }, [matches.fuelRes, refuelShip, ship.id])
 
   const handleRepair = useCallback(() => {
-    if (matches.repairRes) repairShip(ship.id, matches.repairRes.id)
+    if (actionLock.current || !matches.repairRes) return
+    actionLock.current = true
+    repairShip(ship.id, matches.repairRes.id).finally(() => { actionLock.current = false })
   }, [matches.repairRes, repairShip, ship.id])
 
   return (
