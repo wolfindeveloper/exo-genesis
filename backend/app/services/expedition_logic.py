@@ -33,7 +33,7 @@ def calculate_zone_stats(
     return {
         "effective_risk": round(max(0, effective_risk), 4),
         "effective_fuel_cost": max(0, round(effective_fuel_cost)),
-        "effective_duration": max(0.5, round(effective_duration, 1)),
+        "effective_duration": max(0.017, round(effective_duration, 3)),
         "fuel_ok": ship_fuel_current >= max(0, round(effective_fuel_cost)),
         "estimated_max_damage": round(max(0, effective_risk * 15), 1),
     }

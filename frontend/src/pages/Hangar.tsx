@@ -15,11 +15,16 @@ const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 
 export function Hangar() {
   const { ships, shipsContent, loadShips, loadActiveExpeditions } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
-  const [selectedShip, setSelectedShip] = useState<Ship | null>(null)
+  const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
   const [shipsLoaded, setShipsLoaded] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const claimShipId = searchParams.get('claim')
+
+  const selectedShip = useMemo(
+    () => (selectedShipId ? ships.find((s) => s.id === selectedShipId) ?? null : null),
+    [selectedShipId, ships],
+  )
 
   useEffect(() => {
     Promise.all([loadShips(), loadActiveExpeditions()]).finally(() => setShipsLoaded(true))
@@ -28,8 +33,7 @@ export function Hangar() {
   // Auto-open ShipDetailModal from notification banner
   useEffect(() => {
     if (ships.length === 0 || !claimShipId) return
-    const ship = ships.find((s) => s.id === claimShipId)
-    if (ship) setSelectedShip(ship)
+    setSelectedShipId(claimShipId)
     const params = new URLSearchParams(searchParams.toString())
     params.delete('claim')
     navigate({ search: params.toString() }, { replace: true })
@@ -54,8 +58,8 @@ export function Hangar() {
   const idleCount = useMemo(() => ships.filter((s) => s.status === 'idle').length, [ships])
   const onMission = useMemo(() => ships.length - idleCount, [ships.length, idleCount])
 
-  const handleShipTap = useCallback((ship: Ship) => setSelectedShip(ship), [])
-  const handleCloseModal = useCallback(() => setSelectedShip(null), [])
+  const handleShipTap = useCallback((ship: Ship) => setSelectedShipId(ship.id), [])
+  const handleCloseModal = useCallback(() => setSelectedShipId(null), [])
 
   const filteredShipConfigs = useMemo(() => {
     const m = new Map<string, ShipConfig | undefined>()
@@ -157,7 +161,7 @@ export function Hangar() {
             ship={selectedShip}
             config={shipConfigLookup.get(selectedShip.ship_config_id) || null}
             onClose={handleCloseModal}
-            onSend={() => { handleCloseModal(); navigate(`/galaxy?ship=${selectedShip.id}`) }}
+            onSend={() => { handleCloseModal(); navigate(`/galaxy?ship=${selectedShip!.id}`) }}
           />
         )}
       </AnimatePresence>
