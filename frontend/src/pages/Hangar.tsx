@@ -13,7 +13,7 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Hangar() {
-  const { ships, shipsContent, loadShips, loadActiveExpeditions } = useGameStore()
+  const { ships, shipsContent, loadShips, loadActiveExpeditions, loadInventory } = useGameStore()
   const [tierFilter, setTierFilter] = useState(1)
   const [selectedShipId, setSelectedShipId] = useState<string | null>(null)
   const [shipsLoaded, setShipsLoaded] = useState(false)
@@ -27,7 +27,7 @@ export function Hangar() {
   )
 
   useEffect(() => {
-    Promise.all([loadShips(), loadActiveExpeditions()]).finally(() => setShipsLoaded(true))
+    Promise.all([loadShips(), loadActiveExpeditions(), loadInventory()]).finally(() => setShipsLoaded(true))
   }, [])
 
   // Auto-open ShipDetailModal from notification banner
