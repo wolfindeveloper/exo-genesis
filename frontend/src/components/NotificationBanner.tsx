@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
@@ -9,12 +9,26 @@ export function NotificationBanner() {
   const pendingClaims = useGameStore((s) => s.pendingClaims)
   const removePendingClaim = useGameStore((s) => s.removePendingClaim)
   const [dismissed, setDismissed] = useState(false)
+  const shownFresh = useRef(new Set<string>())
 
   const first = pendingClaims[0]
   const visible = !!first && !dismissed
 
+  // Telegram popup once per fresh claim
   useEffect(() => {
-    if (first) setDismissed(false)
+    if (!first) return
+    setDismissed(false)
+    if (first.fresh && !shownFresh.current.has(first.shipId)) {
+      shownFresh.current.add(first.shipId)
+      const tg = (window as any).Telegram?.WebApp
+      if (tg?.showPopup) {
+        tg.showPopup({
+          title: '🚀 Экспедиция завершена!',
+          message: `Корабль «${first.shipName}» вернулся из полёта.\nЗабери награду в Ангаре.`,
+          buttons: [{ type: 'close' }],
+        })
+      }
+    }
   }, [first?.shipId])
 
   useEffect(() => {

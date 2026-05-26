@@ -96,22 +96,18 @@ export const ShipCard = memo(function ShipCard({ ship, config, index = 0, onTap 
   const timer = useExpeditionTimer(myExp?.start_time ?? null, myExp?.end_time ?? null)
   const isComplete = timer?.isComplete ?? false
 
-  // Auto-detect first transition to complete — add to pending claims + Telegram popup
+  // Auto-detect first transition to complete — add to pending claims
+  const mountTime = useRef(Date.now())
+
   useEffect(() => {
     if (isComplete && !wasComplete.current) {
       wasComplete.current = true
-      addPendingClaim(ship.id, name)
-      const tg = (window as any).Telegram?.WebApp
-      if (tg?.showPopup) {
-        tg.showPopup({
-          title: '🚀 Экспедиция завершена!',
-          message: `Корабль «${name}» вернулся из полёта.\nЗабери награду в Ангаре.`,
-          buttons: [{ type: 'close' }],
-        })
-      }
+      const completedDuringSession =
+        myExp && new Date(myExp.end_time).getTime() > mountTime.current
+      addPendingClaim(ship.id, name, completedDuringSession)
     }
     if (!isComplete) wasComplete.current = false
-  }, [isComplete, ship.id, name, addPendingClaim])
+  }, [isComplete, ship.id, name, addPendingClaim, myExp])
 
   const badge = isComplete ? completeBadge : st
 

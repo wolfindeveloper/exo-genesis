@@ -18,7 +18,7 @@ interface GameState {
   resourcesContent: Resource[]
   artifactsContent: Artifact[]
   boxRewards: Record<string, unknown> | null
-  pendingClaims: { shipId: string; shipName: string }[]
+  pendingClaims: { shipId: string; shipName: string; fresh?: boolean }[]
   lastLoot: { shipName: string; loot: LootItem[]; shipStability: number } | null
   isLoading: boolean
   isAuthReady: boolean
@@ -27,7 +27,7 @@ interface GameState {
   error: string | null
 
   initAuth: () => Promise<void>
-  addPendingClaim: (shipId: string, shipName: string) => void
+  addPendingClaim: (shipId: string, shipName: string, fresh?: boolean) => void
   removePendingClaim: (shipId: string) => void
   clearLastLoot: () => void
   loadProfile: () => Promise<void>
@@ -92,11 +92,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ boxRewards: null })
   },
 
-  addPendingClaim: (shipId, shipName) => {
+  addPendingClaim: (shipId, shipName, fresh) => {
     set((s) => ({
       pendingClaims: s.pendingClaims.some((c) => c.shipId === shipId)
         ? s.pendingClaims
-        : [...s.pendingClaims, { shipId, shipName }],
+        : [...s.pendingClaims, { shipId, shipName, fresh }],
     }))
   },
 
