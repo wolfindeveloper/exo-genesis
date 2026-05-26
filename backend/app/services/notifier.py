@@ -14,6 +14,8 @@ _POLL_INTERVAL = 30
 async def _process_pending(content: ContentLoader) -> None:
     from datetime import datetime, timezone
 
+    from app.services.user_activity import is_recently_active
+
     db = await get_supabase()
 
     result = db.table("expeditions").select("*").eq("status", "active").execute()
@@ -29,6 +31,8 @@ async def _process_pending(content: ContentLoader) -> None:
             continue
 
         user_id = row["user_id"]
+        if is_recently_active(user_id):
+            continue
         user_res = db.table("users").select("id").eq("id", user_id).execute()
         if not user_res.data:
             continue

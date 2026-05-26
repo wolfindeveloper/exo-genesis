@@ -23,6 +23,7 @@ async def send_webapp_button(
                     "chat_id": chat_id,
                     "text": text,
                     "parse_mode": "HTML",
+                    "disable_notification": True,
                     "reply_markup": {
                         "inline_keyboard": [[
                             {"text": button_text, "web_app": {"url": web_app_url}},

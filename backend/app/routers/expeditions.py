@@ -5,18 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from supabase import Client
 
-from app.core.config import settings
 from app.core.dependencies import (
     get_content_loader,
     get_current_user_id,
     get_db,
-    get_init_data_payload,
 )
 from app.models.expedition import Expedition
 from app.services.content_loader import ContentLoader
 from app.services.expedition_logic import calculate_damage, calculate_loot, calculate_zone_stats
-from app.services.telegram import notify_expedition_complete
-
 router = APIRouter(prefix="/expeditions", tags=["expeditions"])
 
 
@@ -25,7 +21,6 @@ async def get_active_expeditions(
     user_id: str = Depends(get_current_user_id),
     db: Client = Depends(get_db),
     content: ContentLoader = Depends(get_content_loader),
-    payload: dict = Depends(get_init_data_payload),
 ):
     result = (
         db.table("expeditions")
@@ -34,28 +29,7 @@ async def get_active_expeditions(
         .eq("status", "active")
         .execute()
     )
-    rows = result.data
-    now = datetime.now(timezone.utc)
-
-    for row in rows:
-        end = datetime.fromisoformat(row["end_time"])
-        if end > now:
-            continue
-        result_data = row.get("result_data") or {}
-        if result_data.get("notified"):
-            continue
-        ship_result = db.table("user_ships").select("ship_config_id").eq("id", row["ship_id"]).execute()
-        ship_config_id = ship_result.data[0]["ship_config_id"] if ship_result.data else row["ship_id"]
-        ship_cfg = content.get_ship(ship_config_id)
-        zone_cfg = content.get_zone(row["zone_config_id"])
-        ship_name = ship_cfg.get("name_key", ship_config_id.replace("_", " ")) if ship_cfg else ship_config_id.replace("_", " ")
-        zone_name = zone_cfg.get("name_key", row["zone_config_id"].replace("_", " ")) if zone_cfg else row["zone_config_id"].replace("_", " ")
-        chat_id = int(payload["user"]["id"])
-        await notify_expedition_complete(settings.bot_token, chat_id, ship_name, zone_name, settings.frontend_url)
-        result_data["notified"] = True
-        db.table("expeditions").update({"result_data": result_data}).eq("id", row["id"]).execute()
-
-    return [Expedition(**row) for row in rows]
+    return [Expedition(**row) for row in result.data]
 
 
 class StartExpeditionRequest(BaseModel):

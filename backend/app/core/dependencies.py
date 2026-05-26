@@ -28,7 +28,11 @@ async def get_init_data_payload(
 async def get_current_user_id(
     payload: dict = Depends(get_init_data_payload),
 ) -> str:
-    return str(payload["user"]["id"])
+    user_id = str(payload["user"]["id"])
+    from app.services.user_activity import mark_active
+
+    mark_active(user_id)
+    return user_id
 
 
 async def get_db(supabase: Client = Depends(get_supabase)) -> Client:
