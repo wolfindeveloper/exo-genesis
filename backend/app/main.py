@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -7,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import auth, content, expeditions, health, lab, system, user, user_ships
 from app.services.content_loader import ContentLoader
+from app.services.notifier import run_notifier
 from bot.webhook import delete_webhook, set_webhook, router as bot_router
 
 logger = logging.getLogger(__name__)
@@ -26,7 +28,15 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("webhook setup skipped: %s", e)
 
+    notifier_task = asyncio.create_task(run_notifier(app.state.content_loader))
+
     yield
+
+    notifier_task.cancel()
+    try:
+        await notifier_task
+    except asyncio.CancelledError:
+        pass
 
     try:
         await delete_webhook()
