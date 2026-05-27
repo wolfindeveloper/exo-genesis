@@ -137,10 +137,11 @@ function buildSections(
     }
   }
 
-  if (fuel.length) groups.push({ label: '⛽ Топливо', icon: '⛽', type: 'fuel', items: fuel })
-  if (repair.length) groups.push({ label: '🔧 Ремкомплекты', icon: '🔧', type: 'repair', items: repair })
-  if (elements.length) groups.push({ label: '🧪 Элементы', icon: '🧪', type: 'element', items: elements })
-  if (artifacts.length) groups.push({ label: '✨ Артефакты', icon: '✨', type: 'artifact', items: artifacts })
+  const groups: { label: string; icon: string; items: InventoryItem[] }[] = []
+  if (fuel.length) groups.push({ label: '⛽ Топливо', icon: '⛽', items: fuel })
+  if (repair.length) groups.push({ label: '🔧 Ремкомплекты', icon: '🔧', items: repair })
+  if (elements.length) groups.push({ label: '🧪 Элементы', icon: '🧪', items: elements })
+  if (artifacts.length) groups.push({ label: '✨ Артефакты', icon: '✨', items: artifacts })
 
   const sorter = (a: { item: InventoryItem; info: ItemInfo }, b: { item: InventoryItem; info: ItemInfo }) => {
     switch (sortMode) {
