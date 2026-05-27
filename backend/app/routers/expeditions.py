@@ -65,6 +65,16 @@ class ClaimExpeditionRequest(BaseModel):
     expedition_id: str
 
 
+def _resolve_item_type(content: ContentLoader, item_config_id: str) -> str:
+    if content.get_element(item_config_id):
+        return "element"
+    if content.get_resource(item_config_id):
+        return "resource"
+    if content.get_artifact(item_config_id):
+        return "artifact"
+    return "resource"
+
+
 @router.post("/start", response_model=Expedition)
 async def start_expedition(
     body: StartExpeditionRequest,
@@ -205,9 +215,10 @@ async def claim_expedition(
                 "quantity": existing.data[0]["quantity"] + item["quantity"],
             }).eq("id", existing.data[0]["id"]).execute()
         else:
+            item_type = _resolve_item_type(content, item["item_config_id"])
             db.table("user_inventory").insert({
                 "user_id": user_id,
-                "item_type": "resource",
+                "item_type": item_type,
                 "item_config_id": item["item_config_id"],
                 "quantity": item["quantity"],
                 "metadata": {},

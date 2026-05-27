@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
-import type { Element, InventoryItem, Resource } from '../types'
+import type { Artifact, Element, InventoryItem, Resource } from '../types'
 
 const rarityConfig: Record<string, { border: string; bg: string; text: string; glow: string }> = {
   common: { border: 'border-slate-500/20', bg: 'bg-slate-500/5', text: 'text-slate-300', glow: 'rgba(100,116,139,0.15)' },
@@ -61,26 +61,36 @@ type ItemInfo = {
   description_key?: string
 }
 
-function buildInfo(item: InventoryItem, elMap: Map<string, Element>, resMap: Map<string, Resource>): ItemInfo {
-  if (item.item_type === 'element') {
-    const el = elMap.get(item.item_config_id)
+function buildInfo(item: InventoryItem, elMap: Map<string, Element>, resMap: Map<string, Resource>, artMap: Map<string, Artifact>): ItemInfo {
+  const el = elMap.get(item.item_config_id)
+  if (el) {
     return {
-      name: el?.name_key ?? 'Неизвестный элемент',
-      tier: el?.tier ?? 1,
-      rarity: el?.rarity ?? 'common',
-      icon_path: el?.icon_path ?? '',
-      description_key: el?.description_key,
+      name: el.name_key ?? 'Неизвестный элемент',
+      tier: el.tier ?? 1,
+      rarity: el.rarity ?? 'common',
+      icon_path: el.icon_path ?? '',
+      description_key: el.description_key,
     }
   }
-  if (item.item_type === 'resource') {
-    const r = resMap.get(item.item_config_id)
+  const r = resMap.get(item.item_config_id)
+  if (r) {
     return {
-      name: r?.name_key ?? 'Неизвестный ресурс',
-      tier: r?.tier ?? parseTier(item.item_config_id),
+      name: r.name_key ?? 'Неизвестный ресурс',
+      tier: r.tier ?? parseTier(item.item_config_id),
       rarity: 'common',
-      icon_path: r?.icon_path ?? '',
-      resource_type: r?.resource_type ?? 'fuel',
-      description_key: r?.description_key,
+      icon_path: r.icon_path ?? '',
+      resource_type: r.resource_type ?? 'fuel',
+      description_key: r.description_key,
+    }
+  }
+  const a = artMap.get(item.item_config_id)
+  if (a) {
+    return {
+      name: a.name_key ?? 'Неизвестный артефакт',
+      tier: a.tier ?? 1,
+      rarity: a.rarity ?? 'common',
+      icon_path: '',
+      description_key: a.description_key,
     }
   }
   return {
@@ -96,13 +106,36 @@ function buildSections(
   items: InventoryItem[],
   elMap: Map<string, Element>,
   resMap: Map<string, Resource>,
+  artMap: Map<string, Artifact>,
   sortMode: SortMode,
 ): { label: string; icon: string; items: { item: InventoryItem; info: ItemInfo }[] }[] {
-  const groups: { label: string; icon: string; type: string; items: typeof items }[] = []
-  const fuel = items.filter((i) => i.item_type === 'resource' && i.item_config_id.startsWith('fuel'))
-  const repair = items.filter((i) => i.item_type === 'resource' && i.item_config_id.startsWith('repair_kit'))
-  const elements = items.filter((i) => i.item_type === 'element')
-  const artifacts = items.filter((i) => i.item_type === 'artifact')
+  const fuel: InventoryItem[] = []
+  const repair: InventoryItem[] = []
+  const elements: InventoryItem[] = []
+  const artifacts: InventoryItem[] = []
+
+  for (const i of items) {
+    if (i.item_type === 'resource' && i.item_config_id.startsWith('fuel')) {
+      fuel.push(i)
+    } else if (i.item_type === 'resource' && i.item_config_id.startsWith('repair_kit')) {
+      repair.push(i)
+    } else if (i.item_type === 'element') {
+      elements.push(i)
+    } else if (i.item_type === 'artifact') {
+      artifacts.push(i)
+    } else if (elMap.has(i.item_config_id)) {
+      elements.push(i)
+    } else if (resMap.has(i.item_config_id)) {
+      const r = resMap.get(i.item_config_id)!
+      if (r.resource_type === 'fuel') {
+        fuel.push(i)
+      } else {
+        repair.push(i)
+      }
+    } else if (artMap.has(i.item_config_id)) {
+      artifacts.push(i)
+    }
+  }
 
   if (fuel.length) groups.push({ label: '⛽ Топливо', icon: '⛽', type: 'fuel', items: fuel })
   if (repair.length) groups.push({ label: '🔧 Ремкомплекты', icon: '🔧', type: 'repair', items: repair })
@@ -122,12 +155,12 @@ function buildSections(
   return groups.map((g) => ({
     label: g.label,
     icon: g.icon,
-    items: g.items.map((item) => ({ item, info: buildInfo(item, elMap, resMap) })).sort(sorter),
+    items: g.items.map((item) => ({ item, info: buildInfo(item, elMap, resMap, artMap) })).sort(sorter),
   }))
 }
 
 export function Inventory() {
-  const { inventory, loadInventory, elementsContent, resourcesContent, ships, loadShips } = useGameStore()
+  const { inventory, loadInventory, elementsContent, resourcesContent, artifactsContent, ships, loadShips } = useGameStore()
   const [filter, setFilter] = useState<string>('all')
   const [sortMode, setSortMode] = useState<SortMode>('tier')
   const [selectedItem, setSelectedItem] = useState<{ item: InventoryItem; info: ItemInfo } | null>(null)
@@ -139,6 +172,7 @@ export function Inventory() {
 
   const elMap = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const resMap = useMemo(() => new Map(resourcesContent.map((r) => [r.id, r])), [resourcesContent])
+  const artMap = useMemo(() => new Map(artifactsContent.map((a) => [a.id, a])), [artifactsContent])
 
   const types = useMemo(() => ['all', ...new Set(inventory.map((i) => i.item_type))], [inventory])
 
@@ -148,8 +182,8 @@ export function Inventory() {
   }, [inventory, filter])
 
   const sections = useMemo(
-    () => buildSections(filtered, elMap, resMap, sortMode),
-    [filtered, elMap, resMap, sortMode],
+    () => buildSections(filtered, elMap, resMap, artMap, sortMode),
+    [filtered, elMap, resMap, artMap, sortMode],
   )
 
   const totalItems = inventory.reduce((s, i) => s + i.quantity, 0)

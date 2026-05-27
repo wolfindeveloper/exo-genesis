@@ -60,7 +60,7 @@ def _apply_reward(
                 "stability": item.get("stability", 100),
                 "acquired_at": now,
             }).execute()
-        case "element" | "resource":
+        case "element" | "resource" | "artifact":
             supabase.table("user_inventory").insert({
                 "user_id": user_id,
                 "item_type": item["type"],
