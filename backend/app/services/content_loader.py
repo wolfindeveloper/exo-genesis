@@ -13,6 +13,7 @@ class ContentLoader:
     _artifacts: list[dict] = []
     _resources: list[dict] = []
     _boxes: list[dict] = []
+    _ranks: list[dict] = []
 
     @property
     def ships(self) -> list[dict]:
@@ -37,6 +38,10 @@ class ContentLoader:
     @property
     def boxes(self) -> list[dict]:
         return self._boxes
+
+    @property
+    def ranks(self) -> list[dict]:
+        return self._ranks
 
     def get_ship(self, ship_id: str) -> dict | None:
         return next((s for s in self._ships if s["id"] == ship_id), None)
@@ -64,6 +69,7 @@ class ContentLoader:
         self._artifacts = self._load_json(content_dir / "artifacts.json")
         self._resources = self._load_json(content_dir / "resources.json")
         self._boxes = self._load_json(content_dir / "boxes.json")
+        self._ranks = self._load_json(content_dir / "ranks.json")
 
     @staticmethod
     def _load_json(path: Path) -> list[dict]:

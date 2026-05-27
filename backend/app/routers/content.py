@@ -74,3 +74,8 @@ async def get_box(box_id: str, content: ContentLoader = Depends(get_content_load
     if not box:
         raise HTTPException(status_code=404, detail="Box not found")
     return box
+
+
+@router.get("/ranks")
+async def get_ranks(content: ContentLoader = Depends(get_content_loader)):
+    return content.ranks

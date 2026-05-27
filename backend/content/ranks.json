@@ -1,0 +1,50 @@
+[
+  {
+    "level": 1,
+    "title_key": "Кадет",
+    "description_key": "Только шагнул в бескрайний космос",
+    "icon_path": "/assets/ranks/cadet.svg"
+  },
+  {
+    "level": 3,
+    "title_key": "Исследователь",
+    "description_key": "Повидал пару туманностей и остался жив",
+    "icon_path": "/assets/ranks/explorer.svg"
+  },
+  {
+    "level": 5,
+    "title_key": "Капитан",
+    "description_key": "Командует экипажем и меняет траекторию звёзд",
+    "icon_path": "/assets/ranks/captain.svg"
+  },
+  {
+    "level": 10,
+    "title_key": "Ветеран",
+    "description_key": "Хранит шрамы от квантовых штормов и коллекцию трофеев",
+    "icon_path": "/assets/ranks/veteran.svg"
+  },
+  {
+    "level": 15,
+    "title_key": "Адмирал",
+    "description_key": "Флот слушается его взгляда",
+    "icon_path": "/assets/ranks/admiral.svg"
+  },
+  {
+    "level": 20,
+    "title_key": "Легенда",
+    "description_key": "Его имя шепчут в тёмных барах на краю галактики",
+    "icon_path": "/assets/ranks/legend.svg"
+  },
+  {
+    "level": 30,
+    "title_key": "Архитектор",
+    "description_key": "Перестраивает реальность под свои нужды",
+    "icon_path": "/assets/ranks/architect.svg"
+  },
+  {
+    "level": 50,
+    "title_key": "Демиург",
+    "description_key": "Создаёт миры и галактики одной мыслью",
+    "icon_path": "/assets/ranks/demiurge.svg"
+  }
+]

@@ -131,3 +131,10 @@ export interface ClaimResult {
   loot: LootItem[]
   ship_stability: number
 }
+
+export interface Rank {
+  level: number
+  title_key: string
+  description_key: string
+  icon_path: string
+}
