@@ -122,9 +122,17 @@ async def experiment(
         .eq("item_type", "artifact")
         .execute()
     ).data
+    artifact_meta = {
+        **recipe.get("stats_modifiers", {}),
+        "name_key": recipe.get("artifact_name_key", ""),
+        "description_key": recipe.get("artifact_desc_key", ""),
+    }
     if existing_inv:
+        existing_meta = existing_inv[0].get("metadata") or {}
+        merged_meta = {**existing_meta, **artifact_meta}
         db.table("user_inventory").update({
             "quantity": existing_inv[0]["quantity"] + 1,
+            "metadata": merged_meta,
         }).eq("id", existing_inv[0]["id"]).execute()
     else:
         db.table("user_inventory").insert({
@@ -132,7 +140,7 @@ async def experiment(
             "item_type": "artifact",
             "item_config_id": recipe["artifact_id"],
             "quantity": 1,
-            "metadata": recipe.get("stats_modifiers", {}),
+            "metadata": artifact_meta,
         }).execute()
 
     xp_gain = 25 if is_first else 10

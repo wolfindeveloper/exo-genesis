@@ -83,6 +83,16 @@ function buildInfo(item: InventoryItem, elMap: Map<string, Element>, resMap: Map
       description_key: r.description_key,
     }
   }
+  const meta = item.metadata || {}
+  if (meta.name_key) {
+    return {
+      name: meta.name_key as string,
+      tier: (meta.tier as number) || 1,
+      rarity: (meta.rarity as string) || 'common',
+      icon_path: '',
+      description_key: (meta.description_key as string) || undefined,
+    }
+  }
   const a = artMap.get(item.item_config_id)
   if (a) {
     return {
