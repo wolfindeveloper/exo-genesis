@@ -81,8 +81,6 @@ async def experiment(
     recipe = recipes.get(recipe_key)
 
     _consume_elements(db, user_id, body.element_ids)
-
-    recipe_key = ":".join(sorted(body.element_ids))
     try:
         db.table("experiment_log").insert({
             "user_id": user_id,

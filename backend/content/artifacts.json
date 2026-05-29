@@ -1,42 +1,450 @@
 [
-  { "name_key": "Око Бури", "description_key": "Пульсирует в такт штормам. Говорят, если долго смотреть в него, можно увидеть своё будущее." },
-  { "name_key": "Зуб Времени", "description_key": "Сломает любой замок, но забудет, зачем ты его ломал." },
-  { "name_key": "Сердце Туманности", "description_key": "Горячий сгусток энергии, который поёт, когда рядом опасность." },
-  { "name_key": "Коготь Феникса", "description_key": "Обломок крыла птицы, сгоревшей и возродившейся в сверхновой." },
-  { "name_key": "Шёпот Пустоты", "description_key": "Издаёт тихий гул, от которого у врагов закладывает уши." },
-  { "name_key": "Кристалл Забвения", "description_key": "Хранит память погибших цивилизаций. Очень тяжёлый." },
-  { "name_key": "Перо Судьбы", "description_key": "Если прикрепить к шлему, решения принимаются сами собой." },
-  { "name_key": "Глаз Древнего", "description_key": "Видит сквозь стены. И сквозь ложь." },
-  { "name_key": "Искра Творения", "description_key": "Маленькая, но если уронить — создаст новую вселенную." },
-  { "name_key": "Осколок Радуги", "description_key": "Преломляет свет так, что можно увидеть звук." },
-  { "name_key": "Ребро Левиафана", "description_key": "Прочнее любой брони. И тяжелее любой совести." },
-  { "name_key": "Ключ от Вселенной", "description_key": "Не спрашивай, от чего он. Просто вставь и поверни." },
-  { "name_key": "Лунный Камень", "description_key": "Светится в темноте и слегка подогревает карманы." },
-  { "name_key": "Ржавый Якорь", "description_key": "Останавливает корабль в любой точке пространства." },
-  { "name_key": "Зеркало Истины", "description_key": "Показывает не то, что есть, а то, что могло бы быть." },
-  { "name_key": "Печать Хаоса", "description_key": "От неё пахнет озоном и безнаказанностью." },
-  { "name_key": "Ветка Мирового Древа", "description_key": "Ещё зелёная. Но уже очень древняя." },
-  { "name_key": "Эхо Первого Взрыва", "description_key": "Слышно только в полной тишине." },
-  { "name_key": "Чешуя Дракона", "description_key": "Не горит. Не холодит. Просто красиво блестит." },
-  { "name_key": "Капля Вечности", "description_key": "Никогда не высыхает. Никогда не кончается." },
-  { "name_key": "Сломанная Стрела", "description_key": "Указывает в центр галактики. Всегда." },
-  { "name_key": "Куб Невозможности", "description_key": "Существует, но его не должно существовать." },
-  { "name_key": "Пыльца Звёзд", "description_key": "Щиплет нос при вдыхании. Вызывает лёгкую эйфорию." },
-  { "name_key": "Тень Прошлого", "description_key": "Повторяет движения владельца с задержкой в секунду." },
-  { "name_key": "Свиток Пустоты", "description_key": "Ничего не написано. Но все буквы правильно расставлены." },
-  { "name_key": "Колесо Сансары", "description_key": "Если его крутануть, день проживёшь заново." },
-  { "name_key": "Молния в Банке", "description_key": "Крайне нестабильна. Хранить в прохладном месте." },
-  { "name_key": "Чёрный Лёд", "description_key": "Не тает. Не греется. Просто есть." },
-  { "name_key": "Кость Удачи", "description_key": "Бросать ровно три раза перед вылетом." },
-  { "name_key": "Атом Страха", "description_key": "Расщепляет уверенность противника на части." },
-  { "name_key": "Проволока Судьбы", "description_key": "Связывает события, которые не должны быть связаны." },
-  { "name_key": "Гвоздь Программы", "description_key": "Если вбить в панель управления, всё просто работает." },
-  { "name_key": "Слеза Андроида", "description_key": "Машинное масло. Солёное." },
-  { "name_key": "Фальшивая Монета", "description_key": "Принимается везде. Никто не проверяет." },
-  { "name_key": "Нить Ариадны", "description_key": "Помогает найти выход. Но не говорит, какой он." },
-  { "name_key": "Обломок Тостервселенной", "description_key": "До сих пор подрумянивает хлеб." },
-  { "name_key": "Руна Поворота", "description_key": "Меняет направление любых частиц." },
-  { "name_key": "Шаровая Телепортация", "description_key": "Шар. Телепортирует. Точка." },
-  { "name_key": "Ампула Вдохновения", "description_key": "Выпить — и можно закодировать что угодно." },
-  { "name_key": "Пепел Галактики", "description_key": "Остывшая звезда в твоих руках." }
+  {
+    "id": "oko_buri",
+    "name_key": "Око Бури",
+    "description_key": "Пульсирует в такт штормам",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "speed_mod": 0.12,
+      "fuel_efficiency": 0.1
+    }
+  },
+  {
+    "id": "zub_vremeni",
+    "name_key": "Зуб Времени",
+    "description_key": "Сломает любой замок",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.19,
+      "stability_bonus": 9.0
+    }
+  },
+  {
+    "id": "serdce_tumannosti",
+    "name_key": "Сердце Туманности",
+    "description_key": "Горячий сгусток энергии",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.26,
+      "stability_bonus": 13.0,
+      "fuel_efficiency": 0.2
+    }
+  },
+  {
+    "id": "kogot_feniksa",
+    "name_key": "Коготь Феникса",
+    "description_key": "Обломок крыла древней птицы",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "speed_mod": 0.33,
+      "stability_bonus": 17.0
+    }
+  },
+  {
+    "id": "shepot_pustoty",
+    "name_key": "Шёпот Пустоты",
+    "description_key": "Издаёт тихий гул, похожий на голос",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.4,
+      "stability_bonus": 21.0,
+      "fuel_efficiency": 0.31
+    }
+  },
+  {
+    "id": "kristall_zabvenia",
+    "name_key": "Кристалл Забвения",
+    "description_key": "Хранит память погибших цивилизаций",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "stability_bonus": 3.0,
+      "fuel_efficiency": 0.09
+    }
+  },
+  {
+    "id": "pero_sudby",
+    "name_key": "Перо Судьбы",
+    "description_key": "Если прикрепить к шлему — решения принимаются сами",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.18,
+      "stability_bonus": 9.0
+    }
+  },
+  {
+    "id": "glaz_drevnego",
+    "name_key": "Глаз Древнего",
+    "description_key": "Видит сквозь стены",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.27,
+      "stability_bonus": 14.0,
+      "fuel_efficiency": 0.19
+    }
+  },
+  {
+    "id": "iskra_tvorenia",
+    "name_key": "Искра Творения",
+    "description_key": "Урони — создаст новую вселенную",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "speed_mod": 0.35,
+      "stability_bonus": 18.0
+    }
+  },
+  {
+    "id": "oskolok_radugi",
+    "name_key": "Осколок Радуги",
+    "description_key": "Преломляет свет, открывая невидимое",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.42,
+      "stability_bonus": 22.0,
+      "fuel_efficiency": 0.33
+    }
+  },
+  {
+    "id": "rebro_leviafana",
+    "name_key": "Ребро Левиафана",
+    "description_key": "Прочнее любой брони",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "stability_bonus": 4.0
+    }
+  },
+  {
+    "id": "kluch_ot_vselennoi",
+    "name_key": "Ключ от Вселенной",
+    "description_key": "Не спрашивай от чего",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.18,
+      "stability_bonus": 8.0,
+      "fuel_efficiency": 0.13
+    }
+  },
+  {
+    "id": "lunnyi_kamen",
+    "name_key": "Лунный Камень",
+    "description_key": "Светится в темноте",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.27,
+      "stability_bonus": 14.0
+    }
+  },
+  {
+    "id": "rzhavyi_yakor",
+    "name_key": "Ржавый Якорь",
+    "description_key": "Останавливает корабль в любой точке пространства",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "stability_bonus": 17.0,
+      "fuel_efficiency": 0.25
+    }
+  },
+  {
+    "id": "zerkalo_istiny",
+    "name_key": "Зеркало Истины",
+    "description_key": "Показывает что могло бы быть",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.41,
+      "stability_bonus": 23.0,
+      "fuel_efficiency": 0.32
+    }
+  },
+  {
+    "id": "pechat_haosa",
+    "name_key": "Печать Хаоса",
+    "description_key": "Пахнет озоном и безнаказанностью",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "speed_mod": 0.11
+    }
+  },
+  {
+    "id": "vetka_mirovogo_dreva",
+    "name_key": "Ветка Мирового Древа",
+    "description_key": "Ещё зелёная, но уже древняя",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "stability_bonus": 9.0,
+      "fuel_efficiency": 0.14
+    }
+  },
+  {
+    "id": "eho_pervogo_vzryva",
+    "name_key": "Эхо Первого Взрыва",
+    "description_key": "Слышно только в полной тишине",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.28,
+      "stability_bonus": 15.0,
+      "fuel_efficiency": 0.21
+    }
+  },
+  {
+    "id": "cheshuia_drakona",
+    "name_key": "Чешуя Дракона",
+    "description_key": "Не горит, не холодит",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "speed_mod": 0.36,
+      "fuel_efficiency": 0.27
+    }
+  },
+  {
+    "id": "kaplia_vechnosti",
+    "name_key": "Капля Вечности",
+    "description_key": "Никогда не высыхает",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "stability_bonus": 24.0,
+      "fuel_efficiency": 0.34
+    }
+  },
+  {
+    "id": "slomannaia_strela",
+    "name_key": "Сломанная Стрела",
+    "description_key": "Указывает в центр галактики",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "speed_mod": 0.13,
+      "stability_bonus": 6.0
+    }
+  },
+  {
+    "id": "kub_nevozmozhnosti",
+    "name_key": "Куб Невозможности",
+    "description_key": "Существует, но его не должно существовать",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.18
+    }
+  },
+  {
+    "id": "pylca_zvezd",
+    "name_key": "Пыльца Звёзд",
+    "description_key": "Щиплет нос при вдыхании",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.29,
+      "stability_bonus": 16.0,
+      "fuel_efficiency": 0.22
+    }
+  },
+  {
+    "id": "ten_proshlogo",
+    "name_key": "Тень Прошлого",
+    "description_key": "Повторяет движения владельца",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "stability_bonus": 19.0,
+      "fuel_efficiency": 0.26
+    }
+  },
+  {
+    "id": "svitok_pustoty",
+    "name_key": "Свиток Пустоты",
+    "description_key": "Ничего не написано, но буквы правильные",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.43,
+      "stability_bonus": 25.0,
+      "fuel_efficiency": 0.35
+    }
+  },
+  {
+    "id": "koleso_sansary",
+    "name_key": "Колесо Сансары",
+    "description_key": "Если крутануть — день проживёшь заново",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "fuel_efficiency": 0.11
+    }
+  },
+  {
+    "id": "molnua_v_banke",
+    "name_key": "Молния в Банке",
+    "description_key": "Крайне нестабильна",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.19,
+      "fuel_efficiency": 0.15
+    }
+  },
+  {
+    "id": "chernyi_led",
+    "name_key": "Чёрный Лёд",
+    "description_key": "Не тает, не греется",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "stability_bonus": 15.0,
+      "fuel_efficiency": 0.2
+    }
+  },
+  {
+    "id": "kost_udachi",
+    "name_key": "Кость Удачи",
+    "description_key": "Бросать ровно три раза перед вылетом",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "speed_mod": 0.37,
+      "stability_bonus": 20.0,
+      "fuel_efficiency": 0.28
+    }
+  },
+  {
+    "id": "atom_straha",
+    "name_key": "Атом Страха",
+    "description_key": "Расщепляет уверенность противника",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.44,
+      "stability_bonus": 26.0,
+      "fuel_efficiency": 0.36
+    }
+  },
+  {
+    "id": "provoloka_sudby",
+    "name_key": "Проволока Судьбы",
+    "description_key": "Связывает события в непредсказуемом порядке",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "speed_mod": 0.14,
+      "stability_bonus": 7.0
+    }
+  },
+  {
+    "id": "gvozd_programmy",
+    "name_key": "Гвоздь Программы",
+    "description_key": "Если вбить в панель — всё просто работает",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "stability_bonus": 10.0,
+      "fuel_efficiency": 0.16
+    }
+  },
+  {
+    "id": "sleza_android",
+    "name_key": "Слеза Андроида",
+    "description_key": "Машинное масло, солёное на вкус",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.3,
+      "stability_bonus": 16.0
+    }
+  },
+  {
+    "id": "falshivaia_moneta",
+    "name_key": "Фальшивая Монета",
+    "description_key": "Принимается везде",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "speed_mod": 0.38,
+      "fuel_efficiency": 0.29
+    }
+  },
+  {
+    "id": "nit_ariadny",
+    "name_key": "Нить Ариадны",
+    "description_key": "Помогает найти выход",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.45,
+      "stability_bonus": 27.0,
+      "fuel_efficiency": 0.37
+    }
+  },
+  {
+    "id": "oblomok_tostervselennoi",
+    "name_key": "Обломок Тостервселенной",
+    "description_key": "До сих пор подрумянивает хлеб",
+    "tier": 1,
+    "rarity": "common",
+    "stats_modifiers": {
+      "fuel_efficiency": 0.12
+    }
+  },
+  {
+    "id": "runa_povorota",
+    "name_key": "Руна Поворота",
+    "description_key": "Меняет направление частиц",
+    "tier": 2,
+    "rarity": "uncommon",
+    "stats_modifiers": {
+      "speed_mod": 0.2,
+      "stability_bonus": 11.0
+    }
+  },
+  {
+    "id": "sharovaia_teleportacia",
+    "name_key": "Шаровая Телепортация",
+    "description_key": "Шар телепортируется, точка остаётся",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "speed_mod": 0.31,
+      "fuel_efficiency": 0.23
+    }
+  },
+  {
+    "id": "ampula_vdohnovenia",
+    "name_key": "Ампула Вдохновения",
+    "description_key": "Выпьешь — можно закодировать что угодно",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "stability_bonus": 21.0,
+      "fuel_efficiency": 0.3
+    }
+  },
+  {
+    "id": "pepel_galaktiki",
+    "name_key": "Пепел Галактики",
+    "description_key": "Остывшая звезда в твоих руках",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.46,
+      "stability_bonus": 28.0,
+      "fuel_efficiency": 0.38
+    }
+  }
 ]
