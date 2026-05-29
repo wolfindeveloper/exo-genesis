@@ -20,3 +20,7 @@ class WeekInfo(BaseModel):
     week_seed: str
     total_recipes: int
     discoveries_this_week: int
+
+
+class AttemptsResponse(BaseModel):
+    failed_keys: list[str]

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from supabase import Client
 
 from app.core.dependencies import get_content_loader, get_current_user_id, get_db
-from app.models.lab import ExperimentRequest, ExperimentResponse
+from app.models.lab import AttemptsResponse, ExperimentRequest, ExperimentResponse
 from app.services.content_loader import ContentLoader
 from app.services.recipe_generator import get_weekly_recipes, week_seed
 
@@ -25,6 +25,25 @@ def _consume_elements(db: Client, user_id: str, element_ids: list[str]) -> None:
                 db.table("user_inventory").delete().eq("id", rows[0]["id"]).execute()
             else:
                 db.table("user_inventory").update({"quantity": new_qty}).eq("id", rows[0]["id"]).execute()
+
+
+@router.get("/attempts", response_model=AttemptsResponse)
+async def get_attempts(
+    user_id: str = Depends(get_current_user_id),
+    db: Client = Depends(get_db),
+):
+    try:
+        rows = (
+            db.table("experiment_log")
+            .select("recipe_key")
+            .eq("user_id", user_id)
+            .eq("success", False)
+            .execute()
+        ).data
+        failed_keys = list({r["recipe_key"] for r in rows})
+    except Exception:
+        failed_keys = []
+    return AttemptsResponse(failed_keys=failed_keys)
 
 
 @router.post("/experiment", response_model=ExperimentResponse)
@@ -62,6 +81,16 @@ async def experiment(
     recipe = recipes.get(recipe_key)
 
     _consume_elements(db, user_id, body.element_ids)
+
+    recipe_key = ":".join(sorted(body.element_ids))
+    try:
+        db.table("experiment_log").insert({
+            "user_id": user_id,
+            "recipe_key": recipe_key,
+            "success": recipe is not None,
+        }).execute()
+    except Exception:
+        pass
 
     if not recipe:
         user_row = db.table("users").select("xp").eq("id", user_id).execute().data

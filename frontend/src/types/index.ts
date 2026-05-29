@@ -97,6 +97,10 @@ export interface Artifact {
   stats_modifiers?: Record<string, number>
 }
 
+export interface LabAttempts {
+  failed_keys: string[]
+}
+
 export interface Resource {
   id: string
   name_key: string

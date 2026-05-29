@@ -1,4 +1,4 @@
-import type { Artifact, ClaimResult, Expedition, ExperimentResult, InventoryItem, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
+import type { Artifact, ClaimResult, Expedition, ExperimentResult, InventoryItem, LabAttempts, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone, Element } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -58,6 +58,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ element_ids }),
     }),
+
+  getLabAttempts: () => request<LabAttempts>('/lab/attempts'),
+
+  getWeekInfo: () => request<{ week_seed: string; total_recipes: number; discoveries_this_week: number }>('/system/week-info'),
 
   getStats: () => request<UserStats>('/user/stats'),
 
