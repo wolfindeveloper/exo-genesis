@@ -12,7 +12,7 @@ interface HexSlotProps {
 
 const TIER_COLORS = ['#94a3b8', '#22c55e', '#a855f7', '#f59e0b', '#ffd700']
 
-export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlotProps) {
+export function HexSlot({ active, icon, name, tier = 1, onClick, side, flicker }: HexSlotProps) {
   const color = active ? TIER_COLORS[Math.min(tier - 1, 4)] : '#4a5568'
 
   const dust = useMemo(
