@@ -130,7 +130,3 @@
 - `backend/app/services/recipe_generator.py` — будет удалён
 - `backend/content/ships.json` — будет урезан до 1 корабля
 - `backend/content/elements.json` — будет удалён
-
-## Design Sandbox
-- `game-console-design/` — отдельный Next.js проект с v0.dev прототипом (порт 3001), все финальные стили перенесены в основной проект
-- `ship.html` — заморожен, 5 rejected итераций (не удаляем)
