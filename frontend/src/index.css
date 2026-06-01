@@ -190,6 +190,17 @@ body {
   animation: pulse-slow 4s ease-in-out infinite;
 }
 
+/* ── Floating neon border ── */
+@property --gradient-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes spin-gradient {
+  from { --gradient-angle: 0deg; }
+  to { --gradient-angle: 360deg; }
+}
+
 /* ── Rarity colors ── */
 .rarity-common { --rarity: #94a3b8; --glow: 0 0 8px rgba(148,163,184,0.2); }
 .rarity-uncommon { --rarity: #22c55e; --glow: 0 0 8px rgba(34,197,94,0.3); }

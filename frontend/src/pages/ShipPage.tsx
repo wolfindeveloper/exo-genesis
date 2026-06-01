@@ -22,10 +22,10 @@ const slotConfigs = {
 }
 
 const consoleButtons = [
-  { label: 'КАРТА', icon: '◈', accent: '#00f5ff' },
-  { label: 'ГРУЗ', icon: '▦', accent: '#a855f7' },
-  { label: 'ПУТЕВОДИТЕЛЬ', icon: '◉', accent: '#00f5ff' },
-  { label: 'РЫНОК', icon: '⊞', accent: '#f97316' },
+  { label: 'КАРТА', accent: '#00f5ff' },
+  { label: 'ГРУЗ', accent: '#a855f7' },
+  { label: 'ПУТЕВОДИТЕЛЬ', accent: '#00f5ff' },
+  { label: 'РЫНОК', accent: '#f97316' },
 ]
 
 export default function ShipPage() {
@@ -386,30 +386,43 @@ export default function ShipPage() {
               {consoleButtons.map((btn, i) => (
                 <button
                   key={i}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-gray-800/60 to-gray-900/80 border-2 border-t-white/15 border-l-white/15 border-b-black/40 border-r-black/40 p-0 transition-all duration-200 active:scale-[0.97] hover:border-cyan-400/30"
-                  style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.4)' }}
+                  className="group relative overflow-hidden rounded-xl p-0 transition-all duration-200 active:scale-[0.95] hover:scale-[1.03]"
+                  style={{
+                    background: `conic-gradient(from var(--gradient-angle, 0deg), ${btn.accent}00 0%, ${btn.accent}55 25%, ${btn.accent}00 50%, ${btn.accent}55 75%, ${btn.accent}00 100%)`,
+                    animation: 'spin-gradient 4s linear infinite',
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.06] to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none rounded-xl" />
-                  <div
-                    className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none"
-                    style={{ background: `radial-gradient(ellipse at center, ${btn.accent}15, transparent)` }}
-                  />
-                  <div className="relative flex items-center justify-center gap-2.5 py-3 px-3">
-                    <span className="text-[9px] opacity-30 group-hover:opacity-50 transition-opacity" style={{ color: btn.accent }}>
-                      {btn.icon}
-                    </span>
-                    <span
-                      className="text-[10px] font-semibold tracking-wider transition-all duration-200"
-                      style={{ color: 'rgba(0,245,255,.15)', textShadow: `0 0 8px ${btn.accent}10` }}
-                    >
-                      [{btn.label}]
-                    </span>
+                  {/* button body with metallic bevel */}
+                  <div className="relative m-[1.5px] rounded-[10.5px] bg-gradient-to-b from-gray-800/80 to-gray-950/90 border-t border-l border-white/12 border-b border-r border-black/40 overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,.4)]">
+                    {/* metallic highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+
+                    {/* hover glow */}
+                    <div
+                      className="absolute -inset-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none"
+                      style={{ background: `radial-gradient(ellipse at center, ${btn.accent}25, transparent)` }}
+                    />
+
+                    {/* label */}
+                    <div className="relative flex items-center justify-center py-3.5 px-4">
+                      <span
+                        className="text-[11px] font-bold tracking-[0.15em] transition-all duration-200"
+                        style={{
+                          color: btn.accent,
+                          textShadow: `0 0 14px ${btn.accent}66`,
+                        }}
+                      >
+                        {btn.label}
+                      </span>
+                    </div>
+
+                    {/* bottom accent line */}
+                    <div
+                      className="absolute bottom-0 left-[15%] right-[15%] h-[1.5px] opacity-40"
+                      style={{ background: `linear-gradient(90deg, transparent, ${btn.accent}, transparent)`, boxShadow: `0 0 8px ${btn.accent}66` }}
+                    />
                   </div>
-                  <div
-                    className="absolute bottom-0 left-[10%] right-[10%] h-px opacity-30"
-                    style={{ background: `linear-gradient(90deg, transparent, ${btn.accent}, transparent)` }}
-                  />
                 </button>
               ))}
             </div>
