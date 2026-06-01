@@ -57,7 +57,7 @@ function AppContent() {
   const location = useLocation()
   const loadContent = useGameStore((s) => s.loadContent)
   const initAuth = useGameStore((s) => s.initAuth)
-  const isCockpit = location.pathname === '/hangar'
+  const isCockpit = location.pathname === '/' || location.pathname === '/hangar'
   const isAuthReady = useGameStore((s) => s.isAuthReady)
   const isContentReady = useGameStore((s) => s.isContentReady)
   const error = useGameStore((s) => s.error)
