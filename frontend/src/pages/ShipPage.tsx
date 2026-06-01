@@ -498,6 +498,8 @@ export default function ShipPage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
     </div>
   )
 }
