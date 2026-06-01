@@ -370,10 +370,10 @@ export default function ShipPage() {
 
           {/* fuel + HP bars */}
           <div className="w-full max-w-[280px] mt-3 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
-            <div className="flex gap-4">
-              <div className="flex-1 min-w-0">
+            <div className="flex flex-col gap-2">
+              <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[6px] text-cyan-400/30 font-semibold tracking-wider leading-tight">УРОВЕНЬ ЧАЯ В БАКЕ</span>
+                  <span className="text-[7px] text-orange-400/40 font-semibold tracking-wider">УРОВЕНЬ ЧАЯ В БАКЕ</span>
                   <span className="text-[8px] text-orange-400/40 font-mono">{mainShip?.fuel_current ?? 0}/{100}</span>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-orange-500/10">
@@ -383,9 +383,9 @@ export default function ShipPage() {
                   />
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
+              <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[6px] text-cyan-400/30 font-semibold tracking-wider leading-tight">УРОВЕНЬ ОПТИМИЗМА</span>
+                  <span className="text-[7px] text-green-400/40 font-semibold tracking-wider">УРОВЕНЬ ОПТИМИЗМА</span>
                   <span className="text-[8px] text-green-400/40 font-mono">{Math.round(mainShip?.stability ?? 100)}%</span>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-green-500/10">
