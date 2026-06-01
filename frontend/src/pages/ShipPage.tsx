@@ -200,6 +200,9 @@ export default function ShipPage() {
               <div className="text-white font-bold text-sm tracking-wide drop-shadow-[0_0_4px_rgba(0,245,255,.1)]">
                 {user?.username || first || 'Капитан'}
               </div>
+              <div className="text-[5px] text-cyan-400/15 leading-tight mt-0.5 max-w-[120px]">
+                Пока еще не поглощен черной дырой
+              </div>
               <div className="flex items-center gap-2 mt-0.5">
                 <div className="w-16 h-1.5 bg-black/40 rounded-full overflow-hidden border border-cyan-500/10">
                   <div
