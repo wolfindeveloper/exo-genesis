@@ -7,7 +7,7 @@ import { Galaxy } from './pages/Galaxy'
 import { HudBar } from './components/HudBar'
 import { RewardSheet } from './components/RewardSheet'
 import { useGameStore } from './store/game'
-import { Hangar } from './pages/Hangar'
+import ShipPage from './pages/ShipPage'
 import { Inventory } from './pages/Inventory'
 import { Lab } from './pages/Lab'
 import { Profile } from './pages/Profile'
@@ -23,9 +23,12 @@ const nav = [
 
 function NavBar() {
   const location = useLocation()
+  const isCockpit = location.pathname === '/hangar'
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-space-800/90 backdrop-blur-xl border-t border-white/5 safe-area-pb">
+    <nav className={`fixed bottom-0 left-0 right-0 z-50 safe-area-pb backdrop-blur-[12px] border-t transition-colors duration-300 ${
+      isCockpit ? 'bg-white/5 border-cyan-500/10' : 'bg-space-800/90 border-white/5'
+    }`}>
       <div className="flex max-w-lg mx-auto">
         {nav.map((item) => {
           const active = location.pathname === item.path
@@ -54,6 +57,7 @@ function AppContent() {
   const location = useLocation()
   const loadContent = useGameStore((s) => s.loadContent)
   const initAuth = useGameStore((s) => s.initAuth)
+  const isCockpit = location.pathname === '/hangar'
   const isAuthReady = useGameStore((s) => s.isAuthReady)
   const isContentReady = useGameStore((s) => s.isContentReady)
   const error = useGameStore((s) => s.error)
@@ -105,11 +109,11 @@ function AppContent() {
 
   return (
     <div className="min-h-screen text-white max-w-lg mx-auto relative z-10 pb-16">
-      <HudBar />
+      {!isCockpit && <HudBar />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Hangar /></PageTransition>} />
-          <Route path="/hangar" element={<PageTransition><Hangar /></PageTransition>} />
+          <Route path="/" element={<PageTransition><ShipPage /></PageTransition>} />
+          <Route path="/hangar" element={<PageTransition><ShipPage /></PageTransition>} />
           <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
           <Route path="/lab" element={<PageTransition><Lab /></PageTransition>} />
           <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />
