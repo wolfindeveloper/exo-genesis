@@ -7,6 +7,7 @@ interface HexSlotProps {
   tier?: number
   onClick?: () => void
   side?: 'left' | 'right'
+  flicker?: boolean
 }
 
 const TIER_COLORS = ['#94a3b8', '#22c55e', '#a855f7', '#f59e0b', '#ffd700']
@@ -46,7 +47,7 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
       <div
         className={`w-14 h-14 relative rounded-full transition-all duration-300 overflow-hidden ${
           active ? 'border-[2.5px]' : 'border border-gray-700/20 bg-gray-900/60'
-        }`}
+        } ${flicker ? 'animate-slot-flicker' : ''}`}
         style={{
           borderColor: active ? color : undefined,
           background: active

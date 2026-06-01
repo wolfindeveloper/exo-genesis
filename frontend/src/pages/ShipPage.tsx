@@ -5,19 +5,19 @@ import { HexSlot } from '../components/HexSlot'
 
 const slotConfigs = {
   left: [
-    { active: true, icon: '⚙', name: 'Ядро', tier: 4 },
-    { active: false, icon: '🛡', name: '', tier: 1 },
-    { active: true, icon: '🔥', name: 'Факел', tier: 3 },
+    { active: true, icon: '🥜', name: 'Ядро', tier: 4 },
+    { active: false, icon: '🧻', name: '', tier: 1 },
+    { active: true, icon: '💨', name: 'Факел', tier: 3 },
   ],
   right: [
-    { active: true, icon: '🌀', name: 'Око', tier: 3 },
-    { active: false, icon: '📦', name: '', tier: 1 },
-    { active: true, icon: '💫', name: 'Сердце', tier: 5 },
+    { active: true, icon: '👁️', name: 'Око', tier: 3 },
+    { active: false, icon: '🛒', name: '', tier: 1 },
+    { active: true, icon: '🥩', name: 'Сердце', tier: 5 },
   ],
   bottom: [
-    { active: true, icon: '🧠', name: 'Память', tier: 2 },
-    { active: false, icon: '🌌', name: '', tier: 1 },
-    { active: true, icon: '⚡', name: 'Импульс', tier: 4 },
+    { active: true, icon: '🎞️', name: 'Память', tier: 2 },
+    { active: false, icon: '🕳️', name: '', tier: 1 },
+    { active: true, icon: '🎲', name: 'Импульс', tier: 4, flicker: true },
   ],
 }
 
@@ -197,6 +197,9 @@ export default function ShipPage() {
                 {user?.balance_xgen ?? 0}
               </span>
             </div>
+            <div className="text-[5px] text-cyan-400/15 leading-tight mt-1 max-w-[90px] text-right">
+              *Курс валюты постоянно колеблется, но обычно не в вашу пользу
+            </div>
           </div>
         </div>
 
@@ -340,12 +343,37 @@ export default function ShipPage() {
             ))}
           </div>
 
+          {/* paper airplane — subtle bg detail */}
+          <div className="absolute left-6 top-8 z-0 pointer-events-none opacity-[0.04] animate-paper-plane">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00f5ff" strokeWidth="0.5">
+              <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
+            </svg>
+          </div>
+
+          {/* floating sticker — НЕ НАЖИМАТЬ */}
+          <div
+            className="absolute right-2 bottom-16 z-30 cursor-pointer select-none group"
+            onClick={() => {
+              const tg = (window as any).Telegram?.WebApp
+              if (tg?.showPopup) tg.showPopup({ title: '⚠️', message: 'Ну зачем? Теперь придётся перезагружать вселенную. Подождите 3... 2... 1...', buttons: [{ type: 'close' }] })
+            }}
+          >
+            <div className="rotate-[6deg] hover:rotate-[-4deg] transition-transform duration-300">
+              <div className="bg-yellow-400/8 backdrop-blur-sm border border-yellow-400/15 rounded-md px-2 py-1 shadow-[0_0_10px_rgba(251,191,36,.08)]">
+                <span className="text-[5px] font-bold tracking-wider text-yellow-400/50 whitespace-nowrap">
+                  НЕ НАЖИМАТЬ
+                </span>
+              </div>
+              <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-yellow-400/15 rotate-45 border-l border-t border-yellow-400/15" />
+            </div>
+          </div>
+
           {/* fuel + HP bars */}
           <div className="w-full max-w-[280px] mt-3 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
             <div className="flex gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] text-cyan-400/30 font-semibold tracking-wider">FUEL</span>
+                  <span className="text-[6px] text-cyan-400/30 font-semibold tracking-wider leading-tight">УРОВЕНЬ ЧАЯ В БАКЕ</span>
                   <span className="text-[8px] text-orange-400/40 font-mono">{mainShip?.fuel_current ?? 0}/{100}</span>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-orange-500/10">
@@ -357,7 +385,7 @@ export default function ShipPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] text-cyan-400/30 font-semibold tracking-wider">HP</span>
+                  <span className="text-[6px] text-cyan-400/30 font-semibold tracking-wider leading-tight">УРОВЕНЬ ОПТИМИЗМА</span>
                   <span className="text-[8px] text-green-400/40 font-mono">{Math.round(mainShip?.stability ?? 100)}%</span>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-green-500/10">
@@ -377,8 +405,8 @@ export default function ShipPage() {
           <div className="relative bg-white/5 backdrop-blur-[12px] rounded-2xl border border-cyan-500/20 p-5 shadow-[0_0_30px_rgba(0,245,255,.06),inset_0_1px_0_rgba(255,255,255,.06)]">
             <div className="text-center mb-4 relative">
               <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500/8 to-transparent" />
-              <span className="text-[11px] font-bold tracking-[0.3em] text-cyan-400/30 relative inline-block px-4 bg-white/5">
-                ПУЛЬТ
+              <span className="text-[9px] font-bold tracking-[0.2em] text-cyan-400/30 relative inline-block px-3 bg-white/5">
+                ПАНЕЛЬ СЛОЖНЫХ РЕШЕНИЙ
               </span>
             </div>
 

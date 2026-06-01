@@ -190,6 +190,17 @@ body {
   animation: pulse-slow 4s ease-in-out infinite;
 }
 
+/* ── Paper airplane drift ── */
+@keyframes paper-plane {
+  0%, 100% { transform: translate(0, 0) rotate(-15deg); }
+  25% { transform: translate(8px, -5px) rotate(-12deg); }
+  50% { transform: translate(3px, 3px) rotate(-18deg); }
+  75% { transform: translate(-5px, -2px) rotate(-13deg); }
+}
+.animate-paper-plane {
+  animation: paper-plane 20s ease-in-out infinite;
+}
+
 /* ── Space dust float ── */
 @keyframes dust-float {
   0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
@@ -206,6 +217,26 @@ body {
 @keyframes slot-glow-pulse {
   0%, 100% { opacity: 0.5; filter: brightness(1); }
   50% { opacity: 0.8; filter: brightness(1.2); }
+}
+
+/* ── Slot bad contact flicker ── */
+@keyframes slot-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  3% { opacity: 0.15; transform: scale(0.92); }
+  6% { opacity: 1; transform: scale(1); }
+  10% { opacity: 0.4; transform: scale(0.95); }
+  12% { opacity: 1; transform: scale(1); }
+  45% { opacity: 0.7; }
+  48% { opacity: 1; }
+  70% { opacity: 0.5; transform: scale(0.96); }
+  72% { opacity: 1; transform: scale(1); }
+  92% { opacity: 0.2; transform: scale(0.9); }
+  94% { opacity: 1; transform: scale(1); }
+  96% { opacity: 0.5; }
+  98% { opacity: 1; }
+}
+.animate-slot-flicker {
+  animation: slot-flicker 6s ease-in-out infinite;
 }
 
 /* ── Floating neon border ── */
