@@ -32,11 +32,11 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
       {active && (
         <>
           <div
-            className="absolute -inset-3 rounded-full blur-2xl transition-all duration-700 pointer-events-none"
+            className="absolute -inset-4 rounded-full blur-3xl transition-all duration-700 pointer-events-none"
             style={{ background: `radial-gradient(circle, ${color}55, transparent 70%)`, animation: 'slot-glow-pulse 4s ease-in-out infinite' }}
           />
           <div
-            className="absolute -inset-1.5 rounded-full blur-lg transition-all duration-500 pointer-events-none"
+            className="absolute -inset-2 rounded-full blur-xl transition-all duration-500 pointer-events-none"
             style={{ background: `radial-gradient(circle, ${color}44, transparent 60%)` }}
           />
         </>
@@ -44,15 +44,15 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
 
       {/* slot circle */}
       <div
-        className={`w-11 h-11 relative rounded-full transition-all duration-300 overflow-hidden ${
-          active ? 'border-2' : 'border border-gray-700/20 bg-gray-900/60'
+        className={`w-14 h-14 relative rounded-full transition-all duration-300 overflow-hidden ${
+          active ? 'border-[2.5px]' : 'border border-gray-700/20 bg-gray-900/60'
         }`}
         style={{
           borderColor: active ? color : undefined,
           background: active
             ? `radial-gradient(ellipse at 35% 30%, ${color}33, transparent 70%), radial-gradient(ellipse at 70% 80%, ${color}22, transparent 50%), #0f1420`
             : undefined,
-          boxShadow: active ? `0 0 20px ${color}44, inset 0 0 25px ${color}11` : undefined,
+          boxShadow: active ? `0 0 25px ${color}44, inset 0 0 30px ${color}11` : undefined,
         }}
       >
         {/* nebulous inner glow */}
@@ -71,10 +71,10 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
             style={{
               left: `${d.left}%`,
               top: `${d.top}%`,
-              width: `${d.size}px`,
-              height: `${d.size}px`,
+              width: `${d.size + 1}px`,
+              height: `${d.size + 1}px`,
               background: color,
-              boxShadow: `0 0 3px ${color}`,
+              boxShadow: `0 0 4px ${color}`,
               opacity: 0.2 + (i % 3) * 0.15,
               animationDelay: `${d.delay}s`,
               animationDuration: `${d.duration}s`,
@@ -86,8 +86,8 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
         {/* icon */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <span
-            className="text-[12px] leading-none"
-            style={active ? { filter: `drop-shadow(0 0 6px ${color})` } : { opacity: 0.3 }}
+            className="text-[16px] leading-none"
+            style={active ? { filter: `drop-shadow(0 0 8px ${color})` } : { opacity: 0.3 }}
           >
             {icon}
           </span>
@@ -97,7 +97,7 @@ export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlot
       {/* name label */}
       {name && (
         <span
-          className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 text-[5px] text-center whitespace-nowrap font-medium"
+          className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[6px] text-center whitespace-nowrap font-semibold tracking-wider"
           style={{ color: `${color}99` }}
         >
           {name}

@@ -205,7 +205,7 @@ export default function ShipPage() {
           {/* central cluster: slots + card */}
           <div className="flex items-center justify-center relative">
             {/* left slots - overlapping card */}
-            <div className="flex flex-col gap-3 z-20 -mr-4">
+            <div className="flex flex-col gap-4 z-20 -mr-2">
               {slotConfigs.left.map((slot, i) => (
                 <HexSlot key={i} {...slot} side="left" />
               ))}
@@ -326,7 +326,7 @@ export default function ShipPage() {
             </div>
 
             {/* right slots - overlapping card */}
-            <div className="flex flex-col gap-3 z-20 -ml-4">
+            <div className="flex flex-col gap-4 z-20 -ml-2">
               {slotConfigs.right.map((slot, i) => (
                 <HexSlot key={i} {...slot} side="right" />
               ))}
@@ -334,7 +334,7 @@ export default function ShipPage() {
           </div>
 
           {/* bottom slots */}
-          <div className="flex gap-6 mt-2 z-20">
+          <div className="flex gap-8 mt-2 z-20">
             {slotConfigs.bottom.map((slot, i) => (
               <HexSlot key={i} {...slot} />
             ))}
