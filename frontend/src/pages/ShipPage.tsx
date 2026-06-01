@@ -28,6 +28,33 @@ const consoleButtons = [
   { label: 'СПЕКУЛЯТИВНАЯ ЛАВКА', accent: '#f97316', sub: 'Цены высоки, надежды низки' },
 ]
 
+/* ── Easter egg sticker schedule ── */
+const EGGS_LS = 'eggs/sticker'
+const SPAWN_MIN_MS = 2 * 60 * 60 * 1000
+const SPAWN_MAX_MS = 6 * 60 * 60 * 1000
+const WINDOW_MS = 15 * 60 * 1000
+
+function scheduleNextSpawn(): void {
+  const delay = SPAWN_MIN_MS + Math.random() * (SPAWN_MAX_MS - SPAWN_MIN_MS)
+  const next = Date.now() + delay
+  localStorage.setItem(`${EGGS_LS}/next_spawn`, String(next))
+  localStorage.setItem(`${EGGS_LS}/expires_at`, String(next + WINDOW_MS))
+  localStorage.removeItem(`${EGGS_LS}/state`)
+}
+
+function initSpawnSchedule(): void {
+  const stored = localStorage.getItem(`${EGGS_LS}/next_spawn`)
+  if (!stored || Date.now() >= +stored + WINDOW_MS + 60_000) {
+    scheduleNextSpawn()
+  }
+}
+
+function isStickerActive(): boolean {
+  const expires = localStorage.getItem(`${EGGS_LS}/expires_at`)
+  if (!expires) return false
+  return Date.now() < +expires
+}
+
 export default function ShipPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const user = useGameStore((s) => s.user)
@@ -47,8 +74,28 @@ export default function ShipPage() {
   const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
   const first = tg?.initDataUnsafe?.user?.first_name
 
-  const [stickerIdx, setStickerIdx] = useState(0)
+  const [stickerIdx, setStickerIdx] = useState(() => {
+    const saved = localStorage.getItem(`${EGGS_LS}/state`)
+    return saved ? +saved : 0
+  })
+  const [stickerVisible, setStickerVisible] = useState(false)
   const [consoleMsg, setConsoleMsg] = useState<string | null>(null)
+
+  /* ── Easter egg spawn checker ── */
+  useEffect(() => {
+    initSpawnSchedule()
+    const check = () => setStickerVisible(isStickerActive())
+    check()
+    const id = setInterval(check, 30_000)
+    return () => clearInterval(id)
+  }, [])
+
+  /* reset sticker clicks on new spawn */
+  useEffect(() => {
+    if (!stickerVisible) return
+    const saved = localStorage.getItem(`${EGGS_LS}/state`)
+    if (!saved) setStickerIdx(0)
+  }, [stickerVisible])
 
   useEffect(() => {
     if (!consoleMsg) return
@@ -375,14 +422,18 @@ export default function ShipPage() {
             </svg>
           </div>
 
-          {/* floating sticker — НЕ НАЖИМАТЬ */}
+          {/* floating sticker — Easter egg */}
+          {stickerVisible && (
           <div
-            className="absolute right-2 bottom-16 z-30 cursor-pointer select-none group"
+            className="absolute right-2 bottom-16 z-30 cursor-pointer select-none group animate-fade-in"
             onClick={() => {
               const next = Math.min(stickerIdx + 1, STICKER_FINAL)
               setStickerIdx(next)
+              localStorage.setItem(`${EGGS_LS}/state`, String(next))
               if (next === STICKER_FINAL && user && stickerIdx < STICKER_FINAL) {
                 setUser({ ...user, balance_xgen: user.balance_xgen + 1 })
+                scheduleNextSpawn()
+                setStickerVisible(false)
               }
             }}
           >
@@ -395,6 +446,7 @@ export default function ShipPage() {
               <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-yellow-400/15 rotate-45 border-l border-t border-yellow-400/15" />
             </div>
           </div>
+          )}
 
           {/* fuel + HP bars */}
           <div className="w-full max-w-[280px] mt-3 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
