@@ -44,6 +44,7 @@ interface GameState {
   loadContent: () => Promise<void>
   clearBoxRewards: () => void
   updateNickname: (username: string) => Promise<void>
+  setUser: (user: UserProfile) => void
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -109,6 +110,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   clearLastLoot: () => {
     set({ lastLoot: null })
   },
+
+  setUser: (user) => set({ user }),
 
   updateNickname: async (username: string) => {
     try {

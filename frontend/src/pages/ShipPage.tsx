@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
@@ -31,6 +31,7 @@ const consoleButtons = [
 export default function ShipPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const user = useGameStore((s) => s.user)
+  const setUser = useGameStore((s) => s.setUser)
   const ships = useGameStore((s) => s.ships)
   const shipsContent = useGameStore((s) => s.shipsContent)
   const loadShips = useGameStore((s) => s.loadShips)
@@ -45,6 +46,20 @@ export default function ShipPage() {
   const tg = (window as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: { photo_url?: string; first_name?: string } } } } }).Telegram?.WebApp
   const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
   const first = tg?.initDataUnsafe?.user?.first_name
+
+  const [stickerIdx, setStickerIdx] = useState(0)
+  const stickerMessages = [
+    'НЕ НАЖИМАТЬ',
+    'ЗАЧЕМ ТЫ ЭТО СДЕЛАЛ?',
+    'ХВАТИТ',
+    '...',
+    'ТЫ ЧТО, ГЛУХОЙ?',
+    '⚠️',
+    'СЕРЬЁЗНО?',
+    'ТВОЁ УПОРСТВО ВОСХИЩАЕТ',
+    'ЛАДНО, ВОТ ТЕБЕ 1 XGEN, ТОЛЬКО ОТСТАНЬ',
+  ]
+  const STICKER_FINAL = stickerMessages.length - 1
 
   const mainShip = ships.length > 0 ? ships[0] : null
   const shipConfig = mainShip ? shipsContent.find((c) => c.id === mainShip.ship_config_id) : null
@@ -354,14 +369,17 @@ export default function ShipPage() {
           <div
             className="absolute right-2 bottom-16 z-30 cursor-pointer select-none group"
             onClick={() => {
-              const tg = (window as any).Telegram?.WebApp
-              if (tg?.showPopup) tg.showPopup({ title: '⚠️', message: 'Ну зачем? Теперь придётся перезагружать вселенную. Подождите 3... 2... 1...', buttons: [{ type: 'close' }] })
+              const next = Math.min(stickerIdx + 1, STICKER_FINAL)
+              setStickerIdx(next)
+              if (next === STICKER_FINAL && user && stickerIdx < STICKER_FINAL) {
+                setUser({ ...user, balance_xgen: user.balance_xgen + 1 })
+              }
             }}
           >
-            <div className="rotate-[6deg] hover:rotate-[-4deg] transition-transform duration-300">
+            <div className={`rotate-[6deg] hover:rotate-[-4deg] transition-transform duration-300 ${stickerIdx >= 8 ? 'animate-pulse' : ''}`}>
               <div className="bg-yellow-400/8 backdrop-blur-sm border border-yellow-400/15 rounded-md px-2 py-1 shadow-[0_0_10px_rgba(251,191,36,.08)]">
                 <span className="text-[5px] font-bold tracking-wider text-yellow-400/50 whitespace-nowrap">
-                  НЕ НАЖИМАТЬ
+                  {stickerMessages[stickerIdx]}
                 </span>
               </div>
               <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-yellow-400/15 rotate-45 border-l border-t border-yellow-400/15" />
