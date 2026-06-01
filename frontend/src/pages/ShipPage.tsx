@@ -201,143 +201,173 @@ export default function ShipPage() {
         </div>
 
         {/* ═══ ship section ═══ */}
-        <div className="flex-1 flex flex-col items-center justify-center relative py-2">
-          {/* left slots */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
-            {slotConfigs.left.map((slot, i) => (
-              <div key={i} style={{ marginLeft: slot.active ? '0' : '4px' }}>
-                <HexSlot {...slot} side="left" />
-              </div>
-            ))}
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center relative py-1">
+          {/* central cluster: slots + card */}
+          <div className="flex items-center justify-center relative">
+            {/* left slots - overlapping card */}
+            <div className="flex flex-col gap-3 z-20 -mr-4">
+              {slotConfigs.left.map((slot, i) => (
+                <HexSlot key={i} {...slot} side="left" />
+              ))}
+            </div>
 
-          {/* right slots */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
-            {slotConfigs.right.map((slot, i) => (
-              <div key={i} style={{ marginRight: slot.active ? '0' : '4px' }}>
-                <HexSlot {...slot} side="right" />
-              </div>
-            ))}
-          </div>
+            {/* lightning background */}
+            <div className="absolute inset-0 pointer-events-none z-10 blur-sm">
+              <svg className="w-full h-full opacity-60" viewBox="0 0 400 500" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="lg-left" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#00f5ff" stopOpacity="0.5" />
+                    <stop offset="30%" stopColor="#a855f7" stopOpacity="0.4" />
+                    <stop offset="70%" stopColor="#00f5ff" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#a855f7" stopOpacity="0.15" />
+                  </linearGradient>
+                  <linearGradient id="lg-right" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#a855f7" stopOpacity="0.5" />
+                    <stop offset="30%" stopColor="#00f5ff" stopOpacity="0.4" />
+                    <stop offset="70%" stopColor="#a855f7" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#00f5ff" stopOpacity="0.15" />
+                  </linearGradient>
+                </defs>
+                <path d="M55 60 L48 78 L60 84 L46 104 L62 114 L42 138 L64 150 L40 175" stroke="url(#lg-left)" strokeWidth="2" fill="none" style={{ animation: 'lightning-flicker 2s ease-in-out infinite' }} />
+                <path d="M55 175 L50 192 L62 199 L46 214 L60 224 L42 242 L64 254 L44 272 L60 282" stroke="url(#lg-left)" strokeWidth="1.5" fill="none" style={{ animation: 'lightning-flicker 2.8s ease-in-out infinite 0.4s' }} />
+                <path d="M55 282 L48 298 L62 306 L44 320 L58 332 L40 348 L64 360 L42 378" stroke="url(#lg-left)" strokeWidth="1.2" fill="none" style={{ animation: 'lightning-flicker 2.4s ease-in-out infinite 0.9s' }} />
+                <path d="M345 60 L352 78 L340 84 L354 104 L338 114 L358 138 L336 150 L360 175" stroke="url(#lg-right)" strokeWidth="2" fill="none" style={{ animation: 'lightning-flicker 2s ease-in-out infinite 0.3s' }} />
+                <path d="M345 175 L350 192 L338 199 L354 214 L340 224 L358 242 L336 254 L356 272 L340 282" stroke="url(#lg-right)" strokeWidth="1.5" fill="none" style={{ animation: 'lightning-flicker 2.8s ease-in-out infinite 0.7s' }} />
+                <path d="M345 282 L352 298 L340 306 L356 320 L342 332 L360 348 L336 360 L358 378" stroke="url(#lg-right)" strokeWidth="1.2" fill="none" style={{ animation: 'lightning-flicker 2.4s ease-in-out infinite 1.2s' }} />
+                <circle cx="55" cy="60" r="2.5" fill="#00f5ff" opacity="0.5" />
+                <circle cx="55" cy="175" r="2" fill="#00f5ff" opacity="0.4" />
+                <circle cx="55" cy="282" r="1.5" fill="#00f5ff" opacity="0.3" />
+                <circle cx="345" cy="60" r="2.5" fill="#a855f7" opacity="0.5" />
+                <circle cx="345" cy="175" r="2" fill="#a855f7" opacity="0.4" />
+                <circle cx="345" cy="282" r="1.5" fill="#a855f7" opacity="0.3" />
+              </svg>
+            </div>
 
-          {/* lightning */}
-          <div className="absolute inset-0 pointer-events-none z-10 blur-sm">
-            <svg className="w-full h-full opacity-60" viewBox="0 0 400 500" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="lg-left" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#00f5ff" stopOpacity="0.5" />
-                  <stop offset="30%" stopColor="#a855f7" stopOpacity="0.4" />
-                  <stop offset="70%" stopColor="#00f5ff" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#a855f7" stopOpacity="0.15" />
-                </linearGradient>
-                <linearGradient id="lg-right" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#a855f7" stopOpacity="0.5" />
-                  <stop offset="30%" stopColor="#00f5ff" stopOpacity="0.4" />
-                  <stop offset="70%" stopColor="#a855f7" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#00f5ff" stopOpacity="0.15" />
-                </linearGradient>
-              </defs>
-              <path d="M55 60 L48 78 L60 84 L46 104 L62 114 L42 138 L64 150 L40 175" stroke="url(#lg-left)" strokeWidth="2" fill="none" style={{ animation: 'lightning-flicker 2s ease-in-out infinite' }} />
-              <path d="M55 175 L50 192 L62 199 L46 214 L60 224 L42 242 L64 254 L44 272 L60 282" stroke="url(#lg-left)" strokeWidth="1.5" fill="none" style={{ animation: 'lightning-flicker 2.8s ease-in-out infinite 0.4s' }} />
-              <path d="M55 282 L48 298 L62 306 L44 320 L58 332 L40 348 L64 360 L42 378" stroke="url(#lg-left)" strokeWidth="1.2" fill="none" style={{ animation: 'lightning-flicker 2.4s ease-in-out infinite 0.9s' }} />
-              <path d="M345 60 L352 78 L340 84 L354 104 L338 114 L358 138 L336 150 L360 175" stroke="url(#lg-right)" strokeWidth="2" fill="none" style={{ animation: 'lightning-flicker 2s ease-in-out infinite 0.3s' }} />
-              <path d="M345 175 L350 192 L338 199 L354 214 L340 224 L358 242 L336 254 L356 272 L340 282" stroke="url(#lg-right)" strokeWidth="1.5" fill="none" style={{ animation: 'lightning-flicker 2.8s ease-in-out infinite 0.7s' }} />
-              <path d="M345 282 L352 298 L340 306 L356 320 L342 332 L360 348 L336 360 L358 378" stroke="url(#lg-right)" strokeWidth="1.2" fill="none" style={{ animation: 'lightning-flicker 2.4s ease-in-out infinite 1.2s' }} />
-              <circle cx="55" cy="60" r="2.5" fill="#00f5ff" opacity="0.5" />
-              <circle cx="55" cy="175" r="2" fill="#00f5ff" opacity="0.4" />
-              <circle cx="55" cy="282" r="1.5" fill="#00f5ff" opacity="0.3" />
-              <circle cx="345" cy="60" r="2.5" fill="#a855f7" opacity="0.5" />
-              <circle cx="345" cy="175" r="2" fill="#a855f7" opacity="0.4" />
-              <circle cx="345" cy="282" r="1.5" fill="#a855f7" opacity="0.3" />
-            </svg>
-          </div>
+            {/* ═══ ship card ═══ */}
+            <div className="relative z-10">
+              <div className="absolute -inset-4 bg-gradient-to-b from-purple-500/12 via-cyan-500/8 to-purple-500/12 rounded-[18px] blur-xl animate-pulse-slow" />
+              <div className="absolute -inset-2 bg-gradient-to-b from-cyan-400/4 via-purple-500/4 to-cyan-400/4 rounded-[14px] blur-md" />
 
-          {/* ═══ ship card ═══ */}
-          <div className="relative">
-            <div className="absolute -inset-5 bg-gradient-to-b from-purple-500/15 via-cyan-500/10 to-purple-500/15 rounded-[20px] blur-xl animate-pulse-slow" />
-            <div className="absolute -inset-3 bg-gradient-to-b from-cyan-400/5 via-purple-500/5 to-cyan-400/5 rounded-[18px] blur-md" />
-
-            <div className="relative bg-white/5 backdrop-blur-[12px] rounded-2xl border border-cyan-500/25 p-5 w-64 shadow-[0_0_50px_rgba(0,245,255,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
-              <div className="text-center mb-3 relative">
-                <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent" />
-                <h2 className="text-white font-bold text-sm tracking-[0.2em] relative inline-block px-3 bg-white/5">
-                  {shipName}
-                </h2>
-              </div>
-
-              {/* ship display */}
-              <div className="relative aspect-square bg-gradient-to-b from-gray-800/40 to-gray-900/40 rounded-xl border border-cyan-500/15 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,.3)]">
-                <div className="absolute inset-0 opacity-20">
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <div key={`h-${i}`} className="absolute w-full h-px bg-cyan-400/30" style={{ top: `${i * 8.33}%` }} />
-                  ))}
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <div key={`v-${i}`} className="absolute h-full w-px bg-cyan-400/30" style={{ left: `${i * 8.33}%` }} />
-                  ))}
+              <div className="relative bg-white/5 backdrop-blur-[12px] rounded-2xl border border-cyan-500/25 p-4 w-56 shadow-[0_0_40px_rgba(0,245,255,.1),inset_0_1px_0_rgba(255,255,255,.06)]">
+                <div className="text-center mb-2 relative">
+                  <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent" />
+                  <h2 className="text-white font-bold text-xs tracking-[0.2em] relative inline-block px-3 bg-white/5">
+                    {shipName}
+                  </h2>
                 </div>
 
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_30%,rgba(0,245,255,.02))]" />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/5 to-transparent animate-glitch-sweep" />
-                <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent animate-scanline-down" />
-                <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-cyan-400/20" />
-                <div className="absolute top-2 right-2 w-4 h-4 border-t border-r border-cyan-400/20" />
-                <div className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-cyan-400/20" />
-                <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-cyan-400/20" />
+                {/* ship display */}
+                <div className="relative aspect-square bg-gradient-to-b from-gray-800/40 to-gray-900/40 rounded-xl border border-cyan-500/15 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,.3)]">
+                  <div className="absolute inset-0 opacity-20">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div key={`h-${i}`} className="absolute w-full h-px bg-cyan-400/30" style={{ top: `${i * 10}%` }} />
+                    ))}
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div key={`v-${i}`} className="absolute h-full w-px bg-cyan-400/30" style={{ left: `${i * 10}%` }} />
+                    ))}
+                  </div>
 
-                {/* ship SVG */}
-                <svg viewBox="0 0 100 100" className="w-full h-full p-4 relative z-10">
-                  <defs>
-                    <radialGradient id="eg" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#00f5ff" stopOpacity="0.15" />
-                      <stop offset="100%" stopColor="#00f5ff" stopOpacity="0" />
-                    </radialGradient>
-                    <radialGradient id="eg2" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#f97316" stopOpacity="0.1" />
-                      <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
-                    </radialGradient>
-                  </defs>
-                  <ellipse cx="50" cy="85" rx="12" ry="6" fill="url(#eg)" style={{ animation: 'pulse-slow 4s ease-in-out infinite' }} />
-                  <ellipse cx="50" cy="88" rx="6" ry="4" fill="url(#eg2)" style={{ animation: 'pulse-slow 4s ease-in-out infinite' }} />
-                  <path
-                    d="M 50 8 L 42 20 L 38 35 L 35 55 L 38 75 L 45 88 L 50 92 L 55 88 L 62 75 L 65 55 L 62 35 L 58 20 Z"
-                    fill="rgba(0,245,255,.02)"
-                    stroke="#00f5ff"
-                    strokeWidth="1.2"
-                    style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.15))' }}
-                  />
-                  <path d="M 44 25 L 44 50 M 56 25 L 56 50" stroke="#00f5ff" strokeWidth="0.3" opacity="0.4" />
-                  <ellipse cx="50" cy="32" rx="5" ry="8" fill="rgba(0,245,255,.04)" stroke="#00f5ff" strokeWidth="0.8" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.3))' }} />
-                  <ellipse cx="50" cy="32" rx="2" ry="4" fill="#00f5ff" opacity="0.06" />
-                  <path d="M 35 55 L 18 68 L 22 78 L 35 72" fill="rgba(0,245,255,.01)" stroke="#00f5ff" strokeWidth="1" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.2))' }} />
-                  <line x1="25" y1="62" x2="30" y2="60" stroke="#00f5ff" strokeWidth="0.3" opacity="0.3" />
-                  <path d="M 65 55 L 82 68 L 78 78 L 65 72" fill="rgba(0,245,255,.01)" stroke="#00f5ff" strokeWidth="1" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.2))' }} />
-                  <line x1="75" y1="62" x2="70" y2="60" stroke="#00f5ff" strokeWidth="0.3" opacity="0.3" />
-                  <circle cx="50" cy="52" r="4" fill="none" stroke="#00f5ff" strokeWidth="0.8" />
-                  <circle cx="50" cy="52" r="1.5" fill="#00f5ff" style={{ animation: 'pulse-slow 4s ease-in-out infinite', filter: 'drop-shadow(0 0 8px rgba(0,245,255,.6))' }} />
-                  <path d="M 42 48 L 38 52 L 42 56" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.5" />
-                  <path d="M 58 48 L 62 52 L 58 56" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.5" />
-                  <path d="M 45 18 L 42 14 L 48 16" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.4" />
-                  <path d="M 55 18 L 58 14 L 52 16" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.4" />
-                  <line x1="45" y1="80" x2="45" y2="86" stroke="#00f5ff" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="55" y1="80" x2="55" y2="86" stroke="#00f5ff" strokeWidth="0.4" opacity="0.3" />
-                  <circle cx="50" cy="50" r="32" fill="none" stroke="#00f5ff" strokeWidth="0.3" opacity="0.06" strokeDasharray="3 4" />
-                  <circle cx="50" cy="50" r="22" fill="none" stroke="#a855f7" strokeWidth="0.3" opacity="0.04" strokeDasharray="2 5" />
-                </svg>
-              </div>
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_30%,rgba(0,245,255,.02))]" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/5 to-transparent animate-glitch-sweep" />
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent animate-scanline-down" />
+                  <div className="absolute top-2 left-2 w-3 h-3 border-t border-l border-cyan-400/20" />
+                  <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-cyan-400/20" />
+                  <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-cyan-400/20" />
+                  <div className="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-cyan-400/20" />
 
-              <div className="flex justify-between mt-2.5 text-[7px] text-cyan-400/20 tracking-wider">
-                <span>PWR 94%</span>
-                <span>SHLD 78%</span>
-                <span>SPD 0.42</span>
+                  {/* ship SVG */}
+                  <svg viewBox="0 0 100 100" className="w-full h-full p-3 relative z-10">
+                    <defs>
+                      <radialGradient id="eg" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#00f5ff" stopOpacity="0.15" />
+                        <stop offset="100%" stopColor="#00f5ff" stopOpacity="0" />
+                      </radialGradient>
+                      <radialGradient id="eg2" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.1" />
+                        <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                      </radialGradient>
+                    </defs>
+                    <ellipse cx="50" cy="85" rx="12" ry="6" fill="url(#eg)" style={{ animation: 'pulse-slow 4s ease-in-out infinite' }} />
+                    <ellipse cx="50" cy="88" rx="6" ry="4" fill="url(#eg2)" style={{ animation: 'pulse-slow 4s ease-in-out infinite' }} />
+                    <path
+                      d="M 50 8 L 42 20 L 38 35 L 35 55 L 38 75 L 45 88 L 50 92 L 55 88 L 62 75 L 65 55 L 62 35 L 58 20 Z"
+                      fill="rgba(0,245,255,.02)"
+                      stroke="#00f5ff"
+                      strokeWidth="1.2"
+                      style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.15))' }}
+                    />
+                    <path d="M 44 25 L 44 50 M 56 25 L 56 50" stroke="#00f5ff" strokeWidth="0.3" opacity="0.4" />
+                    <ellipse cx="50" cy="32" rx="5" ry="8" fill="rgba(0,245,255,.04)" stroke="#00f5ff" strokeWidth="0.8" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.3))' }} />
+                    <ellipse cx="50" cy="32" rx="2" ry="4" fill="#00f5ff" opacity="0.06" />
+                    <path d="M 35 55 L 18 68 L 22 78 L 35 72" fill="rgba(0,245,255,.01)" stroke="#00f5ff" strokeWidth="1" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.2))' }} />
+                    <line x1="25" y1="62" x2="30" y2="60" stroke="#00f5ff" strokeWidth="0.3" opacity="0.3" />
+                    <path d="M 65 55 L 82 68 L 78 78 L 65 72" fill="rgba(0,245,255,.01)" stroke="#00f5ff" strokeWidth="1" style={{ filter: 'drop-shadow(0 0 4px rgba(0,245,255,.2))' }} />
+                    <line x1="75" y1="62" x2="70" y2="60" stroke="#00f5ff" strokeWidth="0.3" opacity="0.3" />
+                    <circle cx="50" cy="52" r="4" fill="none" stroke="#00f5ff" strokeWidth="0.8" />
+                    <circle cx="50" cy="52" r="1.5" fill="#00f5ff" style={{ animation: 'pulse-slow 4s ease-in-out infinite', filter: 'drop-shadow(0 0 8px rgba(0,245,255,.6))' }} />
+                    <path d="M 42 48 L 38 52 L 42 56" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.5" />
+                    <path d="M 58 48 L 62 52 L 58 56" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.5" />
+                    <path d="M 45 18 L 42 14 L 48 16" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.4" />
+                    <path d="M 55 18 L 58 14 L 52 16" fill="none" stroke="#00f5ff" strokeWidth="0.5" opacity="0.4" />
+                    <line x1="45" y1="80" x2="45" y2="86" stroke="#00f5ff" strokeWidth="0.4" opacity="0.3" />
+                    <line x1="55" y1="80" x2="55" y2="86" stroke="#00f5ff" strokeWidth="0.4" opacity="0.3" />
+                    <circle cx="50" cy="50" r="32" fill="none" stroke="#00f5ff" strokeWidth="0.3" opacity="0.06" strokeDasharray="3 4" />
+                    <circle cx="50" cy="50" r="22" fill="none" stroke="#a855f7" strokeWidth="0.3" opacity="0.04" strokeDasharray="2 5" />
+                  </svg>
+                </div>
+
+                {/* stats bar */}
+                <div className="flex justify-between mt-2 text-[7px] text-cyan-400/20 tracking-wider">
+                  <span>PWR 94%</span>
+                  <span>SHLD 78%</span>
+                  <span>SPD 0.42</span>
+                </div>
               </div>
+            </div>
+
+            {/* right slots - overlapping card */}
+            <div className="flex flex-col gap-3 z-20 -ml-4">
+              {slotConfigs.right.map((slot, i) => (
+                <HexSlot key={i} {...slot} side="right" />
+              ))}
             </div>
           </div>
 
           {/* bottom slots */}
-          <div className="flex gap-6 mt-5 z-20">
+          <div className="flex gap-6 mt-2 z-20">
             {slotConfigs.bottom.map((slot, i) => (
               <HexSlot key={i} {...slot} />
             ))}
+          </div>
+
+          {/* fuel + HP bars */}
+          <div className="w-full max-w-[280px] mt-3 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
+            <div className="flex gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[8px] text-cyan-400/30 font-semibold tracking-wider">FUEL</span>
+                  <span className="text-[8px] text-orange-400/40 font-mono">{mainShip?.fuel_current ?? 0}/{100}</span>
+                </div>
+                <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-orange-500/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-orange-600 to-orange-400"
+                    style={{ width: `${Math.min(100, ((mainShip?.fuel_current ?? 50) / 100) * 100)}%`, boxShadow: '0 0 6px rgba(249,115,22,.3)' }}
+                  />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[8px] text-cyan-400/30 font-semibold tracking-wider">HP</span>
+                  <span className="text-[8px] text-green-400/40 font-mono">{Math.round(mainShip?.stability ?? 100)}%</span>
+                </div>
+                <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-green-500/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-green-600 to-green-400"
+                    style={{ width: `${Math.min(100, mainShip?.stability ?? 85)}%`, boxShadow: '0 0 6px rgba(34,197,94,.3)' }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

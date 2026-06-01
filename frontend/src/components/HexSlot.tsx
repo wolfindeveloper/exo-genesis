@@ -23,7 +23,7 @@ export function HexSlot({ active, icon, name, glow, onClick, side }: HexSlotProp
         }}
       />
       <div
-        className={`w-9 h-10 relative clip-hexagon transition-all duration-300 ${
+        className={`w-11 h-12 relative clip-hexagon transition-all duration-300 ${
           active
             ? 'bg-gradient-to-b from-cyan-500/15 via-cyan-500/8 to-gray-900/80 border-cyan-400/40 shadow-[0_0_15px_#00f5ff]'
             : 'bg-gray-900/60 border-gray-700/20'
@@ -33,11 +33,11 @@ export function HexSlot({ active, icon, name, glow, onClick, side }: HexSlotProp
           <div className="absolute inset-0 clip-hexagon bg-gradient-to-b from-cyan-400/10 to-transparent" />
         )}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-[9px] leading-none ${active ? 'drop-shadow-[0_0_6px_#00f5ff]' : 'opacity-30'}`}>
+          <span className={`text-[11px] leading-none ${active ? 'drop-shadow-[0_0_8px_#00f5ff]' : 'opacity-30'}`}>
             {icon}
           </span>
           {name && (
-            <span className="text-[5px] text-cyan-300/60 mt-0.5 leading-none truncate max-w-[24px]">
+            <span className="text-[6px] text-cyan-300/60 mt-0.5 leading-none truncate max-w-[28px]">
               {name}
             </span>
           )}
