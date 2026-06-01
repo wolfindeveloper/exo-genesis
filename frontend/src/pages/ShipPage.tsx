@@ -22,10 +22,10 @@ const slotConfigs = {
 }
 
 const consoleButtons = [
-  { label: 'КАРТА', accent: '#00f5ff' },
-  { label: 'ГРУЗ', accent: '#a855f7' },
-  { label: 'ПУТЕВОДИТЕЛЬ', accent: '#00f5ff' },
-  { label: 'РЫНОК', accent: '#f97316' },
+  { label: 'ГДЕ-ТО ТАМ', accent: '#00f5ff', msg: 'Вы все равно заблудитесь' },
+  { label: 'КОЛЛЕКЦИЯ ХЛАМА', accent: '#a855f7' },
+  { label: 'НЕ ПАНИКУЙТЕ', accent: '#00f5ff' },
+  { label: 'СПЕКУЛЯТИВНАЯ ЛАВКА', accent: '#f97316', sub: 'Цены высоки, надежды низки' },
 ]
 
 export default function ShipPage() {
@@ -48,6 +48,13 @@ export default function ShipPage() {
   const first = tg?.initDataUnsafe?.user?.first_name
 
   const [stickerIdx, setStickerIdx] = useState(0)
+  const [consoleMsg, setConsoleMsg] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!consoleMsg) return
+    const t = setTimeout(() => setConsoleMsg(null), 2500)
+    return () => clearTimeout(t)
+  }, [consoleMsg])
   const stickerMessages = [
     'НЕ НАЖИМАТЬ',
     'ЗАЧЕМ ТЫ ЭТО СДЕЛАЛ?',
@@ -428,7 +435,7 @@ export default function ShipPage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 relative">
               {consoleButtons.map((btn, i) => (
                 <button
                   key={i}
@@ -436,6 +443,9 @@ export default function ShipPage() {
                   style={{
                     background: `conic-gradient(from var(--gradient-angle, 0deg), ${btn.accent}00 0%, ${btn.accent}55 25%, ${btn.accent}00 50%, ${btn.accent}55 75%, ${btn.accent}00 100%)`,
                     animation: 'spin-gradient 4s linear infinite',
+                  }}
+                  onClick={() => {
+                    if (btn.msg) setConsoleMsg(btn.msg)
                   }}
                 >
                   {/* button body with metallic bevel */}
@@ -451,7 +461,7 @@ export default function ShipPage() {
                     />
 
                     {/* label */}
-                    <div className="relative flex items-center justify-center py-3.5 px-4">
+                    <div className="relative flex flex-col items-center justify-center py-3 px-4">
                       <span
                         className="text-[11px] font-bold tracking-[0.15em] transition-all duration-200"
                         style={{
@@ -461,6 +471,11 @@ export default function ShipPage() {
                       >
                         {btn.label}
                       </span>
+                      {btn.sub && (
+                        <span className="text-[5px] text-white/20 tracking-wider mt-0.5 leading-tight">
+                          {btn.sub}
+                        </span>
+                      )}
                     </div>
 
                     {/* bottom accent line */}
@@ -472,9 +487,17 @@ export default function ShipPage() {
                 </button>
               ))}
             </div>
+
+            {/* console message toast */}
+            {consoleMsg && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 animate-fade-in">
+                <div className="bg-black/70 backdrop-blur-sm border border-cyan-500/20 rounded-lg px-3 py-1.5 shadow-[0_0_16px_rgba(0,245,255,.1)] whitespace-nowrap">
+                  <span className="text-[8px] text-cyan-400/60 font-mono tracking-wider">{consoleMsg}</span>
+                </div>
+                <div className="absolute bottom-[-3px] left-1/2 -translate-x-1/2 w-2 h-2 bg-black/70 border-r border-b border-cyan-500/20 rotate-45" />
+              </div>
+            )}
           </div>
-        </div>
-      </div>
     </div>
   )
 }
