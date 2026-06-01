@@ -1,53 +1,119 @@
-import { type MouseEventHandler } from 'react'
+import { useMemo } from 'react'
 
 interface HexSlotProps {
   active: boolean
   icon: string
   name?: string
-  glow: string
-  onClick?: MouseEventHandler<HTMLDivElement>
+  tier?: number
+  onClick?: () => void
   side?: 'left' | 'right'
 }
 
-export function HexSlot({ active, icon, name, glow, onClick, side }: HexSlotProps) {
+const TIER_COLORS = ['#94a3b8', '#22c55e', '#a855f7', '#f59e0b', '#ffd700']
+
+export function HexSlot({ active, icon, name, tier = 1, onClick, side }: HexSlotProps) {
+  const color = active ? TIER_COLORS[Math.min(tier - 1, 4)] : '#4a5568'
+
+  const dust = useMemo(
+    () =>
+      Array.from({ length: 6 }, (_, i) => ({
+        left: 10 + (i * 17 + 3) % 80,
+        top: 8 + (i * 13 + 7) % 84,
+        size: 1 + (i % 3),
+        delay: i * 0.9,
+        duration: 3 + (i % 3) * 1.2,
+      })),
+    [],
+  )
+
   return (
     <div className="relative group cursor-pointer" onClick={onClick}>
+      {/* outer glow layers */}
+      {active && (
+        <>
+          <div
+            className="absolute -inset-3 rounded-full blur-2xl transition-all duration-700 pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${color}55, transparent 70%)`, animation: 'slot-glow-pulse 4s ease-in-out infinite' }}
+          />
+          <div
+            className="absolute -inset-1.5 rounded-full blur-lg transition-all duration-500 pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${color}44, transparent 60%)` }}
+          />
+        </>
+      )}
+
+      {/* slot circle */}
       <div
-        className={`absolute inset-0 clip-hexagon blur-sm transition-opacity duration-500 ${
-          active ? 'opacity-60' : 'opacity-10'
+        className={`w-11 h-11 relative rounded-full transition-all duration-300 overflow-hidden ${
+          active ? 'border-2' : 'border border-gray-700/20 bg-gray-900/60'
         }`}
         style={{
+          borderColor: active ? color : undefined,
           background: active
-            ? `radial-gradient(ellipse at center, ${glow}40, transparent)`
-            : '#000',
+            ? `radial-gradient(ellipse at 35% 30%, ${color}33, transparent 70%), radial-gradient(ellipse at 70% 80%, ${color}22, transparent 50%), #0f1420`
+            : undefined,
+          boxShadow: active ? `0 0 20px ${color}44, inset 0 0 25px ${color}11` : undefined,
         }}
-      />
-      <div
-        className={`w-11 h-12 relative clip-hexagon transition-all duration-300 ${
-          active
-            ? 'bg-gradient-to-b from-cyan-500/15 via-cyan-500/8 to-gray-900/80 border-cyan-400/40 shadow-[0_0_15px_#00f5ff]'
-            : 'bg-gray-900/60 border-gray-700/20'
-        } border`}
       >
+        {/* nebulous inner glow */}
         {active && (
-          <div className="absolute inset-0 clip-hexagon bg-gradient-to-b from-cyan-400/10 to-transparent" />
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle at 40% 35%, ${color}44, transparent 60%)` }}
+          />
         )}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-[11px] leading-none ${active ? 'drop-shadow-[0_0_8px_#00f5ff]' : 'opacity-30'}`}>
+
+        {/* space dust particles */}
+        {active && dust.map((d, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full animate-dust-float pointer-events-none"
+            style={{
+              left: `${d.left}%`,
+              top: `${d.top}%`,
+              width: `${d.size}px`,
+              height: `${d.size}px`,
+              background: color,
+              boxShadow: `0 0 3px ${color}`,
+              opacity: 0.2 + (i % 3) * 0.15,
+              animationDelay: `${d.delay}s`,
+              animationDuration: `${d.duration}s`,
+              ['--dust-dur' as string]: `${d.duration}s`,
+            }}
+          />
+        ))}
+
+        {/* icon */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <span
+            className="text-[12px] leading-none"
+            style={active ? { filter: `drop-shadow(0 0 6px ${color})` } : { opacity: 0.3 }}
+          >
             {icon}
           </span>
-          {name && (
-            <span className="text-[6px] text-cyan-300/60 mt-0.5 leading-none truncate max-w-[28px]">
-              {name}
-            </span>
-          )}
         </div>
       </div>
+
+      {/* name label */}
+      {name && (
+        <span
+          className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 text-[5px] text-center whitespace-nowrap font-medium"
+          style={{ color: `${color}99` }}
+        >
+          {name}
+        </span>
+      )}
+
+      {/* active dot indicator */}
       {active && (
         <div
-          className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(0,245,255,.8)] ${
-            side === 'right' ? '-left-1.5' : '-right-1.5'
+          className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full ${
+            side === 'right' ? '-left-2' : '-right-2'
           }`}
+          style={{
+            background: color,
+            boxShadow: `0 0 8px ${color}`,
+          }}
         />
       )}
     </div>

@@ -5,19 +5,19 @@ import { HexSlot } from '../components/HexSlot'
 
 const slotConfigs = {
   left: [
-    { active: true, icon: '⚙', name: 'Ядро', glow: '#00f5ff' },
-    { active: false, icon: '🛡', name: '', glow: '#555' },
-    { active: true, icon: '🔥', name: 'Факел', glow: '#f97316' },
+    { active: true, icon: '⚙', name: 'Ядро', tier: 4 },
+    { active: false, icon: '🛡', name: '', tier: 1 },
+    { active: true, icon: '🔥', name: 'Факел', tier: 3 },
   ],
   right: [
-    { active: true, icon: '🌀', name: 'Око', glow: '#00f5ff' },
-    { active: false, icon: '📦', name: '', glow: '#555' },
-    { active: true, icon: '💫', name: 'Сердце', glow: '#a855f7' },
+    { active: true, icon: '🌀', name: 'Око', tier: 3 },
+    { active: false, icon: '📦', name: '', tier: 1 },
+    { active: true, icon: '💫', name: 'Сердце', tier: 5 },
   ],
   bottom: [
-    { active: true, icon: '🧠', name: 'Память', glow: '#00f5ff' },
-    { active: false, icon: '🌌', name: '', glow: '#555' },
-    { active: true, icon: '⚡', name: 'Импульс', glow: '#f97316' },
+    { active: true, icon: '🧠', name: 'Память', tier: 2 },
+    { active: false, icon: '🌌', name: '', tier: 1 },
+    { active: true, icon: '⚡', name: 'Импульс', tier: 4 },
   ],
 }
 

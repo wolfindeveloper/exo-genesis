@@ -190,6 +190,24 @@ body {
   animation: pulse-slow 4s ease-in-out infinite;
 }
 
+/* ── Space dust float ── */
+@keyframes dust-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  20% { transform: translate(4px, -3px) scale(0.8); opacity: 0.6; }
+  40% { transform: translate(-3px, 5px) scale(1.1); opacity: 0.4; }
+  60% { transform: translate(2px, -2px) scale(0.9); opacity: 0.7; }
+  80% { transform: translate(-4px, 1px) scale(1.05); opacity: 0.5; }
+}
+.animate-dust-float {
+  animation: dust-float var(--dust-dur, 4s) ease-in-out infinite;
+}
+
+/* ── Slot glow pulse ── */
+@keyframes slot-glow-pulse {
+  0%, 100% { opacity: 0.5; filter: brightness(1); }
+  50% { opacity: 0.8; filter: brightness(1.2); }
+}
+
 /* ── Floating neon border ── */
 @property --gradient-angle {
   syntax: '<angle>';
