@@ -1,7 +1,8 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
+import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
 
 interface ZoneCardProps {
@@ -15,6 +16,14 @@ const tierColors = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple',
 const tierBorders = ['', 'border-neon-cyan/20', 'border-neon-green/20', 'border-neon-purple/20', 'border-neon-amber/20', 'border-neon-red/20']
 
 export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index = 0 }: ZoneCardProps) {
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
+  const artifactsContent = useGameStore((s) => s.artifactsContent)
+  const lootNames = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const r of resourcesContent) m.set(r.id, r.name_key)
+    for (const a of artifactsContent) m.set(a.id, a.name_key)
+    return m
+  }, [resourcesContent, artifactsContent])
   const lootOverflow = zone.loot_table.length > 4
 
   return (
@@ -40,7 +49,7 @@ export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index
       <div className="flex flex-wrap gap-1.5">
         {zone.loot_table.slice(0, 4).map((loot) => (
           <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
-            {loot.item_id}
+            {lootNames.get(loot.item_id) || loot.item_id}
           </span>
         ))}
         {lootOverflow && (

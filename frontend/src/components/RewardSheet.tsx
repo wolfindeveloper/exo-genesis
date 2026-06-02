@@ -10,7 +10,7 @@ function lootLabel(item: LootItem): string {
   if (res) return res.name_key
   const art = artifactsContent.find((a) => a.id === item.item_config_id)
   if (art) return art.name_key
-  return 'Неизвестный предмет'
+  return item.item_config_id
 }
 
 function lootIcon(item: LootItem): string {

@@ -60,11 +60,19 @@ interface ZoneModalProps {
 
 export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId }: ZoneModalProps) {
   const { ships, shipsContent } = useGameStore()
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
+  const artifactsContent = useGameStore((s) => s.artifactsContent)
   const [selectedShipId, setSelectedShipId] = useState<string | null>(preselectedShipId || null)
   const [confirming, setConfirming] = useState(false)
   const [imgError, setImgError] = useState(false)
 
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
+  const lootNames = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const r of resourcesContent) m.set(r.id, r.name_key)
+    for (const a of artifactsContent) m.set(a.id, a.name_key)
+    return m
+  }, [resourcesContent, artifactsContent])
 
   const shipMap = useMemo(() => new Map(ships.map((s) => [s.id, s])), [ships])
   const idleShips = useMemo(() => ships.filter((s) => s.status === 'idle'), [ships])
@@ -200,7 +208,7 @@ tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
             <div className="flex flex-wrap gap-1.5">
               {zone.loot_table.map((loot) => (
                   <span key={loot.item_id} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-slate-400 border border-white/5">
-                    📦 {loot.item_id} {loot.min}–{loot.max}
+                    📦 {lootNames.get(loot.item_id) || loot.item_id} {loot.min}–{loot.max}
                   </span>
                 ))}
             </div>

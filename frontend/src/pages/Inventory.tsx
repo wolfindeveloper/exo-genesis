@@ -65,7 +65,7 @@ function buildInfo(item: InventoryItem, resMap: Map<string, Resource>, artMap: M
   const r = resMap.get(item.item_config_id)
   if (r) {
     return {
-      name: r.name_key ?? 'Неизвестный ресурс',
+      name: r.name_key ?? item.item_config_id,
       tier: r.tier ?? parseTier(item.item_config_id),
       rarity: 'common',
       icon_path: r.icon_path ?? '',
@@ -86,7 +86,7 @@ function buildInfo(item: InventoryItem, resMap: Map<string, Resource>, artMap: M
   const a = artMap.get(item.item_config_id)
   if (a) {
     return {
-      name: a.name_key ?? 'Неизвестный артефакт',
+      name: a.name_key ?? item.item_config_id,
       tier: a.tier ?? 1,
       rarity: a.rarity ?? 'common',
       icon_path: '',
@@ -94,7 +94,7 @@ function buildInfo(item: InventoryItem, resMap: Map<string, Resource>, artMap: M
     }
   }
   return {
-    name: 'Неизвестный предмет',
+    name: item.item_config_id,
     tier: 1,
     rarity: 'common',
     icon_path: '',
