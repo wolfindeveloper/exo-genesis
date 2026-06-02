@@ -12,10 +12,9 @@
 ---
 
 ## ✅ Done — Backend
-- [x] FastAPI entry point w/ lifespan + CORS + 13 routes (auth, content, expeditions, health, lab, system, user, user_ships, bot)
+- [x] FastAPI entry point w/ lifespan + CORS + 11 routes (auth, content, expeditions, health, user, user_ships, bot)
 - [x] Pydantic Settings (.env: supabase, bot, webhook, frontend)
-- [x] ContentLoader — ships (1), zones (25), elements (25), resources (2), boxes (1), artifacts (18)
-- [ ] **Запланировано:** guide_entries.json (заменит artifacts + elements)
+- [x] ContentLoader — ships (1), zones (25), resources (2), boxes (1), artifacts (18) — elements удалены
 - [x] **POST /user/ships/{id}/refuel** — заправка (single-tier restore_per_unit=10, max auto-calc)
 - [x] **POST /user/ships/{id}/repair** — ремонт (single-tier restore_per_unit=10, max auto-calc)
 - [x] **POST /user/ships/{id}/equip** — установка артефакта в слот (slot_index, artifact_id)
@@ -24,8 +23,12 @@
 - [x] **notifier.py** — фоновый нотификатор (asyncio, каждые 30с) для Telegram при завершении экспедиции
 - [x] **telegram.py** — send_message с web_app кнопкой + disable_notification
 - [x] **user_activity.py** — in-memory отслеживание активных пользователей (5 min TTL)
+- [x] **🧹 Cleanup Phase 2 prep:** удалены lab.py, system.py, recipe_generator.py, elements.json, element.py, lab.py (models)
+- [x] **zones.json** — loot tables заменены с элементов на ресурсы (fuel + repair_kit)
+- [x] **box_opener.py** — random_drops заменены с элементов на T1-артефакты
+- [ ] **План:** guide_entries.json, GuidePage.tsx, balance_fragments, POST /guide/research
 
-## ✅ Done — Frontend (Cockpit Phase 0 + Phase 1.4)
+## ✅ Done — Frontend (Cockpit + Phase 1.4 + Phase 2 prep)
 - [x] **Vite 8 + React 19 + Tailwind v4 + TS strict** — проект настроен
 - [x] **ShipPage.tsx** — полная кабина одного корабля:
   - Canvas со 120 звёздами + 15 плавающих частиц (анимация)
@@ -48,15 +51,12 @@
 - [x] **api/client.ts** — fetch wrappers: **equipSlot, unequipSlot**, updateProfile с add_xgen
 - [x] **HudBar** — скрывается при переходе на cockpit
 - [x] **NavBar** — меняет стиль (`bg-white/5 border-cyan-500/10`) на /hangar
-
-### Legacy Frontend (pre-cockpit, будет заменено/удалено)
-- [x] Zustand store (user, ships, inventory, activeExpeditions, experiment, stats, artifactsContent, boxRewards, pendingClaims, lastLoot)
-- [x] API client с VITE_API_URL + TMA initData auth
-- [x] 5 страниц: Hangar, Galaxy, Lab, Inventory, Profile
-- [x] Нижняя навигация (🚀 🌌 🔬 🎒 👤)
-- [x] HudBar — верхняя панель с аватаркой, ником, XP баром, XGEN на всех страницах
-- [x] Profile, Galaxy, Inventory, Lab, ShipCard, ShipDetailModal, ZoneCard, ZoneModal, RewardSheet, BoxReveal
-- [x] Snapshot тесты: calculateZoneStats (4 кейса, vitest)
+- [x] **Console buttons navigate** — ГДЕ-ТО ТАМ → /galaxy, КОЛЛЕКЦИЯ ХЛАМА → /inventory
+- [x] **Zone loot percentages** — шанс выпадения отображается в карточках и модалке зон
+- [x] **SlotSelectModal z-index фикс** — теперь выше навбара (z-[60])
+- [x] **🧹 Cleanup:** удалены Lab.tsx, /lab route, 🔬 навигация, experiment/lab из стора/api/types
+- [x] **Inventory/ZoneCard/ZoneModal** — названия предметов из resourcesContent + artifactsContent
+- [x] **БД:** удалено 45 строк elements из user_inventory
 
 ## ✅ Done — Infrastructure
 - [x] GitHub: wolfindeveloper/exo-genesis
@@ -76,20 +76,21 @@
 ### Phase 2 — The Guide (replaces Lab)
 - [ ] Design guide_entries.json: lore, cost, reward structure
 - [ ] GuidePage.tsx — browse/research entries
-- [ ] Backend router + DB table for guide_progress
+- [ ] Backend router + DB table for guide_progress + balance_fragments
 - [ ] Fragment economy: earn in expeditions, spend on research
-- [ ] Remove Lab.tsx, Lab route, experiment endpoints
+- [x] Remove Lab.tsx, Lab route, experiment endpoints, elements.json, recipe_generator.py, system.py, lab router
 
 ### Phase 3 — Expedition Refactor
 - [ ] Single active expedition per user
-- [ ] Fragment loot in zones
+- [ ] Fragment + artifact drops in zones (replace current fuel/repair loot)
 - [ ] Simplified expedition logic (remove tier matching)
+- [ ] artifact_drops с шансом в зонах
 
-### Phase 4 — Cleanup
-- [ ] Remove elements.json, old ships.json
-- [ ] Remove recipe_generator.py, experiment_log, lab router
-- [ ] Simplify Zustand store (remove experiment artifacts)
-- [ ] Update snapshot tests
+### Phase 4 — Cleanup ✅
+- [x] Remove elements.json, old ships.json
+- [x] Remove recipe_generator.py, experiment_log, lab router
+- [x] Simplify Zustand store (remove experiment artifacts)
+- [x] Update boxes/tests (artifact drops instead of elements)
 
 ## 📡 URLs
 - **Frontend:** https://exo-genesis.vercel.app
@@ -98,19 +99,15 @@
 - **GitHub:** https://github.com/wolfindeveloper/exo-genesis
 
 ## Relevant Files (Cockpit)
-- `frontend/src/pages/ShipPage.tsx` — кабина: canvas, header, 8 circular slots, lightning, ship card, fuel/HP, console, sticker, toast
+- `frontend/src/pages/ShipPage.tsx` — кабина: canvas, header, 8 circular slots, lightning, ship card, fuel/HP, console (кнопки навигируют), sticker, toast
 - `frontend/src/components/HexSlot.tsx` — круглый слот: tier glow, dust particles, name label, onClick
 - `frontend/src/components/SlotSelectModal.tsx` — bottom sheet: список артефактов, equip/unequip, tier badges
-- `frontend/src/App.tsx` — routing, HudBar conditional, NavBar cockpit style
+- `frontend/src/App.tsx` — routing, HudBar conditional, NavBar cockpit style (Lab удалён)
 - `frontend/src/index.css` — all animations: dust-float, lightning-flicker, spin-gradient, scanline, fade-in etc.
 - `frontend/src/store/game.ts` — Zustand store (user, ships, inventory, expeditions, equipSlot/unequipSlot)
 - `frontend/src/api/client.ts` — fetch wrappers for all backend endpoints
 
 ## Relevant Files (Legacy — будет заменено)
 - `frontend/src/pages/Hangar.tsx` — будет заменён на ShipPage
-- `frontend/src/pages/Lab.tsx` — будет заменён на GuidePage
 - `frontend/src/components/ShipCard.tsx, ShipDetailModal.tsx` — deprecated (single ship cockpit)
 - `frontend/src/components/HudBar.tsx` — скрыт на cockpit
-- `backend/app/routers/lab.py` — будет удалён
-- `backend/app/services/recipe_generator.py` — будет удалён
-- `backend/content/elements.json` — будет удалён

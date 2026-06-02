@@ -295,15 +295,18 @@ Each entry costs information fragments (obtained from expeditions) to unlock. En
 - [ ] GuidePage.tsx — tree/list of entries
 - [ ] Fragment inventory + spending
 - [ ] Backend router `POST /guide/research`
-- [ ] Remove Lab, elements.json, recipe_generator
+- [x] Remove Lab, elements.json, recipe_generator, system.py, lab models, experiment_log
 
 ### Phase 3 — Expedition Refactor
 - [ ] Single active expedition per user
-- [ ] Fragment loot in zones
+- [ ] Fragment loot in zones (replace element drops)
+- [ ] Artifact drops with chance in zones
 - [ ] Simplified expedition logic (no tier matching)
 
-### Phase 4 — Cleanup
-- [ ] Remove multi-ship content (elements.json, old ships.json)
-- [ ] Remove Lab components, experiment_log table
-- [ ] Simplify Zustand store
-- [ ] Update tests
+### Phase 4 — Cleanup ✅
+- [x] Remove elements.json, old ships.json
+- [x] Remove Lab components, experiment_log table, recipe_generator.py, system.py
+- [x] Remove recipe_generator.py, experiment_log, lab router
+- [x] Simplify Zustand store (remove experiment, lastExperiment, elementsContent)
+- [x] Clean frontend types (remove Element, ExperimentResult, LabAttempts)
+- [x] Update tests (boxes integrity — artifact drops instead of elements)
