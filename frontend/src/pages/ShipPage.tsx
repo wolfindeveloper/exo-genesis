@@ -305,7 +305,7 @@ export default function ShipPage() {
                   <HexSlot
                     key={i}
                     active={!!a}
-                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    icon={a ? '⚙' : '+'}
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                     tier={a?.tier ?? 1}
                     side="left"
@@ -437,7 +437,7 @@ export default function ShipPage() {
                   <HexSlot
                     key={i}
                     active={!!a}
-                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    icon={a ? '⚙' : '+'}
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                     tier={a?.tier ?? 1}
                     side="right"
@@ -456,7 +456,7 @@ export default function ShipPage() {
                 <HexSlot
                   key={i}
 active={!!a}
-                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    icon={a ? '⚙' : '+'}
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                   tier={a?.tier ?? 1}
                   onClick={() => setSlotModalIndex(i)}
