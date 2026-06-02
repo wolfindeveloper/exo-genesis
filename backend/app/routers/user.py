@@ -22,6 +22,44 @@ class ProfileUpdate(BaseModel):
     add_xgen: int = 0
 
 
+@router.get("/profile", response_model=ProfileResponse)
+async def get_profile(
+    user_id: str = Depends(get_current_user_id),
+    payload: dict = Depends(get_init_data_payload),
+    db: Client = Depends(get_db),
+    content: ContentLoader = Depends(get_content_loader),
+):
+    now = datetime.now(timezone.utc).isoformat()
+    tg_user = payload["user"]
+
+    result = db.table("users").select("*").eq("id", user_id).execute()
+    if result.data:
+        db.table("users").update({
+            "last_login": now,
+            "username": tg_user.get("username", result.data[0].get("username", "")),
+        }).eq("id", user_id).execute()
+        return ProfileResponse(**result.data[0], is_new=False)
+
+    new_user = {
+        "id": user_id,
+        "username": tg_user.get("username", ""),
+        "language_code": tg_user.get("language_code", "en"),
+        "balance_xgen": 0,
+        "balance_stars": 0,
+        "level": 1,
+        "xp": 0,
+        "streak_days": 0,
+        "created_at": now,
+        "last_login": now,
+    }
+    result = db.table("users").insert(new_user).execute()
+    if not result.data:
+        return ProfileResponse(id=user_id, is_new=True)
+
+    rewards = open_box("nothing_extra_starter_pack", user_id, db, content)
+    return ProfileResponse(**result.data[0], is_new=True, box_rewards=rewards)
+
+
 @router.patch("/profile", response_model=UserProfile)
 async def patch_profile(
     body: ProfileUpdate,
