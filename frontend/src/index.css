@@ -265,3 +265,22 @@ body {
 .rarity-rare { --rarity: #a855f7; --glow: 0 0 8px rgba(168,85,247,0.3); }
 .rarity-epic { --rarity: #f59e0b; --glow: 0 0 8px rgba(245,158,11,0.4); }
 .rarity-legendary { --rarity: #ef4444; --glow: 0 0 12px rgba(239,68,68,0.5); }
+
+/* ── Guide glitch text ── */
+@keyframes glitch-text {
+  0% { transform: translate(0); opacity: 1; }
+  2% { transform: translate(-1px, 1px); opacity: 0.8; }
+  4% { transform: translate(1px, -1px); opacity: 1; }
+  6% { transform: translate(-1px, -1px); opacity: 0.7; }
+  8% { transform: translate(0); opacity: 1; }
+  20% { transform: translate(0); }
+  22% { transform: translate(1px, 0); opacity: 0.9; letter-spacing: 0.5px; }
+  24% { transform: translate(-1px, 0); opacity: 1; letter-spacing: normal; }
+  50% { transform: translate(0); }
+  52% { transform: translate(0, 1px); opacity: 0.6; }
+  54% { transform: translate(0, -1px); opacity: 1; }
+  70% { transform: translate(0); }
+  72% { transform: skewX(-0.5deg); opacity: 0.8; }
+  74% { transform: skewX(0.5deg); opacity: 1; }
+  76% { transform: skewX(0); }
+}

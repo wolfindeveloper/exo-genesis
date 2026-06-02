@@ -1,4 +1,4 @@
-import type { Artifact, ClaimResult, Expedition, InventoryItem, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone } from '../types'
+import type { Artifact, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -90,4 +90,32 @@ export const api = {
   getResourcesContent: () => request<Resource[]>('/content/resources'),
   getArtifactsContent: () => request<Artifact[]>('/content/artifacts'),
   getRanksContent: () => request<Rank[]>('/content/ranks'),
+
+  getGuideChapters: () => request<GuideChaptersResponse>('/guide/chapters'),
+
+  getGuideChapter: (chapterId: string) => request<GuideChapterDetail>(`/guide/chapters/${chapterId}`),
+
+  researchEntry: (chapterId: string, entryId: string) =>
+    request<GuideResearchResponse>('/guide/research', {
+      method: 'POST',
+      body: JSON.stringify({ chapter_id: chapterId, entry_id: entryId }),
+    }),
+
+  fixGlitch: (chapterId: string, entryId: string) =>
+    request<GuideFixGlitchResponse>('/guide/fix-glitch', {
+      method: 'POST',
+      body: JSON.stringify({ chapter_id: chapterId, entry_id: entryId }),
+    }),
+
+  claimReward: (chapterId: string) =>
+    request<GuideClaimRewardResponse>('/guide/claim-reward', {
+      method: 'POST',
+      body: JSON.stringify({ chapter_id: chapterId }),
+    }),
+
+  logEvent: (eventKey: string) =>
+    request<{ status: string }>('/user/events', {
+      method: 'POST',
+      body: JSON.stringify({ event_key: eventKey }),
+    }),
 }

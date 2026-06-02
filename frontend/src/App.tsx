@@ -8,12 +8,14 @@ import { HudBar } from './components/HudBar'
 import { RewardSheet } from './components/RewardSheet'
 import { useGameStore } from './store/game'
 import ShipPage from './pages/ShipPage'
+import GuidePage from './pages/GuidePage'
 import { Inventory } from './pages/Inventory'
 import { Profile } from './pages/Profile'
 import { PageTransition } from './components/PageTransition'
 
 const nav = [
   { path: '/hangar', icon: '🚀', label: 'Ангар' },
+  { path: '/guide', icon: '📖', label: 'Гайд' },
   { path: '/galaxy', icon: '🌌', label: 'Карта' },
   { path: '/inventory', icon: '🎒', label: 'Инв' },
   { path: '/profile', icon: '👤', label: 'Проф' },
@@ -112,6 +114,7 @@ function AppContent() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><ShipPage /></PageTransition>} />
           <Route path="/hangar" element={<PageTransition><ShipPage /></PageTransition>} />
+          <Route path="/guide" element={<PageTransition><GuidePage /></PageTransition>} />
           <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
           <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

@@ -7,6 +7,8 @@ import SlotSelectModal from '../components/SlotSelectModal'
 import type { Artifact } from '../types'
 import { api } from '../api/client'
 
+const RED_BUTTON_LS = 'eggs/red_button'
+
 const consoleButtons = [
   { label: 'ГДЕ-ТО ТАМ', accent: '#00f5ff', path: '/galaxy', msg: 'Вы все равно заблудитесь' },
   { label: 'КОЛЛЕКЦИЯ ХЛАМА', accent: '#a855f7', path: '/inventory' },
@@ -81,6 +83,12 @@ export default function ShipPage() {
   const [stickerVisible, setStickerVisible] = useState(false)
   const [consoleMsg, setConsoleMsg] = useState<string | null>(null)
   const [fuelLabel, setFuelLabel] = useState<string | null>(null)
+  const [muteCount, setMuteCount] = useState(0)
+  const [stareTimer, setStareTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
+  const [redClicks, setRedClicks] = useState(() => {
+    const saved = localStorage.getItem(RED_BUTTON_LS)
+    return saved ? +saved : 0
+  })
 
   /* ── Easter egg spawn checker ── */
   useEffect(() => {
@@ -109,6 +117,31 @@ export default function ShipPage() {
     const t = setTimeout(() => setFuelLabel(null), 2000)
     return () => clearTimeout(t)
   }, [fuelLabel])
+
+  /* ── Idle timer for stare_60s event ── */
+  useEffect(() => {
+    function resetIdle() {
+      if (stareTimer) clearTimeout(stareTimer)
+      const t = setTimeout(() => {
+        api.logEvent('stare_60s').catch(() => {})
+      }, 60_000)
+      setStareTimer(t)
+    }
+    const events = ['mousedown', 'mousemove', 'touchstart', 'keydown', 'scroll']
+    events.forEach((e) => window.addEventListener(e, resetIdle))
+    resetIdle()
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, resetIdle))
+      if (stareTimer) clearTimeout(stareTimer)
+    }
+  }, [])
+
+  /* ── fuel_below_5 event check ── */
+  useEffect(() => {
+    if (mainShip && mainShip.fuel_current <= 5 && mainShip.fuel_current > 0) {
+      api.logEvent('fuel_below_5').catch(() => {})
+    }
+  }, [mainShip?.fuel_current])
   const stickerMessages = [
     'НЕ НАЖИМАТЬ',
     'ЗАЧЕМ ТЫ ЭТО СДЕЛАЛ?',
@@ -287,7 +320,7 @@ export default function ShipPage() {
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-[12px] rounded-lg px-3 py-2 border border-cyan-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,.06)]">
+          <div className="relative bg-white/5 backdrop-blur-[12px] rounded-lg px-3 py-2 border border-cyan-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,.06)]">
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-cyan-400/30 font-semibold tracking-wider">XGEN</span>
               <span className="text-white font-bold text-sm drop-shadow-[0_0_4px_rgba(0,245,255,.2)]">
@@ -297,6 +330,21 @@ export default function ShipPage() {
             <div className="text-[5px] text-cyan-400/15 leading-tight mt-1 max-w-[90px] text-right">
               *Курс валюты постоянно колеблется, но обычно не в вашу пользу
             </div>
+            {/* Sound toggle tracker (easter egg) */}
+            <button
+              onClick={() => {
+                const next = muteCount + 1
+                setMuteCount(next)
+                if (next >= 5) {
+                  api.logEvent('toggle_sound_5x').catch(() => {})
+                  setMuteCount(0)
+                }
+              }}
+              className="absolute top-1 right-1 text-[4px] text-cyan-400/10 hover:text-cyan-400/30 transition-colors"
+              title="🔊"
+            >
+              🔊
+            </button>
           </div>
         </div>
 
@@ -493,6 +541,15 @@ active={!!a}
                 api.updateProfile({ add_xgen: 1 }).catch(() => {})
                 clearSpawnSchedule()
                 setStickerVisible(false)
+              }
+              /* ── red_button_3x tracking ── */
+              const newClicks = redClicks + 1
+              setRedClicks(newClicks)
+              localStorage.setItem(RED_BUTTON_LS, String(newClicks))
+              if (newClicks >= 3) {
+                setTimeout(() => api.logEvent('red_button_3x').catch(() => {}), 10_000)
+                localStorage.removeItem(RED_BUTTON_LS)
+                setRedClicks(0)
               }
             }}
           >

@@ -9,6 +9,7 @@ class ContentLoader:
     _resources: list[dict] = []
     _boxes: list[dict] = []
     _ranks: list[dict] = []
+    _guide: dict | None = None
 
     @property
     def ships(self) -> list[dict]:
@@ -34,6 +35,10 @@ class ContentLoader:
     def ranks(self) -> list[dict]:
         return self._ranks
 
+    @property
+    def guide(self) -> dict | None:
+        return self._guide
+
     def get_ship(self, ship_id: str) -> dict | None:
         return next((s for s in self._ships if s["id"] == ship_id), None)
 
@@ -49,6 +54,19 @@ class ContentLoader:
     def get_box(self, box_id: str) -> dict | None:
         return next((b for b in self._boxes if b["id"] == box_id), None)
 
+    def get_guide_entry(self, chapter_id: str, entry_id: str) -> dict | None:
+        if not self._guide:
+            return None
+        for ch in self._guide.get("chapters", []):
+            if ch["id"] == chapter_id:
+                return next((e for e in ch.get("entries", []) if e["id"] == entry_id), None)
+        return None
+
+    def get_guide_chapter(self, chapter_id: str) -> dict | None:
+        if not self._guide:
+            return None
+        return next((ch for ch in self._guide.get("chapters", []) if ch["id"] == chapter_id), None)
+
     def load_all(self) -> None:
         content_dir = Path(__file__).resolve().parent.parent.parent / "content"
         self._ships = self._load_json(content_dir / "ships.json")
@@ -57,6 +75,7 @@ class ContentLoader:
         self._resources = self._load_json(content_dir / "resources.json")
         self._boxes = self._load_json(content_dir / "boxes.json")
         self._ranks = self._load_json(content_dir / "ranks.json")
+        self._guide = self._load_dict_json(content_dir / "guide.json")
 
     @staticmethod
     def _load_json(path: Path) -> list[dict]:
@@ -64,3 +83,10 @@ class ContentLoader:
             with open(path, encoding="utf-8") as f:
                 return json.load(f)
         return []
+
+    @staticmethod
+    def _load_dict_json(path: Path) -> dict | None:
+        if path.exists():
+            with open(path, encoding="utf-8") as f:
+                return json.load(f)
+        return None

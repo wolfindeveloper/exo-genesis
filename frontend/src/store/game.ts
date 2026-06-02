@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Artifact, Expedition, InventoryItem, LootItem, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Artifact, Expedition, GuideChapterSummary, InventoryItem, LootItem, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -19,6 +19,7 @@ interface GameState {
   boxRewards: Record<string, unknown> | null
   pendingClaims: { shipId: string; shipName: string; fresh?: boolean }[]
   lastLoot: { shipName: string; loot: LootItem[]; shipStability: number } | null
+  guideChapters: GuideChapterSummary[]
   isLoading: boolean
   isAuthReady: boolean
   isContentReady: boolean
@@ -44,6 +45,10 @@ interface GameState {
   clearBoxRewards: () => void
   updateNickname: (username: string) => Promise<void>
   setUser: (user: UserProfile) => void
+  loadGuideChapters: () => Promise<void>
+  researchEntry: (chapterId: string, entryId: string) => Promise<void>
+  fixGlitch: (chapterId: string, entryId: string) => Promise<void>
+  claimGuideReward: (chapterId: string) => Promise<void>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -60,6 +65,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   boxRewards: null,
   pendingClaims: [],
   lastLoot: null,
+  guideChapters: [],
   isLoading: false,
   isAuthReady: false,
   isContentReady: false,
@@ -253,6 +259,54 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
         await new Promise((r) => setTimeout(r, 1500))
       }
+    }
+  },
+
+  loadGuideChapters: async () => {
+    try {
+      const data = await api.getGuideChapters()
+      set({ guideChapters: data.chapters })
+    } catch (e) {
+      set({ error: (e as Error).message })
+    }
+  },
+
+  researchEntry: async (chapterId, entryId) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.researchEntry(chapterId, entryId)
+      set((s) => ({
+        isLoading: false,
+        user: s.user ? { ...s.user, balance_fragments: result.balance_fragments } : null,
+      }))
+      await get().loadGuideChapters()
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  fixGlitch: async (chapterId, entryId) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.fixGlitch(chapterId, entryId)
+      set((s) => ({
+        isLoading: false,
+        user: s.user ? { ...s.user, balance_fragments: result.balance_fragments } : null,
+      }))
+      await get().loadGuideChapters()
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  claimGuideReward: async (chapterId) => {
+    try {
+      set({ isLoading: true, error: null })
+      await api.claimReward(chapterId)
+      set({ isLoading: false })
+      await Promise.all([get().loadGuideChapters(), get().loadInventory()])
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
     }
   },
 }))

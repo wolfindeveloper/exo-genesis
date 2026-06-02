@@ -121,10 +121,16 @@ async def start_expedition(
     if not stats["fuel_ok"]:
         raise HTTPException(status_code=400, detail="Insufficient fuel")
 
+    new_fuel = ship["fuel_current"] - stats["effective_fuel_cost"]
     db.table("user_ships").update({
         "status": "expedition",
-        "fuel_current": ship["fuel_current"] - stats["effective_fuel_cost"],
+        "fuel_current": new_fuel,
     }).eq("id", body.ship_id).execute()
+
+    if 0 < new_fuel <= 5:
+        existing = db.table("user_events").select("id").eq("user_id", user_id).eq("event_key", "fuel_below_5").execute()
+        if not existing.data:
+            db.table("user_events").insert({"user_id": user_id, "event_key": "fuel_below_5"}).execute()
 
     now = datetime.now(timezone.utc)
     end_time = now + timedelta(hours=stats["effective_duration"])
@@ -201,26 +207,31 @@ async def claim_expedition(
     }).eq("id", expedition["ship_id"]).execute()
 
     for item in loot:
-        existing = (
-            db.table("user_inventory")
-            .select("*")
-            .eq("user_id", user_id)
-            .eq("item_config_id", item["item_config_id"])
-            .execute()
-        )
-        if existing.data:
-            db.table("user_inventory").update({
-                "quantity": existing.data[0]["quantity"] + item["quantity"],
-            }).eq("id", existing.data[0]["id"]).execute()
+        if item["item_config_id"] == "fragments":
+            cur = db.table("users").select("balance_fragments").eq("id", user_id).execute().data
+            new_val = (cur[0]["balance_fragments"] if cur else 0) + item["quantity"]
+            db.table("users").update({"balance_fragments": new_val}).eq("id", user_id).execute()
         else:
-            item_type = _resolve_item_type(content, item["item_config_id"])
-            db.table("user_inventory").insert({
-                "user_id": user_id,
-                "item_type": item_type,
-                "item_config_id": item["item_config_id"],
-                "quantity": item["quantity"],
-                "metadata": {},
-            }).execute()
+            existing = (
+                db.table("user_inventory")
+                .select("*")
+                .eq("user_id", user_id)
+                .eq("item_config_id", item["item_config_id"])
+                .execute()
+            )
+            if existing.data:
+                db.table("user_inventory").update({
+                    "quantity": existing.data[0]["quantity"] + item["quantity"],
+                }).eq("id", existing.data[0]["id"]).execute()
+            else:
+                item_type = _resolve_item_type(content, item["item_config_id"])
+                db.table("user_inventory").insert({
+                    "user_id": user_id,
+                    "item_type": item_type,
+                    "item_config_id": item["item_config_id"],
+                    "quantity": item["quantity"],
+                    "metadata": {},
+                }).execute()
 
     db.table("expeditions").update({
         "status": "completed",

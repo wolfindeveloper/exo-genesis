@@ -446,5 +446,46 @@
       "stability_bonus": 28.0,
       "fuel_efficiency": 0.38
     }
+  },
+  {
+    "id": "termos_optimizma",
+    "name_key": "Термос бесконечного оптимизма",
+    "description_key": "Восстанавливает веру в человечество после каждой экспедиции",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "stability_bonus": 5.0
+    }
+  },
+  {
+    "id": "slovar_izvineniy",
+    "name_key": "Словарь межвидовых извинений",
+    "description_key": "Помогает не получить по шее в негостеприимных секторах",
+    "tier": 3,
+    "rarity": "rare",
+    "stats_modifiers": {
+      "stability_bonus": 8.0
+    }
+  },
+  {
+    "id": "sinya_izolenta",
+    "name_key": "Синяя изолента абсолюта",
+    "description_key": "Держит корпус целым даже когда вселенная против вас",
+    "tier": 4,
+    "rarity": "epic",
+    "stats_modifiers": {
+      "stability_bonus": 15.0
+    }
+  },
+  {
+    "id": "ochki_veroyatnosti",
+    "name_key": "Очки Расширенной Вероятности",
+    "description_key": "Позволяют видеть мир таким, какой он есть: хаотичным, бессмысленным и удивительно смешным",
+    "tier": 5,
+    "rarity": "legendary",
+    "stats_modifiers": {
+      "speed_mod": 0.2,
+      "fuel_efficiency": 0.15
+    }
   }
 ]

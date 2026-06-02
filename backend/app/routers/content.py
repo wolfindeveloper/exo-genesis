@@ -66,3 +66,7 @@ async def get_box(box_id: str, content: ContentLoader = Depends(get_content_load
 @router.get("/ranks")
 async def get_ranks(content: ContentLoader = Depends(get_content_loader)):
     return content.ranks
+
+@router.get("/guide")
+async def get_guide(content: ContentLoader = Depends(get_content_loader)):
+    return content.guide
