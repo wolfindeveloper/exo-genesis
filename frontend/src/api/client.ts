@@ -65,7 +65,7 @@ export const api = {
 
   getStats: () => request<UserStats>('/user/stats'),
 
-  updateProfile: (data: { username?: string }) =>
+  updateProfile: (data: { username?: string; add_xgen?: number }) =>
     request<UserProfile>('/user/profile', {
       method: 'PATCH',
       body: JSON.stringify(data),

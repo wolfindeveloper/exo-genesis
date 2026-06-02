@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
+import { api } from '../api/client'
 
 const slotConfigs = {
   left: [
@@ -50,9 +51,17 @@ function initSpawnSchedule(): void {
 }
 
 function isStickerActive(): boolean {
+  const next = localStorage.getItem(`${EGGS_LS}/next_spawn`)
   const expires = localStorage.getItem(`${EGGS_LS}/expires_at`)
-  if (!expires) return false
-  return Date.now() < +expires
+  if (!next || !expires) return false
+  const now = Date.now()
+  return now >= +next && now < +expires
+}
+
+function clearSpawnSchedule(): void {
+  localStorage.removeItem(`${EGGS_LS}/next_spawn`)
+  localStorage.removeItem(`${EGGS_LS}/expires_at`)
+  localStorage.removeItem(`${EGGS_LS}/state`)
 }
 
 export default function ShipPage() {
@@ -432,7 +441,8 @@ export default function ShipPage() {
               localStorage.setItem(`${EGGS_LS}/state`, String(next))
               if (next === STICKER_FINAL && user && stickerIdx < STICKER_FINAL) {
                 setUser({ ...user, balance_xgen: user.balance_xgen + 1 })
-                scheduleNextSpawn()
+                api.updateProfile({ add_xgen: 1 }).catch(() => {})
+                clearSpawnSchedule()
                 setStickerVisible(false)
               }
             }}
