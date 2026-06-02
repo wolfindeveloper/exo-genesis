@@ -83,6 +83,18 @@ export const api = {
       body: JSON.stringify({ resource_id: resourceId }),
     }),
 
+  equipSlot: (shipId: string, slotIndex: number, artifactId: string) =>
+    request<ShipActionResponse>(`/user/ships/${shipId}/equip`, {
+      method: 'POST',
+      body: JSON.stringify({ slot_index: slotIndex, artifact_id: artifactId }),
+    }),
+
+  unequipSlot: (shipId: string, slotIndex: number) =>
+    request<ShipActionResponse>(`/user/ships/${shipId}/unequip`, {
+      method: 'POST',
+      body: JSON.stringify({ slot_index: slotIndex }),
+    }),
+
   getShipsContent: () => request<ShipConfig[]>('/content/ships'),
   getZonesContent: () => request<Zone[]>('/content/zones'),
   getElementsContent: () => request<Element[]>('/content/elements'),

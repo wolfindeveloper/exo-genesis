@@ -39,6 +39,8 @@ interface GameState {
   claimExpedition: (expeditionId: string, shipName?: string) => Promise<void>
   refuelShip: (shipId: string, resourceId: string) => Promise<void>
   repairShip: (shipId: string, resourceId: string) => Promise<void>
+  equipSlot: (shipId: string, slotIndex: number, artifactId: string) => Promise<void>
+  unequipSlot: (shipId: string, slotIndex: number) => Promise<void>
   experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
   loadContent: () => Promise<void>
@@ -184,6 +186,26 @@ export const useGameStore = create<GameState>((set, get) => ({
     try {
       set({ isLoading: true, error: null })
       const result = await api.repairShip(shipId, resourceId)
+      set({ ships: get().ships.map((s) => (s.id === shipId ? result.ship : s)), inventory: result.inventory, isLoading: false })
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  equipSlot: async (shipId, slotIndex, artifactId) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.equipSlot(shipId, slotIndex, artifactId)
+      set({ ships: get().ships.map((s) => (s.id === shipId ? result.ship : s)), inventory: result.inventory, isLoading: false })
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false })
+    }
+  },
+
+  unequipSlot: async (shipId, slotIndex) => {
+    try {
+      set({ isLoading: true, error: null })
+      const result = await api.unequipSlot(shipId, slotIndex)
       set({ ships: get().ships.map((s) => (s.id === shipId ? result.ship : s)), inventory: result.inventory, isLoading: false })
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })

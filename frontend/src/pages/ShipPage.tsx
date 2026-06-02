@@ -2,25 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
+import SlotSelectModal from '../components/SlotSelectModal'
+import type { Artifact } from '../types'
 import { api } from '../api/client'
-
-const slotConfigs = {
-  left: [
-    { active: true, icon: '🥜', name: 'Ядро', tier: 4 },
-    { active: false, icon: '🧻', name: '', tier: 1 },
-    { active: true, icon: '💨', name: 'Факел', tier: 3 },
-  ],
-  right: [
-    { active: true, icon: '👁️', name: 'Око', tier: 3 },
-    { active: false, icon: '🛒', name: '', tier: 1 },
-    { active: true, icon: '🥩', name: 'Сердце', tier: 5 },
-  ],
-  bottom: [
-    { active: true, icon: '🎞️', name: 'Память', tier: 2 },
-    { active: false, icon: '🕳️', name: '', tier: 1 },
-    { active: true, icon: '🎲', name: 'Импульс', tier: 4, flicker: true },
-  ],
-}
 
 const consoleButtons = [
   { label: 'ГДЕ-ТО ТАМ', accent: '#00f5ff', msg: 'Вы все равно заблудитесь' },
@@ -70,9 +54,14 @@ export default function ShipPage() {
   const setUser = useGameStore((s) => s.setUser)
   const ships = useGameStore((s) => s.ships)
   const shipsContent = useGameStore((s) => s.shipsContent)
+  const artifactsContent = useGameStore((s) => s.artifactsContent)
+  const inventory = useGameStore((s) => s.inventory)
+  const equipSlot = useGameStore((s) => s.equipSlot)
+  const unequipSlot = useGameStore((s) => s.unequipSlot)
   const loadShips = useGameStore((s) => s.loadShips)
+  const loadInventory = useGameStore((s) => s.loadInventory)
 
-  useEffect(() => { loadShips() }, [])
+  useEffect(() => { loadShips(); loadInventory() }, [])
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
@@ -127,6 +116,24 @@ export default function ShipPage() {
   const mainShip = ships.length > 0 ? ships[0] : null
   const shipConfig = mainShip ? shipsContent.find((c) => c.id === mainShip.ship_config_id) : null
   const shipName = shipConfig?.name_key ?? 'VEGA MK-II'
+
+  const slotArtifacts: (Artifact | null)[] = Array.from({ length: 8 }, (_, i) => {
+    const id = (mainShip?.equipped_artifacts ?? [])[i]
+    return id ? (artifactsContent.find((a) => a.id === id) ?? null) : null
+  })
+
+  const [slotModalIndex, setSlotModalIndex] = useState<number | null>(null)
+
+  const SLOT_LABELS: { icon: string; name: string }[] = [
+    { icon: '🥜', name: 'Ядро' },
+    { icon: '🧻', name: '' },
+    { icon: '💨', name: 'Факел' },
+    { icon: '👁️', name: 'Око' },
+    { icon: '🛒', name: '' },
+    { icon: '🥩', name: 'Сердце' },
+    { icon: '🎞️', name: 'Память' },
+    { icon: '🕳️', name: '' },
+  ]
 
   /* ── canvas stars + particles ── */
   useEffect(() => {
@@ -290,9 +297,20 @@ export default function ShipPage() {
           <div className="flex items-center justify-center relative">
             {/* left slots - overlapping card */}
             <div className="flex flex-col gap-4 z-20 -mr-2">
-              {slotConfigs.left.map((slot, i) => (
-                <HexSlot key={i} {...slot} side="left" />
-              ))}
+              {[0, 1, 2].map((i) => {
+                const a = slotArtifacts[i]
+                return (
+                  <HexSlot
+                    key={i}
+                    active={!!a}
+                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    name={a?.name_key ?? SLOT_LABELS[i].name}
+                    tier={a?.tier ?? 1}
+                    side="left"
+                    onClick={() => setSlotModalIndex(i)}
+                  />
+                )
+              })}
             </div>
 
             {/* lightning background */}
@@ -411,17 +429,38 @@ export default function ShipPage() {
 
             {/* right slots - overlapping card */}
             <div className="flex flex-col gap-4 z-20 -ml-2">
-              {slotConfigs.right.map((slot, i) => (
-                <HexSlot key={i} {...slot} side="right" />
-              ))}
+              {[3, 4, 5].map((i) => {
+                const a = slotArtifacts[i]
+                return (
+                  <HexSlot
+                    key={i}
+                    active={!!a}
+                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    name={a?.name_key ?? SLOT_LABELS[i].name}
+                    tier={a?.tier ?? 1}
+                    side="right"
+                    onClick={() => setSlotModalIndex(i)}
+                  />
+                )
+              })}
             </div>
           </div>
 
           {/* bottom slots */}
           <div className="flex gap-8 mt-2 z-20">
-            {slotConfigs.bottom.map((slot, i) => (
-              <HexSlot key={i} {...slot} />
-            ))}
+            {[6, 7].map((i) => {
+              const a = slotArtifacts[i]
+              return (
+                <HexSlot
+                  key={i}
+active={!!a}
+                    icon={a ? '⚙' : SLOT_LABELS[i].icon}
+                    name={a?.name_key ?? SLOT_LABELS[i].name}
+                  tier={a?.tier ?? 1}
+                  onClick={() => setSlotModalIndex(i)}
+                />
+              )
+            })}
           </div>
 
           {/* paper airplane — subtle bg detail */}
@@ -565,6 +604,27 @@ export default function ShipPage() {
           </div>
         </div>
       </div>
+
+      <SlotSelectModal
+        open={slotModalIndex !== null}
+        slotIndex={slotModalIndex ?? 0}
+        equippedArtifact={slotModalIndex !== null ? slotArtifacts[slotModalIndex] : null}
+        inventory={inventory}
+        artifactsContent={artifactsContent}
+        onEquip={(artifactId) => {
+          if (mainShip && slotModalIndex !== null) {
+            equipSlot(mainShip.id, slotModalIndex, artifactId)
+            setSlotModalIndex(null)
+          }
+        }}
+        onUnequip={() => {
+          if (mainShip && slotModalIndex !== null) {
+            unequipSlot(mainShip.id, slotModalIndex)
+            setSlotModalIndex(null)
+          }
+        }}
+        onClose={() => setSlotModalIndex(null)}
+      />
     </div>
   )
 }
