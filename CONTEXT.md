@@ -14,54 +14,38 @@
 ## ✅ Done — Backend
 - [x] FastAPI entry point w/ lifespan + CORS + 13 routes (auth, content, expeditions, health, lab, system, user, user_ships, bot)
 - [x] Pydantic Settings (.env: supabase, bot, webhook, frontend)
-- [x] ContentLoader — ships (25), zones (25), elements (25), resources (10), boxes (1), artifacts (0)
-- [x] Supabase client + миграция (users, user_ships, user_inventory, expeditions, discoveries)
-- [x] Telegram InitData HMAC-SHA256 валидация (+ signature в check_string, Bot API 8.0)
-- [x] GET /user/profile — автосоздание юзера + open_box("nothing_extra_starter_pack") для новых
-- [x] PATCH /user/profile — обновление username
-- [x] GET /user/inventory, /user/ships, /user/stats
-- [x] POST /expeditions/start, POST /expeditions/claim
-- [x] GET /expeditions/active — список активных экспедиций + отправляет Telegram при завершении
-- [x] Expedition logic: calculate_zone_stats() — динамический расчёт с учётом статов корабля + артефактов
-- [x] Recipe Generator (weekly seed, 2-3 elem → artifact, deterministic cache)
-- [x] POST /lab/experiment — крафтинг, First Discoverer, XP
-- [x] GET /system/week-info — кол-во рецептов/открытий за неделю
-- [x] Telegram bot: /start, /help, /profile, /feedback, webhook POST /webhook
-- [x] Procfile: `web: uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- [x] box_opener.py — open_box(): guaranteed + weighted random_drops из boxes.json
-- [x] Snapshot тесты: calculate_zone_stats (4 кейса), boxes integrity
-- [x] **POST /user/ships/{id}/refuel** — заправка корабля (tier-match, max auto-calc)
-- [x] **POST /user/ships/{id}/repair** — ремонт корабля (tier-match, max auto-calc)
-- [x] **user_activity.py** — in-memory отслеживание активных пользователей (5 min TTL)
-- [x] **notifier.py** — фоновый нотификатор (asyncio, каждые 30с) для проактивной отправки Telegram при завершении экспедиций
-- [x] **telegram.py** — send_message с web_app кнопкой + fallback на HTML-ссылку + disable_notification
-- [x] GET /content/artifacts — эндпоинт для артефактов
-
-## ✅ Done — Content
-- [x] 25 элементов (5/tier, Douglas Adams стиль)
-- [x] 25 зон (5/tier) с уникальными названиями, описаниями, loot tables
-- [x] 25 кораблей (5/tier) с именами, описаниями, характеристиками
-- [x] 10 ресурсов: fuel_t1–t5 + repair_kit_t1–t5 (Douglas Adams стиль)
-- [x] 1 box: nothing_extra_starter_pack (5 guaranteed + 2 random T1 elements)
-- [x] Все ID переименованы
-- [x] 3 баннера зон: scrap_yard, nebula_warm_tea, the_outskirts_of_sanity
+- [x] ContentLoader — ships (1), zones (25), elements (25), resources (2), boxes (1), artifacts (18)
 - [ ] **Запланировано:** guide_entries.json (заменит artifacts + elements)
-- [ ] **Запланировано:** ресурсы одного тира (fuel, repair_kit)
+- [x] **POST /user/ships/{id}/refuel** — заправка (single-tier restore_per_unit=10, max auto-calc)
+- [x] **POST /user/ships/{id}/repair** — ремонт (single-tier restore_per_unit=10, max auto-calc)
+- [x] **POST /user/ships/{id}/equip** — установка артефакта в слот (slot_index, artifact_id)
+- [x] **POST /user/ships/{id}/unequip** — снятие артефакта из слота (slot_index)
+- [x] **box_opener.py** — создание корабля пропускается, если у юзера уже есть
+- [x] **notifier.py** — фоновый нотификатор (asyncio, каждые 30с) для Telegram при завершении экспедиции
+- [x] **telegram.py** — send_message с web_app кнопкой + disable_notification
+- [x] **user_activity.py** — in-memory отслеживание активных пользователей (5 min TTL)
 
-## ✅ Done — Frontend (Cockpit Phase 0)
+## ✅ Done — Frontend (Cockpit Phase 0 + Phase 1.4)
 - [x] **Vite 8 + React 19 + Tailwind v4 + TS strict** — проект настроен
 - [x] **ShipPage.tsx** — полная кабина одного корабля:
   - Canvas со 120 звёздами + 15 плавающих частиц (анимация)
   - Glassmorphism-хедер: аватар, XP бар, LVL, XGEN (данные из стора)
-  - 8 круглых слотов для артефактов (3 слева + 3 справа + 2 снизу)
+  - 8 круглых слотов для артефактов (3 слева + 3 справа + 2 снизу), клик открывает SlotSelectModal
   - **Circular slots с rarity-свечением:** Tier 1=серый, 2=зелёный, 3=фиолетовый, 4=оранжевый, 5=золотой + космическая пыль (6 частиц float)
   - **Lightning SVG** с анимацией мерцания между слотами
   - **Карта корабля VEGA MK-II**: SVG, сетка 12×12, сканлайн, glitch-sweep, уголки
   - **Fuel + HP бары** под кораблём (данные из user.ships)
-  - **Console (ПУЛЬТ)**: 4 кнопки с анимированной conic-gradient неоновой границей, металлическим скосом, без иконок/скобок
-- [x] **HexSlot.tsx** — переиспользуемый круглый слот: glow-слои (blur-xl + blur-lg + inner nebulous), 6 dust-частиц с анимацией float, dot-индикатор, name label
-- [x] **index.css** — @property --gradient-angle, keyframes: dust-float, lightning-flicker, glitch-sweep, scanline-down, pulse-slow, spin-gradient, clip-hexagon
+  - **Console (ПАНЕЛЬ СЛОЖНЫХ РЕШЕНИЙ)**: 4 кнопки — ГДЕ-ТО ТАМ (toast), КОЛЛЕКЦИЯ ХЛАМА, НЕ ПАНИКУЙТЕ, СПЕКУЛЯТИВНАЯ ЛАВКА (subtitle)
+  - **Easter egg sticker** — появляется каждые 2-6ч на 15мин, цикл сообщений по клику, +1 XGEN на финальном
+  - **Toast consoleMsg** — auto-dismiss уведомление при клике на «ГДЕ-ТО ТАМ»
+  - **Пилот subtitle** — «Пока еще не поглощен черной дырой» под ником
+  - **setUser** — обновление данных юзера в сторе
+- [x] **HexSlot.tsx** — круглый слот: glow-слои (blur-xl + blur-lg + inner nebulous), 6 dust-частиц float, name label, onClick, flicker animation
+- [x] **SlotSelectModal.tsx** — bottom sheet: список артефактов из инвентаря, кнопка «СНЯТЬ» для экипированного, tier badges, закрытие по Escape/клику вне
+- [x] **index.css** — @property --gradient-angle, keyframes: dust-float, lightning-flicker, glitch-sweep, scanline-down, pulse-slow, spin-gradient, clip-hexagon, **fade-in**
 - [x] **App.tsx** — роутинг: / и /hangar ведут на ShipPage, HudBar скрыт на cockpit, NavBar стеклянный `bg-white/5` на cockpit
+- [x] **store/game.ts** — Zustand store: user, ships, inventory, expeditions; **equipSlot/unequipSlot actions**; **setUser**
+- [x] **api/client.ts** — fetch wrappers: **equipSlot, unequipSlot**, updateProfile с add_xgen
 - [x] **HudBar** — скрывается при переходе на cockpit
 - [x] **NavBar** — меняет стиль (`bg-white/5 border-cyan-500/10`) на /hangar
 
@@ -83,11 +67,11 @@
 
 ## 📋 Next Steps
 
-### Phase 1 — Ship & Resource Simplification
-- [ ] Reduce `ships.json` to single VEGA MK-II config
-- [ ] Single-tier fuel + repair kits (remove tier matching)
-- [ ] Limit user_ships to 1 per user
-- [ ] 8 slot device inventory management (equip/unequip)
+### Phase 1 — Ship & Resource Simplification ✅
+- [x] Reduce `ships.json` to single VEGA MK-II config
+- [x] Single-tier fuel + repair kits (remove tier matching)
+- [x] Limit user_ships to 1 per user
+- [x] 8 slot device inventory management (equip/unequip)
 
 ### Phase 2 — The Guide (replaces Lab)
 - [ ] Design guide_entries.json: lore, cost, reward structure
@@ -114,11 +98,12 @@
 - **GitHub:** https://github.com/wolfindeveloper/exo-genesis
 
 ## Relevant Files (Cockpit)
-- `frontend/src/pages/ShipPage.tsx` — кабина: canvas, header, 8 circular slots, lightning, ship card, fuel/HP, console
-- `frontend/src/components/HexSlot.tsx` — круглый слот: tier glow, dust particles, name label
+- `frontend/src/pages/ShipPage.tsx` — кабина: canvas, header, 8 circular slots, lightning, ship card, fuel/HP, console, sticker, toast
+- `frontend/src/components/HexSlot.tsx` — круглый слот: tier glow, dust particles, name label, onClick
+- `frontend/src/components/SlotSelectModal.tsx` — bottom sheet: список артефактов, equip/unequip, tier badges
 - `frontend/src/App.tsx` — routing, HudBar conditional, NavBar cockpit style
-- `frontend/src/index.css` — all animations: dust-float, lightning-flicker, spin-gradient, scanline etc.
-- `frontend/src/store/game.ts` — Zustand store (user, ships, inventory, expeditions)
+- `frontend/src/index.css` — all animations: dust-float, lightning-flicker, spin-gradient, scanline, fade-in etc.
+- `frontend/src/store/game.ts` — Zustand store (user, ships, inventory, expeditions, equipSlot/unequipSlot)
 - `frontend/src/api/client.ts` — fetch wrappers for all backend endpoints
 
 ## Relevant Files (Legacy — будет заменено)
@@ -128,5 +113,4 @@
 - `frontend/src/components/HudBar.tsx` — скрыт на cockpit
 - `backend/app/routers/lab.py` — будет удалён
 - `backend/app/services/recipe_generator.py` — будет удалён
-- `backend/content/ships.json` — будет урезан до 1 корабля
 - `backend/content/elements.json` — будет удалён

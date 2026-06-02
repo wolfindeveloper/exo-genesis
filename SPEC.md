@@ -205,14 +205,17 @@ Each entry costs information fragments (obtained from expeditions) to unlock. En
 
 ### User Profile
 * `GET /user/profile`: Get stats, balances, level.
+* `PATCH /user/profile`: Update username or add XGEN (`{ username?, add_xgen? }`).
 * `GET /user/inventory`: List items (resources, artifacts, fragments).
 * `GET /user/ships`: Get single ship with status + equipped slots.
 
 ### Gameplay
 * `POST /expeditions/start`: Body `{ zone_id }` (single ship implied).
 * `POST /expeditions/claim`: Body `{ expedition_id }`.
-* `POST /user/ships/refuel`: Refuel ship.
-* `POST /user/ships/repair`: Repair ship stability.
+* `POST /user/ships/{id}/refuel`: Refuel ship (single-tier fuel, restore_per_unit=10).
+* `POST /user/ships/{id}/repair`: Repair ship stability (single-tier repair, restore_per_unit=10).
+* `POST /user/ships/{id}/equip`: Body `{ slot_index, artifact_id }` — equip artifact to slot.
+* `POST /user/ships/{id}/unequip`: Body `{ slot_index }` — unequip artifact from slot.
 
 ### The Guide
 * `GET /guide/entries`: List all entries with unlock status.
@@ -281,11 +284,11 @@ Each entry costs information fragments (obtained from expeditions) to unlock. En
 - [x] Bottom navigation with transparency on cockpit route
 - [x] HudBar hidden on cockpit route (replaced by cockpit header)
 
-### Phase 1 — Ship & Resource Simplification
-- [ ] Reduce `ships.json` to single VEGA MK-II config
-- [ ] Single-tier fuel + repair kits (remove tier matching)
-- [ ] Limit user to one ship
-- [ ] 8 slot device inventory management
+### Phase 1 — Ship & Resource Simplification ✅
+- [x] Reduce `ships.json` to single VEGA MK-II config
+- [x] Single-tier fuel + repair kits (remove tier matching)
+- [x] Limit user to one ship
+- [x] 8 slot device inventory management (equip/unequip)
 
 ### Phase 2 — The Guide (replaces Lab)
 - [ ] `guide_entries.json` with lore, costs, rewards

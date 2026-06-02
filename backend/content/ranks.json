@@ -42,7 +42,7 @@
     "icon_path": "/assets/ranks/architect.svg"
   },
   {
-    "level": 50,
+    "level": 42,
     "title_key": "Демиург",
     "description_key": "Создаёт миры и галактики одной мыслью",
     "icon_path": "/assets/ranks/demiurge.svg"
