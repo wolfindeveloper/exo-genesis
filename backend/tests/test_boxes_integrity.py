@@ -14,10 +14,10 @@ def _check_item(item: dict, label: str) -> None:
                 assert content.get_ship(sid), f"{label}: ship '{sid}' not found"
         else:
             assert content.get_ship(item["item_id"]), f"{label}: ship '{item['item_id']}' not found"
-    elif item_type == "element":
-        assert content.get_element(item["item_id"]), f"{label}: element '{item['item_id']}' not found"
     elif item_type == "resource":
         assert content.get_resource(item["item_id"]), f"{label}: resource '{item['item_id']}' not found"
+    elif item_type == "artifact":
+        assert content.get_artifact(item["item_id"]), f"{label}: artifact '{item['item_id']}' not found"
 
 
 class TestBoxesIntegrity:

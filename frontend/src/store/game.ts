@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Artifact, Element, Expedition, ExperimentResult, InventoryItem, LootItem, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Artifact, Expedition, InventoryItem, LootItem, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -10,11 +10,9 @@ interface GameState {
   ships: Ship[]
   inventory: InventoryItem[]
   activeExpeditions: Expedition[]
-  lastExperiment: ExperimentResult | null
   stats: UserStats | null
   shipsContent: ShipConfig[]
   zonesContent: Zone[]
-  elementsContent: Element[]
   resourcesContent: Resource[]
   artifactsContent: Artifact[]
   ranksContent: Rank[]
@@ -41,7 +39,6 @@ interface GameState {
   repairShip: (shipId: string, resourceId: string) => Promise<void>
   equipSlot: (shipId: string, slotIndex: number, artifactId: string) => Promise<void>
   unequipSlot: (shipId: string, slotIndex: number) => Promise<void>
-  experiment: (elementIds: string[]) => Promise<void>
   loadStats: () => Promise<void>
   loadContent: () => Promise<void>
   clearBoxRewards: () => void
@@ -54,11 +51,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   ships: [],
   inventory: [],
   activeExpeditions: [],
-  lastExperiment: null,
   stats: null,
   shipsContent: [],
   zonesContent: [],
-  elementsContent: [],
   resourcesContent: [],
   artifactsContent: [],
   ranksContent: [],
@@ -227,17 +222,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  experiment: async (elementIds) => {
-    try {
-      set({ isLoading: true, error: null, lastExperiment: null })
-      const result = await api.experiment(elementIds)
-      set({ lastExperiment: result, isLoading: false })
-      await get().loadInventory()
-    } catch (e) {
-      set({ error: (e as Error).message, isLoading: false })
-    }
-  },
-
   loadStats: async () => {
     try {
       const stats = await api.getStats()
@@ -251,15 +235,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
         set({ initFailed: false })
-        const [shipsContent, zonesContent, elementsContent, resourcesContent, artifactsContent, ranksContent] = await Promise.all([
+        const [shipsContent, zonesContent, resourcesContent, artifactsContent, ranksContent] = await Promise.all([
           api.getShipsContent(),
           api.getZonesContent(),
-          api.getElementsContent(),
           api.getResourcesContent(),
           api.getArtifactsContent(),
           api.getRanksContent(),
         ])
-        set({ shipsContent, zonesContent, elementsContent, resourcesContent, artifactsContent, ranksContent, isContentReady: true })
+        set({ shipsContent, zonesContent, resourcesContent, artifactsContent, ranksContent, isContentReady: true })
         return
       } catch (e) {
         const isLast = attempt >= 4

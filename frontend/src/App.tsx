@@ -9,14 +9,12 @@ import { RewardSheet } from './components/RewardSheet'
 import { useGameStore } from './store/game'
 import ShipPage from './pages/ShipPage'
 import { Inventory } from './pages/Inventory'
-import { Lab } from './pages/Lab'
 import { Profile } from './pages/Profile'
 import { PageTransition } from './components/PageTransition'
 
 const nav = [
   { path: '/hangar', icon: '🚀', label: 'Ангар' },
   { path: '/galaxy', icon: '🌌', label: 'Карта' },
-  { path: '/lab', icon: '🔬', label: 'Лаб' },
   { path: '/inventory', icon: '🎒', label: 'Инв' },
   { path: '/profile', icon: '👤', label: 'Проф' },
 ]
@@ -115,7 +113,6 @@ function AppContent() {
           <Route path="/" element={<PageTransition><ShipPage /></PageTransition>} />
           <Route path="/hangar" element={<PageTransition><ShipPage /></PageTransition>} />
           <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
-          <Route path="/lab" element={<PageTransition><Lab /></PageTransition>} />
           <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
         </Routes>

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { useGameStore } from '../store/game'
-import type { Artifact, Element, InventoryItem, Resource } from '../types'
+import type { Artifact, InventoryItem, Resource } from '../types'
 
 const rarityConfig: Record<string, { border: string; bg: string; text: string; glow: string }> = {
   common: { border: 'border-slate-500/20', bg: 'bg-slate-500/5', text: 'text-slate-300', glow: 'rgba(100,116,139,0.15)' },
@@ -61,17 +61,7 @@ type ItemInfo = {
   description_key?: string
 }
 
-function buildInfo(item: InventoryItem, elMap: Map<string, Element>, resMap: Map<string, Resource>, artMap: Map<string, Artifact>): ItemInfo {
-  const el = elMap.get(item.item_config_id)
-  if (el) {
-    return {
-      name: el.name_key ?? 'Неизвестный элемент',
-      tier: el.tier ?? 1,
-      rarity: el.rarity ?? 'common',
-      icon_path: el.icon_path ?? '',
-      description_key: el.description_key,
-    }
-  }
+function buildInfo(item: InventoryItem, resMap: Map<string, Resource>, artMap: Map<string, Artifact>): ItemInfo {
   const r = resMap.get(item.item_config_id)
   if (r) {
     return {
@@ -114,14 +104,12 @@ function buildInfo(item: InventoryItem, elMap: Map<string, Element>, resMap: Map
 
 function buildSections(
   items: InventoryItem[],
-  elMap: Map<string, Element>,
   resMap: Map<string, Resource>,
   artMap: Map<string, Artifact>,
   sortMode: SortMode,
 ): { label: string; icon: string; items: { item: InventoryItem; info: ItemInfo }[] }[] {
   const fuel: InventoryItem[] = []
   const repair: InventoryItem[] = []
-  const elements: InventoryItem[] = []
   const artifacts: InventoryItem[] = []
 
   for (const i of items) {
@@ -129,12 +117,8 @@ function buildSections(
       fuel.push(i)
     } else if (i.item_type === 'resource' && i.item_config_id.startsWith('repair_kit')) {
       repair.push(i)
-    } else if (i.item_type === 'element') {
-      elements.push(i)
     } else if (i.item_type === 'artifact') {
       artifacts.push(i)
-    } else if (elMap.has(i.item_config_id)) {
-      elements.push(i)
     } else if (resMap.has(i.item_config_id)) {
       const r = resMap.get(i.item_config_id)!
       if (r.resource_type === 'fuel') {
@@ -150,7 +134,6 @@ function buildSections(
   const groups: { label: string; icon: string; items: InventoryItem[] }[] = []
   if (fuel.length) groups.push({ label: '⛽ Топливо', icon: '⛽', items: fuel })
   if (repair.length) groups.push({ label: '🔧 Ремкомплекты', icon: '🔧', items: repair })
-  if (elements.length) groups.push({ label: '🧪 Элементы', icon: '🧪', items: elements })
   if (artifacts.length) groups.push({ label: '✨ Артефакты', icon: '✨', items: artifacts })
 
   const sorter = (a: { item: InventoryItem; info: ItemInfo }, b: { item: InventoryItem; info: ItemInfo }) => {
@@ -166,12 +149,12 @@ function buildSections(
   return groups.map((g) => ({
     label: g.label,
     icon: g.icon,
-    items: g.items.map((item) => ({ item, info: buildInfo(item, elMap, resMap, artMap) })).sort(sorter),
+    items: g.items.map((item) => ({ item, info: buildInfo(item, resMap, artMap) })).sort(sorter),
   }))
 }
 
 export function Inventory() {
-  const { inventory, loadInventory, elementsContent, resourcesContent, artifactsContent, ships, loadShips } = useGameStore()
+  const { inventory, loadInventory, resourcesContent, artifactsContent, ships, loadShips } = useGameStore()
   const [filter, setFilter] = useState<string>('all')
   const [sortMode, setSortMode] = useState<SortMode>('tier')
   const [selectedItem, setSelectedItem] = useState<{ item: InventoryItem; info: ItemInfo } | null>(null)
@@ -181,7 +164,6 @@ export function Inventory() {
     loadShips()
   }, [loadInventory, loadShips])
 
-  const elMap = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const resMap = useMemo(() => new Map(resourcesContent.map((r) => [r.id, r])), [resourcesContent])
   const artMap = useMemo(() => new Map(artifactsContent.map((a) => [a.id, a])), [artifactsContent])
 
@@ -193,8 +175,8 @@ export function Inventory() {
   }, [inventory, filter])
 
   const sections = useMemo(
-    () => buildSections(filtered, elMap, resMap, artMap, sortMode),
-    [filtered, elMap, resMap, artMap, sortMode],
+    () => buildSections(filtered, resMap, artMap, sortMode),
+    [filtered, resMap, artMap, sortMode],
   )
 
   const totalItems = inventory.reduce((s, i) => s + i.quantity, 0)

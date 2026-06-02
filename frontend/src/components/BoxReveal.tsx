@@ -19,7 +19,6 @@ export function BoxReveal() {
   const rawRewards = useGameStore((s) => s.boxRewards)
   const clearBoxRewards = useGameStore((s) => s.clearBoxRewards)
   const shipsContent = useGameStore((s) => s.shipsContent)
-  const elementsContent = useGameStore((s) => s.elementsContent)
   const resourcesContent = useGameStore((s) => s.resourcesContent)
 
   const [phase, setPhase] = useState<'idle' | 'opening' | 'rewards' | 'done'>('idle')
@@ -43,8 +42,7 @@ export function BoxReveal() {
     setPickedShip(chosenShip)
 
     const drops = boxRewards.random.map((r) => {
-      const elem = elementsContent.find((e) => e.id === r.item_id)
-      return { label: elem?.name_key || r.item_id || '?', qty: r.quantity || 0 }
+      return { label: r.item_id || '?', qty: r.quantity || 0 }
     })
     setPickedDrops(drops)
 

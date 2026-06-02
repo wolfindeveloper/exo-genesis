@@ -1,26 +1,20 @@
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { motion } from 'motion/react'
 
 import { cardHover } from '../lib/animations'
-import { useGameStore } from '../store/game'
-import type { Element, Zone } from '../types'
+import type { Zone } from '../types'
 
 interface ZoneCardProps {
   zone: Zone
   onSelect: (zone: Zone) => void
   disabled?: boolean
   index?: number
-  elementLookup?: Map<string, Element>
 }
 
 const tierColors = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple', 'text-neon-amber', 'text-neon-red']
 const tierBorders = ['', 'border-neon-cyan/20', 'border-neon-green/20', 'border-neon-purple/20', 'border-neon-amber/20', 'border-neon-red/20']
 
-export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index = 0, elementLookup: externalLookup }: ZoneCardProps) {
-  const elementsContent = useGameStore((s) => s.elementsContent)
-  const localLookup = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
-  const elementLookup = externalLookup || localLookup
-
+export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index = 0 }: ZoneCardProps) {
   const lootOverflow = zone.loot_table.length > 4
 
   return (
@@ -44,14 +38,11 @@ export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index
         <span>⚠ {Math.round(zone.risk_factor * 100)}%</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        {zone.loot_table.slice(0, 4).map((loot) => {
-          const el = elementLookup.get(loot.item_id)
-          return (
-            <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
-              {el?.name_key || 'Неизвестный предмет'}
-            </span>
-          )
-        })}
+        {zone.loot_table.slice(0, 4).map((loot) => (
+          <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
+            {loot.item_id}
+          </span>
+        ))}
         {lootOverflow && (
           <span className="text-[9px] bg-space-700/50 px-2 py-0.5 rounded-full text-slate-500 border border-white/5">
             +{zone.loot_table.length - 4}

@@ -66,8 +66,6 @@ class ClaimExpeditionRequest(BaseModel):
 
 
 def _resolve_item_type(content: ContentLoader, item_config_id: str) -> str:
-    if content.get_element(item_config_id):
-        return "element"
     if content.get_resource(item_config_id):
         return "resource"
     if content.get_artifact(item_config_id):

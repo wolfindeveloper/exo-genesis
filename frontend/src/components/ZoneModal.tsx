@@ -19,23 +19,6 @@ const tierGradients = [
 
 const tierAccent = ['', 'text-neon-cyan', 'text-neon-green', 'text-neon-purple', 'text-neon-amber', 'text-neon-red']
 
-// ---------------------------------------------------------------------------
-// Emoji helpers
-// ---------------------------------------------------------------------------
-const elementEmoji: Record<string, string> = {
-  blue_electrical_tape: '🟦', compressed_luck: '🎲', warp_paper_clip: '📎',
-  frozen_confusion: '💗', the_battery_will_die_tomorrow: '🔋',
-  custom_rivet_set: '🔩', pride_of_cows_liquid_methane: '🐄',
-  the_singular_button: '🔘', quick_no_lubricant: '🛢️', reflector_of_views: '✨',
-  the_dust_of_paradoxes: '🌫️', logic_gate_inverter: '🔄', chrome_nostalgia: '💿',
-  quantum_stabilizer: '⚛️', bergamot_crystal: '🍵',
-  essential_oil_condensate: '💧', the_fractal_of_greatness: '🌀',
-  fragments_of_a_deal: '📜', condensation_of_possibilities: '💫',
-  the_core_of_reality: '🔮',
-  "the_universe's_bug_report": '🐛', "the_demiurge's_ink": '🖋️',
-  absolute_zero: '❄️', the_holy_spoon: '🥄', the_pen_of_laughter: '🪶',
-}
-
 const zoneEmoji: Record<string, string> = {
   the_outskirts_of_sanity: '🌌',
   scrap_yard: '🗑️',
@@ -76,12 +59,11 @@ interface ZoneModalProps {
 }
 
 export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId }: ZoneModalProps) {
-  const { ships, shipsContent, elementsContent } = useGameStore()
+  const { ships, shipsContent } = useGameStore()
   const [selectedShipId, setSelectedShipId] = useState<string | null>(preselectedShipId || null)
   const [confirming, setConfirming] = useState(false)
   const [imgError, setImgError] = useState(false)
 
-  const elementLookup = useMemo(() => new Map(elementsContent.map((e) => [e.id, e])), [elementsContent])
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
 
   const shipMap = useMemo(() => new Map(ships.map((s) => [s.id, s])), [ships])
@@ -216,14 +198,11 @@ tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
           <div>
             <h4 className="text-[10px] font-display uppercase tracking-wider text-slate-500 mb-2">Возможная добыча</h4>
             <div className="flex flex-wrap gap-1.5">
-              {zone.loot_table.map((loot) => {
-                const el = elementLookup.get(loot.item_id)
-                return (
+              {zone.loot_table.map((loot) => (
                   <span key={loot.item_id} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-slate-400 border border-white/5">
-                    {elementEmoji[loot.item_id] || '📦'} {el?.name_key || 'Неизвестный предмет'} {loot.min}–{loot.max}
+                    📦 {loot.item_id} {loot.min}–{loot.max}
                   </span>
-                )
-              })}
+                ))}
             </div>
           </div>
 

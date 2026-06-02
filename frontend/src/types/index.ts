@@ -68,26 +68,6 @@ export interface Expedition {
   result_data: Record<string, unknown> | null
 }
 
-export interface Element {
-  id: string
-  name_key: string
-  description_key?: string
-  tier: number
-  rarity: string
-  icon_path: string
-}
-
-export interface ExperimentResult {
-  success: boolean
-  artifact_id: string | null
-  artifact_name_key: string | null
-  artifact_tier: number | null
-  artifact_rarity: string | null
-  stats_modifiers: Record<string, unknown> | null
-  is_first_discoverer: boolean
-  xp_gained: number
-}
-
 export interface Artifact {
   id: string
   name_key: string
@@ -95,10 +75,6 @@ export interface Artifact {
   tier: number
   rarity: string
   stats_modifiers?: Record<string, number>
-}
-
-export interface LabAttempts {
-  failed_keys: string[]
 }
 
 export interface Resource {
