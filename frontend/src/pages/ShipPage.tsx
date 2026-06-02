@@ -80,6 +80,7 @@ export default function ShipPage() {
   })
   const [stickerVisible, setStickerVisible] = useState(false)
   const [consoleMsg, setConsoleMsg] = useState<string | null>(null)
+  const [fuelLabel, setFuelLabel] = useState<string | null>(null)
 
   /* ── Easter egg spawn checker ── */
   useEffect(() => {
@@ -102,6 +103,12 @@ export default function ShipPage() {
     const t = setTimeout(() => setConsoleMsg(null), 2500)
     return () => clearTimeout(t)
   }, [consoleMsg])
+
+  useEffect(() => {
+    if (!fuelLabel) return
+    const t = setTimeout(() => setFuelLabel(null), 2000)
+    return () => clearTimeout(t)
+  }, [fuelLabel])
   const stickerMessages = [
     'НЕ НАЖИМАТЬ',
     'ЗАЧЕМ ТЫ ЭТО СДЕЛАЛ?',
@@ -358,6 +365,7 @@ export default function ShipPage() {
                   <h2 className="text-white font-bold text-xs tracking-[0.2em] relative inline-block px-3 bg-white/5">
                     {shipName}
                   </h2>
+                  <p className="text-[5px] text-cyan-400/15 italic tracking-wider mt-0.5">Может лететь куда угодно, кроме нужного вам места.</p>
                 </div>
 
                 {/* ship display */}
@@ -505,7 +513,7 @@ active={!!a}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[7px] text-orange-400/40 font-semibold tracking-wider">УРОВЕНЬ ЧАЯ В БАКЕ</span>
-                  <span className="text-[8px] text-orange-400/40 font-mono">{mainShip?.fuel_current ?? 0}/{100}</span>
+                  <button onClick={() => setFuelLabel('ERROR 418: I\'M A TEAPOT')} className="text-[8px] text-orange-400/40 font-mono hover:text-orange-300/60 transition-colors">{fuelLabel ?? `${mainShip?.fuel_current ?? 0}/${100}`}</button>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-orange-500/10">
                   <div
