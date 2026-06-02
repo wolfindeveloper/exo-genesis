@@ -71,6 +71,7 @@
 | `language_code` | TEXT | e.g., `'en'`, `'ru'` |
 | `balance_xgen` | INTEGER | Default: `0` |
 | `balance_stars` | INTEGER | Default: `0` |
+| `balance_fragments` | INTEGER | Default: `0` — fragment currency for The Guide |
 | `level` | INTEGER | Default: `1` |
 | `xp` | INTEGER | Default: `0` |
 | `created_at` | TIMESTAMPTZ | |
@@ -111,14 +112,33 @@
 | `status` | ENUM | `'active'`, `'completed'`, `'failed'` |
 | `result_data` | JSONB | Loot table result (nullable until completed) |
 
-#### `guide_progress` (replaces Lab/Discoveries)
+#### `guide_progress` (tracks per-entry research status)
 | Column Name | Data Type | Constraints / Details |
 | :--- | :--- | :--- |
 | `id` | UUID | Primary Key |
 | `user_id` | TEXT | Foreign Key → `users.id` |
-| `entry_id` | TEXT | References `guide_entries.json` ID |
-| `researched_at` | TIMESTAMPTZ | When the entry was unlocked |
-| UNIQUE(user_id, entry_id) | | |
+| `chapter_id` | TEXT | References `guide.json` chapter ID |
+| `entry_id` | TEXT | References `guide.json` entry ID |
+| `status` | TEXT | `'locked'`, `'researched'`, `'glitched'` |
+| UNIQUE(user_id, chapter_id, entry_id) | | |
+
+#### `chapter_progress` (per-chapter completion + reward claiming)
+| Column Name | Data Type | Constraints / Details |
+| :--- | :--- | :--- |
+| `id` | UUID | Primary Key |
+| `user_id` | TEXT | Foreign Key → `users.id` |
+| `chapter_id` | TEXT | References `guide.json` chapter ID |
+| `reward_claimed` | BOOLEAN | Default: `false` |
+| UNIQUE(user_id, chapter_id) | | |
+
+#### `user_events` (action tracking for dynamic chapter unlocks)
+| Column Name | Data Type | Constraints / Details |
+| :--- | :--- | :--- |
+| `id` | UUID | Primary Key |
+| `user_id` | TEXT | Foreign Key → `users.id` |
+| `event_key` | TEXT | e.g., `'stare_60s'`, `'red_button_3x'`, `'fuel_below_5'` |
+| `completed_at` | TIMESTAMPTZ | Default: `now()` |
+| UNIQUE(user_id, event_key) | | |
 
 ---
 
@@ -153,17 +173,37 @@ All JSON files reside in `/backend/content/`.
 }]
 ```
 
-### `guide_entries.json` (replaces artifacts + recipes)
-Each entry costs information fragments (obtained from expeditions) to unlock. Entries unlock lore, stat bonuses, new slot abilities, etc.
+### `guide.json` (chapters with entries — replaces Lab)
+Chapters group related entries. Each entry has a fragment cost and optional glitch chance. Some entries use `unlock_event` instead of fragment cost for dynamic discovery. Each chapter has a reward artifact granted when all entries are researched.
 ```json
-[{
-  "id": "entry_void_travel",
-  "title_key": "Путешествие сквозь пустоту",
-  "tier": 1,
-  "fragment_cost": 5,
-  "lore_text": "Древние записи гласят...",
-  "reward": { "type": "stat_bonus", "stat": "speed_mod", "value": 0.05 }
-}]
+{
+  "chapters": [
+    {
+      "id": "ch_basics",
+      "title": "Глава I: Основы бытия",
+      "description": "Понять, что паника — это не выход.",
+      "order": 1,
+      "reward_artifact_id": "termos_optimizma",
+      "entries": [
+        {
+          "id": "why_ship_sighs",
+          "title": "Почему корабль издает звуки вздоха?",
+          "text": "Вега МК-II очень старается...",
+          "fragment_cost": 1,
+          "glitch_chance": 0.2
+        },
+        {
+          "id": "stare_effect",
+          "title": "Эффект созерцания",
+          "text": "Вселенная существует только тогда...",
+          "unlock_event": "stare_60s",
+          "fragment_cost": 0,
+          "glitch_chance": 0
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ### `resources.json` (fuel + repair kits, single tier)
@@ -218,11 +258,17 @@ Each entry costs information fragments (obtained from expeditions) to unlock. En
 * `POST /user/ships/{id}/unequip`: Body `{ slot_index }` — unequip artifact from slot.
 
 ### The Guide
-* `GET /guide/entries`: List all entries with unlock status.
-* `POST /guide/research`: Body `{ entry_id }` — spend fragments to unlock.
+* `GET /guide/chapters`: List all chapters with progress per user.
+* `GET /guide/chapters/{chapter_id}`: Chapter detail with entries statuses.
+* `POST /guide/research`: Body `{ chapter_id, entry_id }` — spend fragments to unlock an entry (may trigger glitch).
+* `POST /guide/fix-glitch`: Body `{ chapter_id, entry_id }` — pay 2× fragment cost to fix a glitched entry.
+* `POST /guide/claim-reward`: Body `{ chapter_id }` — claim the chapter reward artifact when all entries researched.
 
-### System
-* `GET /system/week-info`: Current week seed.
+### User Events
+* `POST /user/events`: Body `{ event_key }` — log a user action for dynamic chapter unlocks (e.g., `stare_60s`, `red_button_3x`).
+
+### Content
+* `GET /content/guide`: Load guide.json chapters/entries.
 
 ---
 
@@ -290,11 +336,16 @@ Each entry costs information fragments (obtained from expeditions) to unlock. En
 - [x] Limit user to one ship
 - [x] 8 slot device inventory management (equip/unequip)
 
-### Phase 2 — The Guide (replaces Lab)
-- [ ] `guide_entries.json` with lore, costs, rewards
-- [ ] GuidePage.tsx — tree/list of entries
-- [ ] Fragment inventory + spending
-- [ ] Backend router `POST /guide/research`
+### Phase 2 — The Guide ✅
+- [x] `guide.json` — 4 chapters (I, II, III + secret X), 29 entries with costs, texts, glitch chances, unlock events
+- [x] GuidePage.tsx — chapter list → entry list → article detail with glitch display + reward claiming
+- [x] Fragment economy: `balance_fragments` column, earn in expeditions, spend on research
+- [x] Backend router `guide.py` — 5 endpoints: chapters list, chapter detail, research, fix-glitch, claim-reward
+- [x] DB migration (00004_guide.sql) — `guide_progress`, `chapter_progress`, `user_events` tables
+- [x] Dynamic chapters via `user_events` (stare_60s, red_button_3x, fuel_below_5, toggle_sound_5x, donated)
+- [x] Glitch text mechanic — random on research, fixable at 2× cost, CSS glitch animation
+- [x] Chapter reward artifacts (4 new equipables: Термос оптимизма, Словарь извинений, Синяя изолента, Очки вероятности)
+- [x] Fragment loot in all zones (weighted, scales by tier)
 - [x] Remove Lab, elements.json, recipe_generator, system.py, lab models, experiment_log
 
 ### Phase 3 — Expedition Refactor

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
@@ -165,6 +165,11 @@ export default function ShipPage() {
   })
 
   const [slotModalIndex, setSlotModalIndex] = useState<number | null>(null)
+  const closeModal = useCallback(() => setSlotModalIndex(null), [setSlotModalIndex])
+
+  function handleSlotClick(i: number) {
+    setSlotModalIndex(i)
+  }
 
   const SLOT_LABELS: { icon: string; name: string }[] = [
     { icon: '🥜', name: 'Ядро' },
@@ -364,7 +369,7 @@ export default function ShipPage() {
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                     tier={a?.tier ?? 1}
                     side="left"
-                    onClick={() => setSlotModalIndex(i)}
+                    onClick={() => handleSlotClick(i)}
                   />
                 )
               })}
@@ -497,7 +502,7 @@ export default function ShipPage() {
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                     tier={a?.tier ?? 1}
                     side="right"
-                    onClick={() => setSlotModalIndex(i)}
+                    onClick={() => handleSlotClick(i)}
                   />
                 )
               })}
@@ -506,7 +511,7 @@ export default function ShipPage() {
 
           {/* bottom slots */}
           <div className="flex gap-8 mt-2 z-20">
-            {[6, 7].map((i) => {
+              {[6, 7].map((i) => {
               const a = slotArtifacts[i]
               return (
                 <HexSlot
@@ -515,7 +520,7 @@ active={!!a}
                     icon={a ? '⚙' : '+'}
                     name={a?.name_key ?? SLOT_LABELS[i].name}
                   tier={a?.tier ?? 1}
-                  onClick={() => setSlotModalIndex(i)}
+                  onClick={() => handleSlotClick(i)}
                 />
               )
             })}
@@ -682,16 +687,16 @@ active={!!a}
         onEquip={(artifactId) => {
           if (mainShip && slotModalIndex !== null) {
             equipSlot(mainShip.id, slotModalIndex, artifactId)
-            setSlotModalIndex(null)
+            closeModal()
           }
         }}
         onUnequip={() => {
           if (mainShip && slotModalIndex !== null) {
             unequipSlot(mainShip.id, slotModalIndex)
-            setSlotModalIndex(null)
+            closeModal()
           }
         }}
-        onClose={() => setSlotModalIndex(null)}
+        onClose={closeModal}
       />
     </div>
   )

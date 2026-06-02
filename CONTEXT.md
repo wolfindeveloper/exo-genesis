@@ -26,9 +26,17 @@
 - [x] **🧹 Cleanup Phase 2 prep:** удалены lab.py, system.py, recipe_generator.py, elements.json, element.py, lab.py (models)
 - [x] **zones.json** — loot tables заменены с элементов на ресурсы (fuel + repair_kit)
 - [x] **box_opener.py** — random_drops заменены с элементов на T1-артефакты
-- [ ] **План:** guide_entries.json, GuidePage.tsx, balance_fragments, POST /guide/research
+- [x] **guide.py** — 5 endpoints: GET /guide/chapters, GET /guide/chapters/{id}, POST /guide/research, POST /guide/fix-glitch, POST /guide/claim-reward
+- [x] **events.py** — POST /user/events (stare_60s, red_button_3x, fuel_below_5, toggle_sound_5x, donated)
+- [x] **content/guide.json** — 4 главы (I, II, III, X), 29 статей с текстами, ценами, glitch_chance, unlock_event
+- [x] **artifacts.json** — +4 награды за главы (termos_optimizma, slovar_izvineniy, sinya_izolenta, ochki_veroyatnosti)
+- [x] **content_loader.py** — загрузка guide.json, методы get_guide_entry/get_guide_chapter
+- [x] **zones.json** — fragments добавлены в loot_table всех зон
+- [x] **expeditions.py** — обработка fragments в луте + fuel_below_5 event
+- [x] **Миграция 00004_guide.sql** — balance_fragments, guide_progress, chapter_progress, user_events
+- [x] **main.py** — подключены guide.router и events.router
 
-## ✅ Done — Frontend (Cockpit + Phase 1.4 + Phase 2 prep)
+## ✅ Done — Frontend (Cockpit + Phase 1.4 + Phase 2)
 - [x] **Vite 8 + React 19 + Tailwind v4 + TS strict** — проект настроен
 - [x] **ShipPage.tsx** — полная кабина одного корабля:
   - Canvas со 120 звёздами + 15 плавающих частиц (анимация)
@@ -57,6 +65,13 @@
 - [x] **🧹 Cleanup:** удалены Lab.tsx, /lab route, 🔬 навигация, experiment/lab из стора/api/types
 - [x] **Inventory/ZoneCard/ZoneModal** — названия предметов из resourcesContent + artifactsContent
 - [x] **БД:** удалено 45 строк elements из user_inventory
+- [x] **GuidePage.tsx** — список глав → статьи → деталь статьи (глюк-текст, исправление, награда)
+- [x] **App.tsx** — /guide route, 📖 Гайд в BottomNav
+- [x] **api/client.ts** — getGuideChapters, getGuideChapter, researchEntry, fixGlitch, claimReward, logEvent
+- [x] **store/game.ts** — guideChapters state, loadGuideChapters, researchEntry, fixGlitch, claimGuideReward actions
+- [x] **ShipPage.tsx** — трекинг событий: stare_60s (idle timer), red_button_3x (стикер ×3), toggle_sound_5x (🔊 кнопка); useCallback для onClose slot-модала; Douglas Adams сообщение при пустом инвентаре
+- [x] **index.css** — glitch-text keyframe
+- [x] **SlotSelectModal.tsx** — фикс click-outside: setTimeout заменён на mousedown+touchstart (исправляет баг с повторным открытием слотов)
 
 ## ✅ Done — Infrastructure
 - [x] GitHub: wolfindeveloper/exo-genesis
