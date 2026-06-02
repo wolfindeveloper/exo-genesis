@@ -24,6 +24,10 @@ export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index
     for (const a of artifactsContent) m.set(a.id, a.name_key)
     return m
   }, [resourcesContent, artifactsContent])
+  const totalWeight = useMemo(
+    () => zone.loot_table.reduce((s, l) => s + l.weight, 0),
+    [zone.loot_table],
+  )
   const lootOverflow = zone.loot_table.length > 4
 
   return (
@@ -49,7 +53,7 @@ export const ZoneCard = memo(function ZoneCard({ zone, onSelect, disabled, index
       <div className="flex flex-wrap gap-1.5">
         {zone.loot_table.slice(0, 4).map((loot) => (
           <span key={loot.item_id} className="text-[9px] bg-space-500/50 px-2 py-0.5 rounded-full text-slate-400 border border-white/5">
-            {lootNames.get(loot.item_id) || loot.item_id}
+            {lootNames.get(loot.item_id) || loot.item_id} {Math.round(loot.weight / totalWeight * 100)}%
           </span>
         ))}
         {lootOverflow && (

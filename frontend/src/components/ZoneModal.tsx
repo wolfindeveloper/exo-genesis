@@ -73,6 +73,10 @@ export function ZoneModal({ zone, onClose, onStart, isLoading, preselectedShipId
     for (const a of artifactsContent) m.set(a.id, a.name_key)
     return m
   }, [resourcesContent, artifactsContent])
+  const totalWeight = useMemo(
+    () => zone.loot_table.reduce((s, l) => s + l.weight, 0),
+    [zone.loot_table],
+  )
 
   const shipMap = useMemo(() => new Map(ships.map((s) => [s.id, s])), [ships])
   const idleShips = useMemo(() => ships.filter((s) => s.status === 'idle'), [ships])
@@ -208,7 +212,7 @@ tracking-[0.15em] drop-shadow-lg ${tierAccent[zone.tier]}`}>{zone.name_key}</h2>
             <div className="flex flex-wrap gap-1.5">
               {zone.loot_table.map((loot) => (
                   <span key={loot.item_id} className="text-[10px] bg-space-700/50 px-2.5 py-1 rounded-full text-slate-400 border border-white/5">
-                    📦 {lootNames.get(loot.item_id) || loot.item_id} {loot.min}–{loot.max}
+                    📦 {lootNames.get(loot.item_id) || loot.item_id} {Math.round(loot.weight / totalWeight * 100)}% {loot.min}–{loot.max}шт
                   </span>
                 ))}
             </div>
