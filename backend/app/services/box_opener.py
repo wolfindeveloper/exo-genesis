@@ -49,6 +49,9 @@ def _apply_reward(
             col = f"balance_{item['type']}" if item["type"] != "xp" else "xp"
             supabase.table("users").update({col: quantity}).eq("id", user_id).execute()
         case "ship":
+            existing = supabase.table("user_ships").select("id").eq("user_id", user_id).execute()
+            if existing.data:
+                return
             ship_id = (
                 rng.choice(item["pool"])
                 if "pool" in item

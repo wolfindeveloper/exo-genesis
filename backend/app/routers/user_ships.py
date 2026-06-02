@@ -23,15 +23,6 @@ async def _get_ship_or_404(ship_id: str, user_id: str, db: Client) -> dict:
     return result.data[0]
 
 
-def _ensure_tier_match(resource_id: str, ship_tier: int, content: ContentLoader) -> dict:
-    resource = content.get_resource(resource_id)
-    if not resource:
-        raise HTTPException(status_code=404, detail="Resource not found")
-    if resource["tier"] != ship_tier:
-        raise HTTPException(status_code=400, detail="Resource tier must match ship tier")
-    return resource
-
-
 def _resolve_inventory(user_id: str, resource_id: str, db: Client) -> dict:
     result = db.table("user_inventory").select("*").eq("user_id", user_id).eq("item_config_id", resource_id).execute()
     if not result.data:
@@ -51,17 +42,18 @@ async def refuel_ship(
     if ship["status"] != "idle":
         raise HTTPException(status_code=400, detail="Ship must be idle")
 
-    ship_config = content.get_ship(ship["ship_config_id"])
-    if not ship_config:
-        raise HTTPException(status_code=404, detail="Ship config not found")
+    resource = content.get_resource(body.resource_id)
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    if resource["resource_type"] != "fuel":
+        raise HTTPException(status_code=400, detail="Not a fuel resource")
 
-    resource = _ensure_tier_match(body.resource_id, ship_config["tier"], content)
-    fuel_capacity = ship_config["stats"]["fuel_capacity"]
+    fuel_capacity = 100
     current_fuel = ship["fuel_current"]
     if current_fuel >= fuel_capacity:
         raise HTTPException(status_code=400, detail="Fuel already full")
 
-    restore_per_unit = resource["tier"] * 10
+    restore_per_unit = 10
     needed = fuel_capacity - current_fuel
     units_needed = -(-needed // restore_per_unit)
 
@@ -98,16 +90,17 @@ async def repair_ship(
     if ship["status"] != "idle":
         raise HTTPException(status_code=400, detail="Ship must be idle")
 
-    ship_config = content.get_ship(ship["ship_config_id"])
-    if not ship_config:
-        raise HTTPException(status_code=404, detail="Ship config not found")
+    resource = content.get_resource(body.resource_id)
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    if resource["resource_type"] != "repair_kit":
+        raise HTTPException(status_code=400, detail="Not a repair resource")
 
-    resource = _ensure_tier_match(body.resource_id, ship_config["tier"], content)
     current_stability = ship["stability"]
     if current_stability >= 100:
         raise HTTPException(status_code=400, detail="Stability already full")
 
-    restore_per_unit = resource["tier"] * 10
+    restore_per_unit = 10
     needed = 100 - current_stability
     units_needed = -(-needed // restore_per_unit)
 

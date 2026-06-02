@@ -9,9 +9,9 @@
     "guaranteed": [
       { "type": "xgen", "quantity": 42 },
       { "type": "xp", "quantity": 42 },
-      { "type": "ship", "pool": ["stella", "orion", "aurora", "vega", "zenith"], "stability": 100 },
-      { "type": "resource", "item_id": "fuel_t1", "quantity": 42 },
-      { "type": "resource", "item_id": "repair_kit_t1", "quantity": 42 }
+      { "type": "ship", "item_id": "vega_mk2", "stability": 100 },
+      { "type": "resource", "item_id": "fuel", "quantity": 42 },
+      { "type": "resource", "item_id": "repair_kit", "quantity": 42 }
     ],
     "random_drops": [
       { "type": "element", "item_id": "blue_electrical_tape", "weight": 42, "min": 2, "max": 4 },
