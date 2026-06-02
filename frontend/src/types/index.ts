@@ -44,6 +44,7 @@ export interface UserProfile {
   language_code: string
   balance_xgen: number
   balance_stars: number
+  balance_fragments?: number
   level: number
   xp: number
   streak_days: number

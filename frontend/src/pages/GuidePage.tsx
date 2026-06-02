@@ -3,14 +3,6 @@ import { ArrowLeft, BookOpen, Check, FileText, Lock, Sparkles, TriangleAlert } f
 import { useGameStore } from '../store/game'
 import type { GuideChapterDetail, GuideEntryDetail } from '../types'
 
-const RARITY_COLORS: Record<string, string> = {
-  common: 'from-slate-400 to-slate-300',
-  uncommon: 'from-green-500 to-emerald-400',
-  rare: 'from-cyan-400 to-blue-500',
-  epic: 'from-purple-500 to-pink-500',
-  legendary: 'from-amber-400 to-orange-500',
-}
-
 export default function GuidePage() {
   const user = useGameStore((s) => s.user)
   const guideChapters = useGameStore((s) => s.guideChapters)
@@ -86,11 +78,6 @@ export default function GuidePage() {
   function getArtifactName(artifactId: string) {
     const a = artifactsContent.find((a) => a.id === artifactId)
     return a?.name_key ?? artifactId
-  }
-
-  function getArtifactRarity(artifactId: string) {
-    const a = artifactsContent.find((a) => a.id === artifactId)
-    return a?.rarity ?? 'common'
   }
 
   function glitchText(text: string): string {
@@ -211,7 +198,6 @@ export default function GuidePage() {
 
   // Chapter detail view
   const chapter = selectedChapter
-  const forFix = chapter.entries.find((e) => e.status === 'glitched')
   const entryCost = (entry: GuideEntryDetail) => entry.glitch_chance && entry.glitch_chance > 0
     ? entry.fragment_cost * 2
     : entry.fragment_cost

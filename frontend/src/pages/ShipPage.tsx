@@ -136,12 +136,6 @@ export default function ShipPage() {
     }
   }, [])
 
-  /* ── fuel_below_5 event check ── */
-  useEffect(() => {
-    if (mainShip && mainShip.fuel_current <= 5 && mainShip.fuel_current > 0) {
-      api.logEvent('fuel_below_5').catch(() => {})
-    }
-  }, [mainShip?.fuel_current])
   const stickerMessages = [
     'НЕ НАЖИМАТЬ',
     'ЗАЧЕМ ТЫ ЭТО СДЕЛАЛ?',
@@ -156,6 +150,12 @@ export default function ShipPage() {
   const STICKER_FINAL = stickerMessages.length - 1
 
   const mainShip = ships.length > 0 ? ships[0] : null
+  /* ── fuel_below_5 event check ── */
+  useEffect(() => {
+    if (mainShip && mainShip.fuel_current <= 5 && mainShip.fuel_current > 0) {
+      api.logEvent('fuel_below_5').catch(() => {})
+    }
+  }, [mainShip?.fuel_current])
   const shipConfig = mainShip ? shipsContent.find((c) => c.id === mainShip.ship_config_id) : null
   const shipName = shipConfig?.name_key ?? 'VEGA MK-II'
 
