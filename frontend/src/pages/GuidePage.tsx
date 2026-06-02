@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, BookOpen, Check, FileText, Lock, Sparkles, TriangleAlert } from 'lucide-react'
 import { useGameStore } from '../store/game'
+import { api } from '../api/client'
 import type { GuideChapterDetail, GuideEntryDetail } from '../types'
 
 export default function GuidePage() {
@@ -27,26 +28,23 @@ export default function GuidePage() {
     return () => clearTimeout(t)
   }, [msg])
 
-  async function handleResearch(entry: GuideEntryDetail) {
-    if (!selectedChapter) return
+  async function loadChapterDetail(chapterId: string) {
     try {
-      await researchEntry(selectedChapter.id, entry.id)
-      setMsg(`«${entry.title}» — исследовано`)
-      const updated = await (await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/guide/chapters/${selectedChapter.id}`)).json()
-      setSelectedChapter(updated)
-      if (openedEntry?.id === entry.id) {
-        setOpenedChapterEntry(updated, entry.id)
-      }
+      const data = await api.getGuideChapter(chapterId)
+      setSelectedChapter(data)
     } catch (e) {
       setMsg((e as Error).message)
     }
   }
 
-  function setOpenedChapterEntry(chapter: GuideChapterDetail, entryId: string) {
-    const entry = chapter.entries.find((e) => e.id === entryId)
-    if (entry) {
-      setOpenedEntry(entry)
-      setSelectedChapter(chapter)
+  async function handleResearch(entry: GuideEntryDetail) {
+    if (!selectedChapter) return
+    try {
+      await researchEntry(selectedChapter.id, entry.id)
+      setMsg(`«${entry.title}» — исследовано`)
+      await loadChapterDetail(selectedChapter.id)
+    } catch (e) {
+      setMsg((e as Error).message)
     }
   }
 
@@ -54,9 +52,7 @@ export default function GuidePage() {
     if (!selectedChapter) return
     try {
       await fixGlitch(selectedChapter.id, entry.id)
-      const updated = await (await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/guide/chapters/${selectedChapter.id}`)).json()
-      setSelectedChapter(updated)
-      setOpenedEntry({ ...entry, status: 'researched', text: entry.text })
+      await loadChapterDetail(selectedChapter.id)
       setMsg('Глюк исправлен')
     } catch (e) {
       setMsg((e as Error).message)
@@ -67,9 +63,8 @@ export default function GuidePage() {
     if (!selectedChapter) return
     try {
       await claimGuideReward(selectedChapter.id)
-      const updated = await (await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/guide/chapters/${selectedChapter.id}`)).json()
-      setSelectedChapter(updated)
-      setMsg(`Награда получена!`)
+      await loadChapterDetail(selectedChapter.id)
+      setMsg('Награда получена!')
     } catch (e) {
       setMsg((e as Error).message)
     }
@@ -127,12 +122,7 @@ export default function GuidePage() {
               return (
                 <button
                   key={ch.id}
-                  onClick={() => {
-                    fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/guide/chapters/${ch.id}`)
-                      .then((r) => r.json())
-                      .then((data) => setSelectedChapter(data))
-                      .catch(() => setMsg('Не удалось загрузить главу'))
-                  }}
+                  onClick={() => loadChapterDetail(ch.id)}
                   className="text-left bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-4 hover:bg-white/[0.07] active:bg-white/[0.04] transition-all group"
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -334,9 +324,7 @@ export default function GuidePage() {
 
                     {entry.status === 'researched' && (
                       <button
-                        onClick={() => {
-                          setOpenedEntry(entry)
-                        }}
+                        onClick={() => setOpenedEntry(entry)}
                         className="text-[7px] text-cyan-400/40 hover:text-cyan-300/60 ml-2 shrink-0"
                       >
                         <FileText className="w-3 h-3" />
