@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
@@ -7,8 +8,8 @@ import type { Artifact } from '../types'
 import { api } from '../api/client'
 
 const consoleButtons = [
-  { label: 'ГДЕ-ТО ТАМ', accent: '#00f5ff', msg: 'Вы все равно заблудитесь' },
-  { label: 'КОЛЛЕКЦИЯ ХЛАМА', accent: '#a855f7' },
+  { label: 'ГДЕ-ТО ТАМ', accent: '#00f5ff', path: '/galaxy', msg: 'Вы все равно заблудитесь' },
+  { label: 'КОЛЛЕКЦИЯ ХЛАМА', accent: '#a855f7', path: '/inventory' },
   { label: 'НЕ ПАНИКУЙТЕ', accent: '#00f5ff' },
   { label: 'СПЕКУЛЯТИВНАЯ ЛАВКА', accent: '#f97316', sub: 'Цены высоки, надежды низки' },
 ]
@@ -67,6 +68,7 @@ export default function ShipPage() {
   const xp = user?.xp ?? 0
   const nextXp = level * 100
   const xpPct = Math.min(100, Math.round((xp / nextXp) * 100))
+  const navigate = useNavigate()
 
   const tg = (window as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: { photo_url?: string; first_name?: string } } } } }).Telegram?.WebApp
   const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
@@ -549,6 +551,7 @@ active={!!a}
                     animation: 'spin-gradient 4s linear infinite',
                   }}
                   onClick={() => {
+                    if (btn.path) navigate(btn.path)
                     if (btn.msg) setConsoleMsg(btn.msg)
                   }}
                 >
