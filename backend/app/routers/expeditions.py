@@ -131,7 +131,7 @@ async def start_expedition(
     db.table("user_ships").update({
         "status": "expedition",
         "fuel_current": new_fuel,
-    }).eq("id", body.ship_id).execute()
+    }).eq("id", ship["id"]).execute()
 
     if 0 < new_fuel <= 5:
         existing = db.table("user_events").select("id").eq("user_id", user_id).eq("event_key", "fuel_below_5").execute()
@@ -143,7 +143,7 @@ async def start_expedition(
 
     expedition_data = {
         "user_id": user_id,
-        "ship_id": body.ship_id,
+        "ship_id": ship["id"],
         "zone_config_id": body.zone_id,
         "start_time": now.isoformat(),
         "end_time": end_time.isoformat(),
