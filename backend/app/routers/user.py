@@ -44,7 +44,8 @@ async def get_profile(
             "username": tg_user.get("username", result.data[0].get("username", "")),
         }).eq("id", user_id).execute()
         profile = db.table("users").select("*").eq("id", user_id).execute().data[0]
-        return ProfileResponse(**profile, is_new=False, **streak_info)
+        profile.update(streak_info)
+        return ProfileResponse(**profile, is_new=False)
 
     new_user = {
         "id": user_id,
