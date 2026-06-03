@@ -162,10 +162,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  startExpedition: async (shipId, zoneId) => {
+  startExpedition: async (zoneId) => {
     try {
       set({ isLoading: true, error: null })
-      const expedition = await api.startExpedition(shipId, zoneId)
+      const expedition = await api.startExpedition(zoneId)
       set({ activeExpeditions: [...get().activeExpeditions, expedition], isLoading: false })
       await get().loadShips()
     } catch (e) {

@@ -57,7 +57,6 @@ async def get_active_expeditions(
 
 
 class StartExpeditionRequest(BaseModel):
-    ship_id: str
     zone_id: str
 
 
@@ -87,14 +86,22 @@ async def start_expedition(
     ships_result = (
         db.table("user_ships")
         .select("*")
-        .eq("id", body.ship_id)
         .eq("user_id", user_id)
         .execute()
     )
     if not ships_result.data:
-        raise HTTPException(status_code=404, detail="Ship not found")
-
+        raise HTTPException(status_code=404, detail="No ships found")
     ship = ships_result.data[0]
+
+    active_exp = (
+        db.table("expeditions")
+        .select("id")
+        .eq("user_id", user_id)
+        .eq("status", "active")
+        .execute()
+    )
+    if active_exp.data:
+        raise HTTPException(status_code=400, detail="Expedition already in progress")
 
     if ship["status"] != "idle":
         raise HTTPException(status_code=400, detail="Ship is not idle")

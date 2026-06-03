@@ -4,6 +4,7 @@ import { User } from 'lucide-react'
 import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
 import SlotSelectModal from '../components/SlotSelectModal'
+import { useExpeditionTimer } from '../hooks/useTimer'
 import type { Artifact } from '../types'
 import { api } from '../api/client'
 
@@ -63,8 +64,13 @@ export default function ShipPage() {
   const unequipSlot = useGameStore((s) => s.unequipSlot)
   const loadShips = useGameStore((s) => s.loadShips)
   const loadInventory = useGameStore((s) => s.loadInventory)
+  const zonesContent = useGameStore((s) => s.zonesContent)
+  const activeExpeditions = useGameStore((s) => s.activeExpeditions)
+  const loadActiveExpeditions = useGameStore((s) => s.loadActiveExpeditions)
+  const claimExpedition = useGameStore((s) => s.claimExpedition)
+  const isLoading = useGameStore((s) => s.isLoading)
 
-  useEffect(() => { loadShips(); loadInventory() }, [])
+  useEffect(() => { loadShips(); loadInventory(); loadActiveExpeditions() }, [])
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
@@ -163,6 +169,19 @@ export default function ShipPage() {
     const id = (mainShip?.equipped_artifacts ?? [])[i]
     return id ? (artifactsContent.find((a) => a.id === id) ?? null) : null
   })
+
+  /* ── Expedition state ── */
+  const activeExp = activeExpeditions[0] ?? null
+  const activeZoneName = activeExp
+    ? (zonesContent.find((z) => z.id === activeExp.zone_config_id)?.name_key ?? activeExp.zone_config_id)
+    : null
+  const expTimer = useExpeditionTimer(activeExp?.start_time ?? null, activeExp?.end_time ?? null)
+
+  const handleClaimExpedition = async () => {
+    if (!activeExp) return
+    await claimExpedition(activeExp.id, shipName)
+    await loadActiveExpeditions()
+  }
 
   const [slotModalIndex, setSlotModalIndex] = useState<number | null>(null)
   const closeModal = useCallback(() => setSlotModalIndex(null), [setSlotModalIndex])
@@ -598,6 +617,46 @@ active={!!a}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ═══ expedition status / launch ═══ */}
+        <div className="w-full max-w-[280px] mt-2 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
+          {activeExp ? (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[7px] text-cyan-400/40 font-semibold tracking-wider">ЭКСПЕДИЦИЯ</span>
+                <span className="text-[7px] text-cyan-400/30">{activeZoneName}</span>
+              </div>
+              {expTimer && !expTimer.isComplete ? (
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[8px] text-cyan-400/50 font-mono">🚀 {expTimer.display}</span>
+                  </div>
+                  <div className="h-1.5 bg-black/40 rounded-full overflow-hidden border border-cyan-500/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
+                      style={{ width: `${expTimer.pct}%`, boxShadow: '0 0 6px rgba(0,245,255,.3)' }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <button
+                  disabled={isLoading}
+                  onClick={handleClaimExpedition}
+                  className="w-full py-2 rounded-lg bg-gradient-to-r from-green-600/80 to-green-400/80 text-[9px] font-bold tracking-wider text-white/90 active:scale-[0.97] transition-all disabled:opacity-40"
+                >
+                  {isLoading ? 'ЗАБИРАЮ...' : '🎁 ЗАБРАТЬ НАГРАДУ'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/galaxy')}
+              className="w-full py-2 rounded-lg bg-gradient-to-r from-neon-cyan/80 to-neon-purple/80 text-[9px] font-bold tracking-wider text-white/90 active:scale-[0.97] transition-all hover:from-neon-cyan hover:to-neon-purple"
+            >
+              🚀 ЗАПУСК ЭКСПЕДИЦИИ
+            </button>
+          )}
         </div>
 
         {/* ═══ console panel ═══ */}

@@ -14,7 +14,7 @@ import { Profile } from './pages/Profile'
 import { PageTransition } from './components/PageTransition'
 
 const nav = [
-  { path: '/hangar', icon: '🚀', label: 'Ангар' },
+  { path: '/', icon: '🚀', label: 'Ангар' },
   { path: '/guide', icon: '📖', label: 'Гайд' },
   { path: '/galaxy', icon: '🌌', label: 'Карта' },
   { path: '/inventory', icon: '🎒', label: 'Инв' },
@@ -23,7 +23,7 @@ const nav = [
 
 function NavBar() {
   const location = useLocation()
-  const isCockpit = location.pathname === '/hangar'
+  const isCockpit = location.pathname === '/'
 
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-50 safe-area-pb backdrop-blur-[12px] border-t transition-colors duration-300 ${
@@ -57,7 +57,7 @@ function AppContent() {
   const location = useLocation()
   const loadContent = useGameStore((s) => s.loadContent)
   const initAuth = useGameStore((s) => s.initAuth)
-  const isCockpit = location.pathname === '/' || location.pathname === '/hangar'
+  const isCockpit = location.pathname === '/'
   const isAuthReady = useGameStore((s) => s.isAuthReady)
   const isContentReady = useGameStore((s) => s.isContentReady)
   const error = useGameStore((s) => s.error)
@@ -113,7 +113,6 @@ function AppContent() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><ShipPage /></PageTransition>} />
-          <Route path="/hangar" element={<PageTransition><ShipPage /></PageTransition>} />
           <Route path="/guide" element={<PageTransition><GuidePage /></PageTransition>} />
           <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
           <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />

@@ -38,10 +38,10 @@ export const api = {
 
   getActiveExpeditions: () => request<Expedition[]>('/expeditions/active'),
 
-  startExpedition: (ship_id: string, zone_id: string) =>
+  startExpedition: (zone_id: string) =>
     request<Expedition>('/expeditions/start', {
       method: 'POST',
-      body: JSON.stringify({ ship_id, zone_id }),
+      body: JSON.stringify({ zone_id }),
     }),
 
   claimExpedition: (expedition_id: string) =>

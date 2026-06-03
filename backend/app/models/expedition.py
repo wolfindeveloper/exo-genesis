@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 
 class ExpeditionStartRequest(BaseModel):
-    ship_id: str
     zone_id: str
 
 
