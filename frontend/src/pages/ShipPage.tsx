@@ -64,6 +64,8 @@ export default function ShipPage() {
   const unequipSlot = useGameStore((s) => s.unequipSlot)
   const loadShips = useGameStore((s) => s.loadShips)
   const loadInventory = useGameStore((s) => s.loadInventory)
+  const refuelShip = useGameStore((s) => s.refuelShip)
+  const repairShip = useGameStore((s) => s.repairShip)
   const zonesContent = useGameStore((s) => s.zonesContent)
   const activeExpeditions = useGameStore((s) => s.activeExpeditions)
   const loadActiveExpeditions = useGameStore((s) => s.loadActiveExpeditions)
@@ -169,6 +171,22 @@ export default function ShipPage() {
     const id = (mainShip?.equipped_artifacts ?? [])[i]
     return id ? (artifactsContent.find((a) => a.id === id) ?? null) : null
   })
+
+  /* ── Inventory counts ── */
+  const fuelInInventory = inventory.find((i) => i.item_config_id === 'fuel')?.quantity ?? 0
+  const repairInInventory = inventory.find((i) => i.item_config_id === 'repair_kit')?.quantity ?? 0
+
+  const isShipIdle = mainShip?.status === 'idle'
+
+  const handleRefuel = async () => {
+    if (!mainShip || fuelInInventory === 0) return
+    await refuelShip(mainShip.id, 'fuel')
+  }
+
+  const handleRepair = async () => {
+    if (!mainShip || repairInInventory === 0) return
+    await repairShip(mainShip.id, 'repair_kit')
+  }
 
   /* ── Expedition state ── */
   const activeExp = activeExpeditions[0] ?? null
@@ -590,7 +608,8 @@ active={!!a}
 
           {/* fuel + HP bars */}
           <div className="w-full max-w-[280px] mt-3 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
+              {/* fuel */}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[7px] text-orange-400/40 font-semibold tracking-wider">УРОВЕНЬ ЧАЯ В БАКЕ</span>
@@ -602,7 +621,17 @@ active={!!a}
                     style={{ width: `${Math.min(100, ((mainShip?.fuel_current ?? 50) / 100) * 100)}%`, boxShadow: '0 0 6px rgba(249,115,22,.3)' }}
                   />
                 </div>
+                {(mainShip?.fuel_current ?? 100) < 100 && (
+                  <button
+                    disabled={!isShipIdle || fuelInInventory === 0 || isLoading}
+                    onClick={handleRefuel}
+                    className="w-full mt-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-600/60 to-orange-400/60 text-[7px] font-bold tracking-wider text-white/70 text-center active:scale-[0.97] transition-all disabled:opacity-25 hover:from-orange-600 hover:to-orange-400 hover:text-white"
+                  >
+                    ☕ ЗАПРАВКА ЧАЕМ ({fuelInInventory})
+                  </button>
+                )}
               </div>
+              {/* repair */}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[7px] text-green-400/40 font-semibold tracking-wider">УРОВЕНЬ ОПТИМИЗМА</span>
@@ -614,6 +643,15 @@ active={!!a}
                     style={{ width: `${Math.min(100, mainShip?.stability ?? 85)}%`, boxShadow: '0 0 6px rgba(34,197,94,.3)' }}
                   />
                 </div>
+                {(mainShip?.stability ?? 100) < 100 && (
+                  <button
+                    disabled={!isShipIdle || repairInInventory === 0 || isLoading}
+                    onClick={handleRepair}
+                    className="w-full mt-1 py-1.5 rounded-lg bg-gradient-to-r from-green-600/60 to-green-400/60 text-[7px] font-bold tracking-wider text-white/70 text-center active:scale-[0.97] transition-all disabled:opacity-25 hover:from-green-600 hover:to-green-400 hover:text-white"
+                  >
+                    ✨ ДОБАВИТЬ ОПТИМИЗМА ({repairInInventory})
+                  </button>
+                )}
               </div>
             </div>
           </div>
