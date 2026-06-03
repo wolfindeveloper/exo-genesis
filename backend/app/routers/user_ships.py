@@ -58,14 +58,8 @@ async def refuel_ship(
     units_needed = -(-needed // restore_per_unit)
 
     inv_item = _resolve_inventory(user_id, body.resource_id, db)
-    if inv_item["quantity"] < units_needed:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Not enough resources. Need {units_needed}, have {inv_item['quantity']}",
-        )
-
-    new_fuel = min(fuel_capacity, current_fuel + units_needed * restore_per_unit)
-    actual_used = -(-(new_fuel - current_fuel) // restore_per_unit)
+    actual_used = min(inv_item["quantity"], units_needed)
+    new_fuel = min(fuel_capacity, current_fuel + actual_used * restore_per_unit)
 
     db.table("user_ships").update({"fuel_current": new_fuel}).eq("id", ship_id).execute()
     db.table("user_inventory").update({
@@ -105,14 +99,8 @@ async def repair_ship(
     units_needed = -(-needed // restore_per_unit)
 
     inv_item = _resolve_inventory(user_id, body.resource_id, db)
-    if inv_item["quantity"] < units_needed:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Not enough resources. Need {units_needed}, have {inv_item['quantity']}",
-        )
-
-    new_stability = min(100, current_stability + units_needed * restore_per_unit)
-    actual_used = -(-(new_stability - current_stability) // restore_per_unit)
+    actual_used = min(inv_item["quantity"], units_needed)
+    new_stability = min(100, current_stability + actual_used * restore_per_unit)
 
     db.table("user_ships").update({"stability": new_stability}).eq("id", ship_id).execute()
     db.table("user_inventory").update({
