@@ -25,7 +25,12 @@ WHERE user_id = '754269918'
     'termos_optimizma', 'slovar_izvineniy', 'sinya_izolenta', 'ochki_veroyatnosti'
   );
 
--- 3. Fix ship_config_id to vega_mk2 if it's something else
+-- 3. Delete stale tiered resources (pre-Phase 1) and unknown generated artifacts
+DELETE FROM user_inventory
+WHERE user_id = '754269918'
+  AND item_config_id IN ('fuel_t1', 'repair_kit_t1', 'artifact_6c669c59');
+
+-- 4. Fix ship_config_id to vega_mk2 if it's something else
 UPDATE user_ships
 SET ship_config_id = 'vega_mk2'
 WHERE user_id = '754269918'
