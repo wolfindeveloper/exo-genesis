@@ -363,11 +363,19 @@ export default function ShipPage() {
           </div>
 
           <div className="relative bg-white/5 backdrop-blur-[12px] rounded-lg px-3 py-2 border border-cyan-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,.06)]">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-cyan-400/30 font-semibold tracking-wider">XGEN</span>
-              <span className="text-white font-bold text-sm drop-shadow-[0_0_4px_rgba(0,245,255,.2)]">
-                {user?.balance_xgen ?? 0}
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-cyan-400/30 font-semibold tracking-wider">XGEN</span>
+                <span className="text-white font-bold text-sm drop-shadow-[0_0_4px_rgba(0,245,255,.2)]">
+                  {user?.balance_xgen ?? 0}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-amber-400/30 font-semibold tracking-wider">📜</span>
+                <span className="text-amber-300 font-bold text-sm drop-shadow-[0_0_4px_rgba(251,191,36,.2)]">
+                  {user?.balance_fragments ?? 0}
+                </span>
+              </div>
             </div>
             <div className="text-[5px] text-cyan-400/15 leading-tight mt-1 max-w-[90px] text-right">
               *Курс валюты постоянно колеблется, но обычно не в вашу пользу
@@ -520,9 +528,9 @@ export default function ShipPage() {
 
                 {/* stats bar */}
                 <div className="flex justify-between mt-2 text-[7px] text-cyan-400/20 tracking-wider">
-                  <span>PWR 94%</span>
-                  <span>SHLD 78%</span>
-                  <span>SPD 0.42</span>
+                  <span>PWR {Math.round(mainShip?.fuel_current ?? 0)}/{Math.round(mainShip?.effective_stats?.max_fuel ?? 100)}</span>
+                  <span>SHLD {Math.round(mainShip?.effective_stats?.max_stability ?? 100)}%</span>
+                  <span>SPD {((mainShip?.effective_stats?.speed_mod ?? 1.0) + (mainShip?.effective_stats?.total_speed_bonus ?? 0)).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -613,15 +621,15 @@ active={!!a}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[7px] text-orange-400/40 font-semibold tracking-wider">УРОВЕНЬ ЧАЯ В БАКЕ</span>
-                  <button onClick={() => setFuelLabel('ERROR 418: I\'M A TEAPOT')} className="text-[8px] text-orange-400/40 font-mono hover:text-orange-300/60 transition-colors">{fuelLabel ?? `${mainShip?.fuel_current ?? 0}/${100}`}</button>
+                  <button onClick={() => setFuelLabel('ERROR 418: I\'M A TEAPOT')} className="text-[8px] text-orange-400/40 font-mono hover:text-orange-300/60 transition-colors">{fuelLabel ?? `${mainShip?.fuel_current ?? 0}/${mainShip?.effective_stats?.max_fuel ?? 100}`}</button>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-orange-500/10">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-orange-600 to-orange-400"
-                    style={{ width: `${Math.min(100, ((mainShip?.fuel_current ?? 50) / 100) * 100)}%`, boxShadow: '0 0 6px rgba(249,115,22,.3)' }}
+                    style={{ width: `${Math.min(100, ((mainShip?.fuel_current ?? 50) / (mainShip?.effective_stats?.max_fuel ?? 100)) * 100)}%`, boxShadow: '0 0 6px rgba(249,115,22,.3)' }}
                   />
                 </div>
-                {(mainShip?.fuel_current ?? 100) < 100 && (
+                {(mainShip?.fuel_current ?? 0) < (mainShip?.effective_stats?.max_fuel ?? 100) && (
                   <button
                     disabled={!isShipIdle || fuelInInventory === 0 || isLoading}
                     onClick={handleRefuel}
@@ -635,15 +643,15 @@ active={!!a}
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[7px] text-green-400/40 font-semibold tracking-wider">УРОВЕНЬ ОПТИМИЗМА</span>
-                  <span className="text-[8px] text-green-400/40 font-mono">{Math.round(mainShip?.stability ?? 100)}%</span>
+                  <span className="text-[8px] text-green-400/40 font-mono">{Math.round(mainShip?.stability ?? 100)}/{Math.round(mainShip?.effective_stats?.max_stability ?? 100)}</span>
                 </div>
                 <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-green-500/10">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-green-600 to-green-400"
-                    style={{ width: `${Math.min(100, mainShip?.stability ?? 85)}%`, boxShadow: '0 0 6px rgba(34,197,94,.3)' }}
+                    style={{ width: `${Math.min(100, ((mainShip?.stability ?? 85) / (mainShip?.effective_stats?.max_stability ?? 100)) * 100)}%`, boxShadow: '0 0 6px rgba(34,197,94,.3)' }}
                   />
                 </div>
-                {(mainShip?.stability ?? 100) < 100 && (
+                {(mainShip?.stability ?? 0) < (mainShip?.effective_stats?.max_stability ?? 100) && (
                   <button
                     disabled={!isShipIdle || repairInInventory === 0 || isLoading}
                     onClick={handleRepair}

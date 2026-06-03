@@ -12,6 +12,7 @@ from app.core.dependencies import (
     get_db,
 )
 from app.models.expedition import Expedition
+from app.services.artifact_resolver import resolve_effective_stats
 from app.services.content_loader import ContentLoader
 from app.services.expedition_logic import calculate_damage, calculate_loot, calculate_zone_stats
 from app.services.progression import grant_xp
@@ -110,12 +111,17 @@ async def start_expedition(
     ship_config = content.get_ship(ship["ship_config_id"]) or {}
     ship_speed_mod = (ship_config.get("stats") or {}).get("speed_mod", 1.0)
 
-    # Resolve artifact bonuses from equipped artifacts
-    artifacts = []
-    for a_id in ship.get("equipped_artifacts", []):
-        a = content.get_artifact(a_id)
-        if a and "stats_modifiers" in a:
-            artifacts.append(a["stats_modifiers"])
+    resolved = resolve_effective_stats(
+        ship_config,
+        ship.get("equipped_artifacts", []),
+        content,
+    )
+    eff = resolved["effective_stats"]
+    artifacts = [{
+        "speed_mod": eff["total_speed_bonus"],
+        "stability_bonus": eff["total_stability_bonus"],
+        "fuel_efficiency": eff["total_fuel_efficiency"],
+    }] if (eff["total_speed_bonus"] or eff["total_stability_bonus"] or eff["total_fuel_efficiency"]) else []
 
     stats = calculate_zone_stats(
         zone_config=zone_config,

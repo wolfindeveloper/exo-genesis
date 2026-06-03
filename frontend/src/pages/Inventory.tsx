@@ -206,11 +206,16 @@ export function Inventory() {
 
   const hasItems = sections.length > 0
 
+  const user = useGameStore((s) => s.user)
+
   return (
     <div className="p-4 pb-28">
       <motion.header className="mb-4" variants={fadeIn} initial="hidden" animate="visible">
         <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-green">Инвентарь</h1>
         <p className="text-xs text-slate-500 mt-1">{totalUnique} предметов · {totalItems} ед.</p>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-[10px] text-amber-400/70 font-mono">📜 Фрагментов бреда: <strong className="text-amber-300">{user?.balance_fragments ?? 0}</strong></span>
+        </div>
       </motion.header>
 
       <motion.div variants={fadeIn} initial="hidden" animate="visible" className="flex gap-2 mb-3 overflow-x-auto pb-1">

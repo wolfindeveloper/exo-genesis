@@ -130,6 +130,9 @@ export function HudBar() {
       <span className="text-[11px] text-neon-cyan font-mono tabular-nums shrink-0">
         🔷{xgenCount}
       </span>
+      <span className="text-[11px] text-amber-400/80 font-mono tabular-nums shrink-0">
+        📜{user?.balance_fragments ?? 0}
+      </span>
     </motion.header>
   )
 }

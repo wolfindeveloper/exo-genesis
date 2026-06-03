@@ -244,16 +244,16 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 * `POST /auth/validate`: Validate Telegram InitData, return/create user profile.
 
 ### User Profile
-* `GET /user/profile`: Get stats, balances, level.
+* `GET /user/profile`: Get stats, balances, level, streak info. Returns `daily_reward`, `streak_broken`, `daily_reward_items` on first login of the day. Auto-tracks streak (increments if yesterday, resets if older).
 * `PATCH /user/profile`: Update username or add XGEN (`{ username?, add_xgen? }`).
 * `GET /user/inventory`: List items (resources, artifacts, fragments).
 * `GET /user/ships`: Get single ship with status + equipped slots.
 
 ### Gameplay
 * `POST /expeditions/start`: Body `{ zone_id }` (single ship implied).
-* `POST /expeditions/claim`: Body `{ expedition_id }`.
-* `POST /user/ships/{id}/refuel`: Refuel ship (single-tier fuel, restore_per_unit=10).
-* `POST /user/ships/{id}/repair`: Repair ship stability (single-tier repair, restore_per_unit=10).
+* `POST /expeditions/claim`: Body `{ expedition_id }`. Returns `xp_gained`, `level`, `leveled_up` in addition to loot.
+* `POST /user/ships/{id}/refuel`: Refuel ship (single-tier fuel, restore_per_unit=10, uses `min(inventory, needed)` — partial OK).
+* `POST /user/ships/{id}/repair`: Repair ship stability (single-tier repair, restore_per_unit=10, partial OK).
 * `POST /user/ships/{id}/equip`: Body `{ slot_index, artifact_id }` — equip artifact to slot.
 * `POST /user/ships/{id}/unequip`: Body `{ slot_index }` — unequip artifact from slot.
 
@@ -363,7 +363,28 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 ### Phase 4 — Cleanup ✅
 - [x] Remove elements.json, old ships.json
 - [x] Remove Lab components, experiment_log table, recipe_generator.py, system.py
-- [x] Remove recipe_generator.py, experiment_log, lab router
 - [x] Simplify Zustand store (remove experiment, lastExperiment, elementsContent)
 - [x] Clean frontend types (remove Element, ExperimentResult, LabAttempts)
 - [x] Update tests (boxes integrity — artifact drops instead of elements)
+- [x] **Remove dead components:** ShipCard.tsx, ShipDetailModal.tsx, Hangar.tsx (fully replaced by ShipPage)
+- [x] HudBar — fix `/hangar` → `/`
+
+### Phase 5 — Progression & Polish ✅
+- [x] **Refuel/Repair buttons** on ShipPage: «☕ ЗАПРАВКА ЧАЕМ» + «✨ ДОБАВИТЬ ОПТИМИЗМА», partial resource consumption
+- [x] **Artifact stats in ZoneModal:** `artifactBonuses` resolved from `mainShip.equipped_artifacts` → passed as 7th arg to `calculateZoneStats`
+- [x] **Progression system** (`backend/app/services/progression.py`):
+  - `check_streak()` — daily streak tracking on login, reset on miss, rewards fragments (`min(streak, 30)`)
+  - `grant_xp()` — increment XP, auto level-up at `level * 100` threshold with remainder carry
+- [x] **XP grant on expedition claim:** `xp_reward = zone_tier * 25`
+- [x] **Box opener XP fix:** overwrite → increment via `grant_xp()`
+- [x] **Profile page:** daily reward notification banner (🔥 streak / 🔄 broken)
+- [x] **Store:** `loadProfile()` after `claimExpedition` (XP/level reflected immediately)
+
+### Phase 6 — Artifact Stats Applied to Ship ✅
+- [x] `artifact_resolver.py` — new service `resolve_effective_stats()` aggregates all equipped artifact modifiers and converts to `effective_stats` (`max_stability`, `max_fuel`, `speed_mod`, total bonuses)
+- [x] **GET /user/ships** — returns `resolved_artifacts` (full artifact objects) + `effective_stats`
+- [x] **refuel/repair** — use `effective_stats.max_fuel` / `max_stability` instead of hardcoded 100
+- [x] **equip/unequip** — return enriched ship with `effective_stats`
+- [x] **ShipPage.tsx** — fuel/stability bars display `current / effective_max`, PWR/SHLD/SPD reflect real stats
+- [x] **ZoneModal.tsx** — reads `effective_stats` from API response instead of local artifact resolution
+- [x] **expeditions/start** — uses `artifact_resolver` instead of manual artifact iteration

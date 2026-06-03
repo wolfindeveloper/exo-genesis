@@ -7,6 +7,7 @@ from supabase import Client
 from app.core.dependencies import get_content_loader, get_current_user_id, get_db, get_init_data_payload
 from app.models.user import UserProfile
 from app.services.box_opener import open_box
+from app.services.artifact_resolver import resolve_effective_stats
 from app.services.content_loader import ContentLoader
 from app.services.progression import check_streak
 
@@ -105,6 +106,7 @@ async def get_inventory(
 async def get_ships(
     user_id: str = Depends(get_current_user_id),
     db: Client = Depends(get_db),
+    content: ContentLoader = Depends(get_content_loader),
 ):
     result = (
         db.table("user_ships")
@@ -113,7 +115,19 @@ async def get_ships(
         .order("acquired_at")
         .execute()
     )
-    return result.data or []
+    ships = result.data or []
+    enriched = []
+    for ship in ships:
+        ship_config = content.get_ship(ship["ship_config_id"]) or {}
+        resolved = resolve_effective_stats(
+            ship_config,
+            ship.get("equipped_artifacts", []),
+            content,
+        )
+        ship["resolved_artifacts"] = resolved["resolved_artifacts"]
+        ship["effective_stats"] = resolved["effective_stats"]
+        enriched.append(ship)
+    return enriched
 
 
 class UserStats(BaseModel):

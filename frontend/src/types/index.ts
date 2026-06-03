@@ -1,3 +1,12 @@
+export interface EffectiveStats {
+  max_stability: number
+  max_fuel: number
+  speed_mod: number
+  total_stability_bonus: number
+  total_speed_bonus: number
+  total_fuel_efficiency: number
+}
+
 export interface Ship {
   id: string
   user_id: string
@@ -7,6 +16,8 @@ export interface Ship {
   fuel_current: number
   equipped_artifacts: string[]
   acquired_at: string
+  resolved_artifacts?: (Artifact | null)[]
+  effective_stats?: EffectiveStats
 }
 
 export interface ShipConfig {

@@ -75,13 +75,17 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
 
   const mainShip = ships[0] ?? null
   const shipConfig = mainShip ? shipConfigLookup.get(mainShip.ship_config_id) : null
+  const eff = mainShip?.effective_stats
   const speedMod = shipConfig?.stats?.speed_mod ?? 1.0
 
   const artifactBonuses = useMemo(() => {
-    return (mainShip?.equipped_artifacts ?? [])
-      .map((id) => artifactsContent.find((a) => a.id === id)?.stats_modifiers)
-      .filter((m): m is Record<string, number> => m != null)
-  }, [mainShip?.equipped_artifacts, artifactsContent])
+    if (!eff) return []
+    const mods: Record<string, number> = {}
+    if (eff.total_speed_bonus) mods.speed_mod = eff.total_speed_bonus
+    if (eff.total_stability_bonus) mods.stability_bonus = eff.total_stability_bonus
+    if (eff.total_fuel_efficiency) mods.fuel_efficiency = eff.total_fuel_efficiency
+    return Object.keys(mods).length > 0 ? [mods] : []
+  }, [eff])
 
   const calcedStats = useMemo(() => {
     if (!mainShip) return null
