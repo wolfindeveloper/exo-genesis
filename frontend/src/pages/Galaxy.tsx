@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { ZoneCard } from '../components/ZoneCard'
@@ -13,8 +13,14 @@ const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 
 
 export function Galaxy() {
   const { zonesContent: zones, startExpedition, isLoading } = useGameStore()
+  const ships = useGameStore((s) => s.ships)
+  const loadShips = useGameStore((s) => s.loadShips)
   const [tierFilter, setTierFilter] = useState(1)
   const [zoneModal, setZoneModal] = useState<Zone | null>(null)
+
+  useEffect(() => {
+    if (ships.length === 0) loadShips()
+  }, [])
 
   const maxTier = Math.max(...zones.map((z) => z.tier), 1)
   const filteredZones = zones.filter((z) => z.tier === tierFilter)

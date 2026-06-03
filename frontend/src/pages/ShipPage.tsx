@@ -620,43 +620,45 @@ active={!!a}
         </div>
 
         {/* ═══ expedition status / launch ═══ */}
-        <div className="w-full max-w-[280px] mt-2 bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
-          {activeExp ? (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[7px] text-cyan-400/40 font-semibold tracking-wider">ЭКСПЕДИЦИЯ</span>
-                <span className="text-[7px] text-cyan-400/30">{activeZoneName}</span>
-              </div>
-              {expTimer && !expTimer.isComplete ? (
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[8px] text-cyan-400/50 font-mono">🚀 {expTimer.display}</span>
-                  </div>
-                  <div className="h-1.5 bg-black/40 rounded-full overflow-hidden border border-cyan-500/10">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
-                      style={{ width: `${expTimer.pct}%`, boxShadow: '0 0 6px rgba(0,245,255,.3)' }}
-                    />
-                  </div>
+        <div className="flex justify-center w-full mt-2">
+          <div className="w-full max-w-[280px] bg-white/5 backdrop-blur-[12px] rounded-xl border border-cyan-500/15 p-3 shadow-[0_0_20px_rgba(0,245,255,.04)]">
+            {activeExp ? (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[7px] text-cyan-400/40 font-semibold tracking-wider">ЭКСПЕДИЦИЯ</span>
+                  <span className="text-[7px] text-cyan-400/30">{activeZoneName}</span>
                 </div>
-              ) : (
-                <button
-                  disabled={isLoading}
-                  onClick={handleClaimExpedition}
-                  className="w-full py-2 rounded-lg bg-gradient-to-r from-green-600/80 to-green-400/80 text-[9px] font-bold tracking-wider text-white/90 active:scale-[0.97] transition-all disabled:opacity-40"
-                >
-                  {isLoading ? 'ЗАБИРАЮ...' : '🎁 ЗАБРАТЬ НАГРАДУ'}
-                </button>
-              )}
-            </div>
-          ) : (
-            <button
-              onClick={() => navigate('/galaxy')}
-              className="w-full py-2 rounded-lg bg-gradient-to-r from-neon-cyan/80 to-neon-purple/80 text-[9px] font-bold tracking-wider text-white/90 active:scale-[0.97] transition-all hover:from-neon-cyan hover:to-neon-purple"
-            >
-              🚀 ЗАПУСК ЭКСПЕДИЦИИ
-            </button>
-          )}
+                {expTimer && !expTimer.isComplete ? (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[8px] text-cyan-400/50 font-mono">🚀 {expTimer.display}</span>
+                    </div>
+                    <div className="h-1.5 bg-black/40 rounded-full overflow-hidden border border-cyan-500/10">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400"
+                        style={{ width: `${expTimer.pct}%`, boxShadow: '0 0 6px rgba(0,245,255,.3)' }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    disabled={isLoading}
+                    onClick={handleClaimExpedition}
+                    className="w-full py-2 rounded-lg bg-gradient-to-r from-green-600/80 to-green-400/80 text-[9px] font-bold tracking-wider text-white/90 text-center active:scale-[0.97] transition-all disabled:opacity-40"
+                  >
+                    {isLoading ? 'ЗАБИРАЮ...' : '🎁 ЗАБРАТЬ НАГРАДУ'}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/galaxy')}
+                className="w-full py-2 rounded-lg bg-gradient-to-r from-neon-cyan/80 to-neon-purple/80 text-[9px] font-bold tracking-wider text-white/90 text-center active:scale-[0.97] transition-all hover:from-neon-cyan hover:to-neon-purple"
+              >
+                🚀 ЗАПУСК ЭКСПЕДИЦИИ
+              </button>
+            )}
+          </div>
         </div>
 
         {/* ═══ console panel ═══ */}
