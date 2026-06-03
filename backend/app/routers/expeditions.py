@@ -106,9 +106,8 @@ async def start_expedition(
     if ship["status"] != "idle":
         raise HTTPException(status_code=400, detail="Ship is not idle")
 
-    ship_config = content.get_ship(ship["ship_config_id"])
-    if not ship_config:
-        raise HTTPException(status_code=404, detail="Ship config not found")
+    ship_config = content.get_ship(ship["ship_config_id"]) or {}
+    ship_speed_mod = (ship_config.get("stats") or {}).get("speed_mod", 1.0)
 
     # Resolve artifact bonuses from equipped artifacts
     artifacts = []
@@ -120,7 +119,7 @@ async def start_expedition(
     stats = calculate_zone_stats(
         zone_config=zone_config,
         ship_stability=ship["stability"],
-        ship_speed_mod=ship_config["stats"]["speed_mod"],
+        ship_speed_mod=ship_speed_mod,
         ship_fuel_current=ship["fuel_current"],
         artifact_bonuses=artifacts,
     )
