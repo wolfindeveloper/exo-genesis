@@ -34,7 +34,7 @@ interface GameState {
   loadShips: () => Promise<void>
   loadInventory: () => Promise<void>
   loadActiveExpeditions: () => Promise<void>
-  startExpedition: (shipId: string, zoneId: string) => Promise<void>
+  startExpedition: (zoneId: string) => Promise<void>
   claimExpedition: (expeditionId: string, shipName?: string) => Promise<void>
   refuelShip: (shipId: string, resourceId: string) => Promise<void>
   repairShip: (shipId: string, resourceId: string) => Promise<void>
