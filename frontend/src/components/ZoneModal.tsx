@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { calculateZoneStats } from '../lib/expeditionCalc'
@@ -53,8 +53,13 @@ interface ZoneModalProps {
 
 export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps) {
   const { ships, shipsContent, resourcesContent, artifactsContent } = useGameStore()
+  const loadShips = useGameStore((s) => s.loadShips)
   const [confirming, setConfirming] = useState(false)
   const [imgError, setImgError] = useState(false)
+
+  useEffect(() => {
+    if (ships.length === 0) loadShips()
+  }, [])
 
   const shipConfigLookup = useMemo(() => new Map(shipsContent.map((s) => [s.id, s])), [shipsContent])
   const lootNames = useMemo(() => {
@@ -70,18 +75,19 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
 
   const mainShip = ships[0] ?? null
   const shipConfig = mainShip ? shipConfigLookup.get(mainShip.ship_config_id) : null
+  const speedMod = shipConfig?.stats?.speed_mod ?? 1.0
 
   const calcedStats = useMemo(() => {
-    if (!mainShip || !shipConfig) return null
+    if (!mainShip) return null
     return calculateZoneStats(
       zone.risk_factor,
       zone.fuel_cost,
       zone.duration_hours,
       mainShip.stability,
-      shipConfig.stats.speed_mod,
+      speedMod,
       mainShip.fuel_current,
     )
-  }, [mainShip, shipConfig, zone])
+  }, [mainShip, speedMod, zone])
 
   const canLaunch = mainShip && mainShip.status === 'idle' && calcedStats?.fuelOk
 
