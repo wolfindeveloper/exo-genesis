@@ -33,14 +33,12 @@ function findRank(level: number, ranks: Rank[]): Rank | null {
 }
 
 function computeAchievements(stats: {
-  discoveries_made: number; artifacts_crafted: number; total_expeditions: number; joined_days: number; total_elements: number
+  artifacts_crafted: number; total_expeditions: number; joined_days: number
 }) {
   return [
-    { id: 'discoverer', icon: '🏆', label: 'Первооткрыватель', earned: stats.discoveries_made > 0, desc: 'Сделайте первое открытие' },
     { id: 'engineer', icon: '🔧', label: 'Инженер', earned: stats.artifacts_crafted > 0, desc: 'Создайте первый артефакт' },
     { id: 'explorer', icon: '🚀', label: 'Исследователь', earned: stats.total_expeditions >= 10, desc: 'Проведите 10 экспедиций' },
     { id: 'veteran', icon: '⭐', label: 'Ветеран', earned: stats.joined_days > 30, desc: 'Проведите 30 дней в проекте' },
-    { id: 'collector', icon: '🧪', label: 'Собиратель', earned: stats.total_elements >= 25, desc: 'Соберите 25 элементов' },
   ]
 }
 
@@ -67,7 +65,7 @@ export function Profile() {
   const failRate = totalExps > 0 ? 100 - successRate : 0
 
   const achievements = useMemo(() => computeAchievements(stats || {
-    discoveries_made: 0, artifacts_crafted: 0, total_expeditions: 0, joined_days: 0, total_elements: 0,
+    artifacts_crafted: 0, total_expeditions: 0, joined_days: 0,
   }), [stats])
 
   const levelXpCount = useCountUp(xp, 1200)
@@ -78,8 +76,6 @@ export function Profile() {
   const expeditionsCount = useCountUp(stats?.total_expeditions ?? 0, 1000)
   const completedCount = useCountUp(stats?.completed_expeditions ?? 0, 1000)
   const artifactsCount = useCountUp(stats?.artifacts_crafted ?? 0, 1000)
-  const discoveriesCount = useCountUp(stats?.discoveries_made ?? 0, 1000)
-  const elementsCount = useCountUp(stats?.total_elements ?? 0, 1000)
 
   useEffect(() => {
     loadProfile()
@@ -344,8 +340,6 @@ export function Profile() {
         <StatCard label="Экспедиций" value={expeditionsCount} icon="🚀" />
         <StatCard label="Завершено" value={completedCount} icon="✅" />
         <StatCard label="Артефактов" value={artifactsCount} icon="✨" />
-        <StatCard label="Открытий" value={discoveriesCount} icon="🏆" />
-        <StatCard label="Элементов" value={elementsCount} icon="🧪" />
         <motion.div variants={fadeIn} className="col-span-2 glass-card p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-base">📅</span>

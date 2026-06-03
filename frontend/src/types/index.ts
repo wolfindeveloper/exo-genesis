@@ -106,8 +106,6 @@ export interface UserStats {
   completed_expeditions: number
   failed_expeditions: number
   artifacts_crafted: number
-  discoveries_made: number
-  total_elements: number
   joined_days: number
 }
 
