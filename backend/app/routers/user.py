@@ -8,6 +8,7 @@ from app.core.dependencies import get_content_loader, get_current_user_id, get_d
 from app.models.user import UserProfile
 from app.services.box_opener import open_box
 from app.services.content_loader import ContentLoader
+from app.services.progression import check_streak
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -15,6 +16,9 @@ router = APIRouter(prefix="/user", tags=["user"])
 class ProfileResponse(UserProfile):
     is_new: bool = False
     box_rewards: dict | None = None
+    streak_broken: bool | None = None
+    daily_reward: bool | None = None
+    daily_reward_items: dict | None = None
 
 
 class ProfileUpdate(BaseModel):
@@ -34,11 +38,13 @@ async def get_profile(
 
     result = db.table("users").select("*").eq("id", user_id).execute()
     if result.data:
+        streak_info = check_streak(user_id, db)
         db.table("users").update({
             "last_login": now,
             "username": tg_user.get("username", result.data[0].get("username", "")),
         }).eq("id", user_id).execute()
-        return ProfileResponse(**result.data[0], is_new=False)
+        profile = db.table("users").select("*").eq("id", user_id).execute().data[0]
+        return ProfileResponse(**profile, is_new=False, **streak_info)
 
     new_user = {
         "id": user_id,

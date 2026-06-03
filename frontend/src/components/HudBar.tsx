@@ -50,7 +50,7 @@ export function HudBar() {
   }, [navigate])
 
   const handleClaimsClick = useCallback(() => {
-    navigate('/hangar')
+    navigate('/')
   }, [navigate])
 
   if (!user) return null

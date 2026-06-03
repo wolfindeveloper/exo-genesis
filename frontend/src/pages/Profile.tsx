@@ -100,6 +100,8 @@ export function Profile() {
     setTimeout(() => inputRef.current?.focus(), 0)
   }, [user, first])
 
+  const [showReward, setShowReward] = useState(true)
+
   if (!user) return <div className="p-4 pb-28 space-y-4">{Array.from({ length: 4 }, (_, i) => <div key={i} className="shimmer rounded-xl h-24" />)}</div>
 
   const ringRadius = 36
@@ -111,6 +113,35 @@ export function Profile() {
       <motion.header className="mb-6" variants={fadeIn} initial="hidden" animate="visible">
         <h1 className="font-display text-lg uppercase tracking-[0.2em] text-neon-cyan">Профиль</h1>
       </motion.header>
+
+      {/* Daily reward notification */}
+      {showReward && user.daily_reward && (
+        <motion.div
+          className="glass-card p-3 mb-4 flex items-center gap-3 border-neon-amber/20"
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          <div className="w-10 h-10 rounded-full bg-neon-amber/20 flex items-center justify-center text-lg shrink-0">
+            {user.streak_broken ? '🔄' : '🔥'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-display text-neon-amber uppercase tracking-wider">
+              {user.streak_broken ? 'Стрик сброшен' : 'Ежедневная награда!'}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              Дней подряд: {user.streak_days}
+              {user.daily_reward_items && ` · +${user.daily_reward_items.fragments ?? 0} Фрагментов бреда`}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowReward(false)}
+            className="text-slate-600 hover:text-slate-300 text-xs shrink-0"
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
 
       {/* Hero — avatar + level ring + rank */}
       <motion.div

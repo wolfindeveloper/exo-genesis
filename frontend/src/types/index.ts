@@ -48,6 +48,9 @@ export interface UserProfile {
   level: number
   xp: number
   streak_days: number
+  streak_broken?: boolean
+  daily_reward?: boolean
+  daily_reward_items?: Record<string, number>
 }
 
 export interface InventoryItem {
@@ -111,6 +114,9 @@ export interface ClaimResult {
   status: string
   loot: LootItem[]
   ship_stability: number
+  xp_gained?: number
+  level?: number
+  leveled_up?: boolean
 }
 
 export interface Rank {

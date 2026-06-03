@@ -14,6 +14,7 @@ from app.core.dependencies import (
 from app.models.expedition import Expedition
 from app.services.content_loader import ContentLoader
 from app.services.expedition_logic import calculate_damage, calculate_loot, calculate_zone_stats
+from app.services.progression import grant_xp
 from app.services.telegram import notify_expedition_complete
 
 router = APIRouter(prefix="/expeditions", tags=["expeditions"])
@@ -239,13 +240,20 @@ async def claim_expedition(
                     "metadata": {},
                 }).execute()
 
+    zone_tier = zone_config.get("tier", 1)
+    xp_reward = zone_tier * 25
+    xp_result = grant_xp(user_id, xp_reward, db)
+
     db.table("expeditions").update({
         "status": "completed",
-        "result_data": {"loot": loot, "stability_damage": ship["stability"] - new_stability},
+        "result_data": {"loot": loot, "stability_damage": ship["stability"] - new_stability, "xp_gained": xp_reward},
     }).eq("id", body.expedition_id).execute()
 
     return {
         "status": "completed",
         "loot": loot,
         "ship_stability": new_stability,
+        "xp_gained": xp_reward,
+        "level": xp_result["level"],
+        "leveled_up": xp_result["leveled_up"],
     }

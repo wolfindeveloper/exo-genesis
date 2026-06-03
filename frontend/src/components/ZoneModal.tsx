@@ -77,6 +77,12 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
   const shipConfig = mainShip ? shipConfigLookup.get(mainShip.ship_config_id) : null
   const speedMod = shipConfig?.stats?.speed_mod ?? 1.0
 
+  const artifactBonuses = useMemo(() => {
+    return (mainShip?.equipped_artifacts ?? [])
+      .map((id) => artifactsContent.find((a) => a.id === id)?.stats_modifiers)
+      .filter((m): m is Record<string, number> => m != null)
+  }, [mainShip?.equipped_artifacts, artifactsContent])
+
   const calcedStats = useMemo(() => {
     if (!mainShip) return null
     return calculateZoneStats(
@@ -86,8 +92,9 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
       mainShip.stability,
       speedMod,
       mainShip.fuel_current,
+      artifactBonuses,
     )
-  }, [mainShip, speedMod, zone])
+  }, [mainShip, speedMod, zone, artifactBonuses])
 
   const canLaunch = mainShip && mainShip.status === 'idle' && calcedStats?.fuelOk
 

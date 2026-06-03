@@ -9,6 +9,7 @@ from app.models.user import UserProfile
 from app.services.auth import _validate_init_data
 from app.services.box_opener import open_box
 from app.services.content_loader import ContentLoader
+from app.services.progression import check_streak
 from app.services.supabase import get_supabase
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -35,12 +36,12 @@ async def validate_auth(
     existing = supabase.table("users").select("*").eq("id", user_id).execute()
 
     if existing.data:
+        check_streak(user_id, supabase)
         supabase.table("users").update({
             "last_login": datetime.now(timezone.utc).isoformat(),
             "username": tg_user.get("username", ""),
         }).eq("id", user_id).execute()
-        row = existing.data[0]
-        row["last_login"] = datetime.now(timezone.utc).isoformat()
+        row = supabase.table("users").select("*").eq("id", user_id).execute().data[0]
         return AuthResponse(**row, is_new=False)
 
     now = datetime.now(timezone.utc).isoformat()

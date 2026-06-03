@@ -222,7 +222,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         lastLoot: { shipName: shipName || 'Корабль', loot: result.loot, shipStability: result.ship_stability },
         isLoading: false,
       })
-      await Promise.all([get().loadShips(), get().loadInventory()])
+      await Promise.all([get().loadShips(), get().loadInventory(), get().loadProfile()])
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
     }

@@ -45,9 +45,12 @@ def _apply_reward(
 ) -> None:
     now = datetime.now(timezone.utc).isoformat()
     match item["type"]:
-        case "xgen" | "stars" | "xp":
-            col = f"balance_{item['type']}" if item["type"] != "xp" else "xp"
+        case "xgen" | "stars":
+            col = f"balance_{item['type']}"
             supabase.table("users").update({col: quantity}).eq("id", user_id).execute()
+        case "xp":
+            from app.services.progression import grant_xp
+            grant_xp(user_id, quantity, supabase)
         case "ship":
             existing = supabase.table("user_ships").select("id").eq("user_id", user_id).execute()
             if existing.data:
