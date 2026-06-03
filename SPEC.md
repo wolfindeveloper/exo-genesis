@@ -348,11 +348,17 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 - [x] Fragment loot in all zones (weighted, scales by tier)
 - [x] Remove Lab, elements.json, recipe_generator, system.py, lab models, experiment_log
 
-### Phase 3 — Expedition Refactor
-- [ ] Single active expedition per user
-- [ ] Fragment loot in zones (replace element drops)
-- [ ] Artifact drops with chance in zones
-- [ ] Simplified expedition logic (no tier matching)
+### Phase 3 — Expedition Refactor ✅
+- [x] Single active expedition per user — backend checks for existing active expedition before allowing start
+- [x] Fragment loot in zones — all 25 zones have fragments in loot_table
+- [x] Artifact drops with chance in zones — T1 artifacts in random drops from boxes
+- [x] Simplified expedition logic — `POST /expeditions/start` no longer requires `ship_id`, auto-selects user's first ship
+- [x] Ship config fallback — if `ship_config_id` not found in content, uses `speed_mod: 1.0` default instead of 404
+- [x] Launch button on ShipPage — navigates to /galaxy for zone selection
+- [x] Expedition status on ShipPage — timer with progress bar during flight, claim button when complete
+- [x] ZoneModal simplified — removed ship picker, auto-uses main ship, calcStats with fallback
+- [x] `resources.json` — added `fragments` entry with `name_key: "Фрагменты бреда"` for proper display in zones/inventory
+- [x] `/hangar` route removed — ShipPage is the only cockpit view
 
 ### Phase 4 — Cleanup ✅
 - [x] Remove elements.json, old ships.json

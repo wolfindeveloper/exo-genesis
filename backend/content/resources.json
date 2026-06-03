@@ -14,5 +14,13 @@
     "tier": 1,
     "resource_type": "repair_kit",
     "icon_path": "/assets/resources/repair_kit.svg"
+  },
+  {
+    "id": "fragments",
+    "name_key": "Фрагменты бреда",
+    "description_key": "Обрывки информации, которые ваш корабль собрал во время экспедиции. Используются для исследования Гайда.",
+    "tier": 1,
+    "resource_type": "fragment",
+    "icon_path": "/assets/resources/fragments.svg"
   }
 ]
