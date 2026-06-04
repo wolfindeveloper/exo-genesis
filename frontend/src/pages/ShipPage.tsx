@@ -586,14 +586,16 @@ active={!!a}
           {stickerVisible && (
           <div
             className="absolute right-2 bottom-16 z-30 cursor-pointer select-none group animate-fade-in"
-            onClick={() => {
+            onClick={async () => {
               const next = Math.min(stickerIdx + 1, STICKER_FINAL)
               setStickerIdx(next)
               localStorage.setItem(`${EGGS_LS}/state`, String(next))
               if (next === STICKER_FINAL && user && stickerIdx < STICKER_FINAL) {
-                useGameStore.setState({ error: null })
-                setUser({ ...user, balance_xgen: user.balance_xgen + 1 })
-                api.updateProfile({ add_xgen: 1 }).catch(() => {})
+                try {
+                  const updated = await api.updateProfile({ add_xgen: 1 })
+                  setUser(updated)
+                  useGameStore.setState({ error: null })
+                } catch { /* ignore */ }
                 clearSpawnSchedule()
                 setStickerVisible(false)
               }
