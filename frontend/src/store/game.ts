@@ -137,6 +137,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   loadShips: async () => {
     try {
+      set({ error: null })
       const ships = await api.getShips()
       set({ ships })
     } catch (e) {
@@ -146,6 +147,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   loadInventory: async () => {
     try {
+      set({ error: null })
       const inventory = await api.getInventory()
       set({ inventory })
     } catch (e) {

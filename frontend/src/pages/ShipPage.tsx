@@ -591,8 +591,9 @@ active={!!a}
               setStickerIdx(next)
               localStorage.setItem(`${EGGS_LS}/state`, String(next))
               if (next === STICKER_FINAL && user && stickerIdx < STICKER_FINAL) {
+                useGameStore.setState({ error: null })
                 setUser({ ...user, balance_xgen: user.balance_xgen + 1 })
-                api.updateProfile({ add_xgen: 1 }).then(() => useGameStore.setState({ error: null }))
+                api.updateProfile({ add_xgen: 1 }).catch(() => {})
                 clearSpawnSchedule()
                 setStickerVisible(false)
               }
