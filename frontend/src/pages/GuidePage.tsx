@@ -32,8 +32,10 @@ export default function GuidePage() {
     try {
       const data = await api.getGuideChapter(chapterId)
       setSelectedChapter(data)
+      return data
     } catch (e) {
       setMsg((e as Error).message)
+      return null
     }
   }
 
@@ -41,8 +43,10 @@ export default function GuidePage() {
     if (!selectedChapter) return
     try {
       await researchEntry(selectedChapter.id, entry.id)
+      const data = await loadChapterDetail(selectedChapter.id)
+      const updated = data?.entries.find((e) => e.id === entry.id)
+      if (updated) setOpenedEntry(updated)
       setMsg(`«${entry.title}» — исследовано`)
-      await loadChapterDetail(selectedChapter.id)
     } catch (e) {
       setMsg((e as Error).message)
     }
@@ -52,7 +56,9 @@ export default function GuidePage() {
     if (!selectedChapter) return
     try {
       await fixGlitch(selectedChapter.id, entry.id)
-      await loadChapterDetail(selectedChapter.id)
+      const data = await loadChapterDetail(selectedChapter.id)
+      const updated = data?.entries.find((e) => e.id === entry.id)
+      if (updated) setOpenedEntry(updated)
       setMsg('Глюк исправлен')
     } catch (e) {
       setMsg((e as Error).message)
