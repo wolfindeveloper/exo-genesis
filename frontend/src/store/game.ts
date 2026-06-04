@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Artifact, Expedition, GuideChapterSummary, InventoryItem, LootItem, LootResult, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Artifact, Expedition, GuideChapterSummary, GuideClaimRewardResponse, InventoryItem, LootResult, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -48,7 +48,7 @@ interface GameState {
   loadGuideChapters: () => Promise<void>
   researchEntry: (chapterId: string, entryId: string) => Promise<void>
   fixGlitch: (chapterId: string, entryId: string) => Promise<void>
-  claimGuideReward: (chapterId: string) => Promise<void>
+  claimGuideReward: (chapterId: string) => Promise<GuideClaimRewardResponse | undefined>
 }
 
 export const useGameStore = create<GameState>((set, get) => ({

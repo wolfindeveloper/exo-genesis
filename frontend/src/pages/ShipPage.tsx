@@ -5,7 +5,7 @@ import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
 import SlotSelectModal from '../components/SlotSelectModal'
 import { useExpeditionTimer } from '../hooks/useTimer'
-import { getNextLevelXp, getXpProgress } from '../lib/xp'
+import { getXpProgress } from '../lib/xp'
 import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import type { Artifact } from '../types'
 import { api } from '../api/client'
@@ -78,7 +78,6 @@ export default function ShipPage() {
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
-  const nextXp = getNextLevelXp(level)
   const xpPct = getXpProgress(xp, level)
   const navigate = useNavigate()
 

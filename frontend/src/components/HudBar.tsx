@@ -3,11 +3,10 @@ import { motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
 import { useCountUp } from '../hooks/useCountUp'
-import { getNextLevelXp, getXpProgress } from '../lib/xp'
+import { getXpProgress } from '../lib/xp'
 import { getTierForLevel, findRank } from '../lib/ranks'
 import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import { useGameStore } from '../store/game'
-import type { Rank } from '../types'
 
 const tierColors = ['#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
 
