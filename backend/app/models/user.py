@@ -15,6 +15,7 @@ class UserProfile(BaseModel):
     language_code: str | None = "en"
     balance_xgen: int = 0
     balance_stars: int = 0
+    balance_fragments: int = 0
     level: int = 1
     xp: int = 0
     streak_days: int = 0

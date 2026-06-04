@@ -75,6 +75,7 @@ async def get_profile(
         "language_code": tg_user.get("language_code", "en"),
         "balance_xgen": 10,
         "balance_stars": 0,
+        "balance_fragments": 0,
         "level": 1,
         "xp": 0,
         "streak_days": 0,
@@ -102,7 +103,7 @@ async def patch_profile(
         current = db.table("users").select("balance_xgen").eq("id", user_id).execute().data
         if not current:
             raise HTTPException(status_code=404, detail="User not found")
-        new_balance = current[0].get("balance_xgen", 0) + body.add_xgen
+        new_balance = int(current[0].get("balance_xgen", 0)) + body.add_xgen
         db.table("users").update({"balance_xgen": new_balance}).eq("id", user_id).execute()
     if updates:
         db.table("users").update(updates).eq("id", user_id).execute()
