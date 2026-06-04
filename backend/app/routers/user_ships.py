@@ -67,10 +67,12 @@ def _use_resource_on_ship(
     inv_item = _resolve_inventory(ship["user_id"], resource["id"], db)
     actual_used = min(inv_item["quantity"], units_needed)
     new_val = min(max_val, current + actual_used * restore_per_unit)
+    if field == "fuel_current":
+        new_val = int(new_val)
 
     db.table("user_ships").update({field: new_val}).eq("id", ship["id"]).execute()
     db.table("user_inventory").update({
-        "quantity": inv_item["quantity"] - actual_used,
+        "quantity": int(inv_item["quantity"] - actual_used),
     }).eq("id", inv_item["id"]).execute()
 
     return {"applied": actual_used * restore_per_unit}
