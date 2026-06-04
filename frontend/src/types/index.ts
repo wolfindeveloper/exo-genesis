@@ -128,6 +128,15 @@ export interface ClaimResult {
   leveled_up?: boolean
 }
 
+export interface LootResult {
+  shipName: string
+  loot: LootItem[]
+  shipStability: number
+  xpGained?: number
+  level?: number
+  leveledUp?: boolean
+}
+
 export interface Rank {
   level: number
   title_key: string

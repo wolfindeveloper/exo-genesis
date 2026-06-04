@@ -2,6 +2,7 @@ import base64
 import hashlib
 import hmac
 import json
+import time
 from urllib.parse import parse_qsl
 
 from cryptography.exceptions import InvalidSignature
@@ -58,6 +59,9 @@ def _validate_init_data(init_data_raw: str) -> dict:
             hashlib.sha256,
         ).hexdigest()
         if received_hash == expected_hash:
+            auth_date = int(parsed.get("auth_date", "0"))
+            if auth_date > 0 and (time.time() - auth_date) > 86400:
+                raise HTTPException(status_code=401, detail="Init data expired")
             return _build_payload(parsed, received_hash)
 
     # Second try: Ed25519 signature validation (Bot API 8.0+)
@@ -99,6 +103,9 @@ def _validate_init_data(init_data_raw: str) -> dict:
                     try:
                         verify_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
                         verify_key.verify(check_string.encode("utf-8"), sig_bytes)
+                        auth_date = int(parsed.get("auth_date", "0"))
+                        if auth_date > 0 and (time.time() - auth_date) > 86400:
+                            raise HTTPException(status_code=401, detail="Init data expired")
                         return _build_payload(parsed, received_hash or received_signature)
                     except (InvalidSignature, Exception):
                         pass

@@ -62,9 +62,10 @@ export default function GuidePage() {
   async function handleClaimReward() {
     if (!selectedChapter) return
     try {
-      await claimGuideReward(selectedChapter.id)
+      const result = await claimGuideReward(selectedChapter.id)
+      const name = result?.artifact_name ? getArtifactName(result.artifact_name) : 'артефакт'
+      setMsg(`Награда получена: ${name}!`)
       await loadChapterDetail(selectedChapter.id)
-      setMsg('Награда получена!')
     } catch (e) {
       setMsg((e as Error).message)
     }

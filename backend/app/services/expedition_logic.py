@@ -66,4 +66,4 @@ def calculate_loot(
 
 def calculate_damage(risk_factor: float, stability: float, rng: random.Random) -> float:
     damage = risk_factor * rng.uniform(5, 15)
-    return round(max(0, min(stability - damage, stability)), 1)
+    return round(max(0, stability - damage), 1)

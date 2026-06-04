@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 
 export function useCountUp(value: number, duration = 1000, disabled = false): number {
-  const [display, setDisplay] = useState(() => disabled ? value : 0)
+  const [display, setDisplay] = useState(() => (disabled ? value : 0))
   const prevValue = useRef(value)
+  const disabledRef = useRef(disabled)
 
   useEffect(() => {
-    if (disabled) return
+    disabledRef.current = disabled
+    if (disabled) {
+      prevValue.current = value
+      setDisplay(value)
+      return
+    }
     const start = prevValue.current
     const startTime = performance.now()
     let raf: number

@@ -47,7 +47,10 @@ def _apply_reward(
     match item["type"]:
         case "xgen" | "stars":
             col = f"balance_{item['type']}"
-            supabase.table("users").update({col: quantity}).eq("id", user_id).execute()
+            current = supabase.table("users").select(col).eq("id", user_id).execute()
+            if current.data:
+                new_val = current.data[0].get(col, 0) + quantity
+                supabase.table("users").update({col: new_val}).eq("id", user_id).execute()
         case "xp":
             from app.services.progression import grant_xp
             grant_xp(user_id, quantity, supabase)
@@ -83,6 +86,8 @@ def _weighted_choices(
     if not pool or count <= 0:
         return []
     total = sum(it["weight"] for it in pool)
+    if total <= 0:
+        return []
     result = []
     for _ in range(count):
         roll = rng.uniform(0, total)

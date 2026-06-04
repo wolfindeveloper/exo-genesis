@@ -43,6 +43,39 @@ def _enrich_ship(ship: dict, content: ContentLoader) -> dict:
     return ship
 
 
+RESOURCE_TYPE_MAP = {
+    "fuel": {"field": "fuel_current", "resource_type": "fuel"},
+    "repair_kit": {"field": "stability", "resource_type": "repair_kit"},
+}
+
+
+def _use_resource_on_ship(
+    ship: dict,
+    resource: dict,
+    max_val: float,
+    restore_per_unit: int,
+    db: Client,
+) -> dict:
+    field = RESOURCE_TYPE_MAP[resource["id"]]["field"]
+    current = ship[field]
+    if current >= max_val:
+        return {"applied": 0}
+
+    needed = max_val - current
+    units_needed = -(-needed // restore_per_unit)
+
+    inv_item = _resolve_inventory(ship["user_id"], resource["id"], db)
+    actual_used = min(inv_item["quantity"], units_needed)
+    new_val = min(max_val, current + actual_used * restore_per_unit)
+
+    db.table("user_ships").update({field: new_val}).eq("id", ship["id"]).execute()
+    db.table("user_inventory").update({
+        "quantity": inv_item["quantity"] - actual_used,
+    }).eq("id", inv_item["id"]).execute()
+
+    return {"applied": actual_used * restore_per_unit}
+
+
 @router.post("/{ship_id}/refuel")
 async def refuel_ship(
     ship_id: str,
@@ -56,41 +89,22 @@ async def refuel_ship(
         raise HTTPException(status_code=400, detail="Ship must be idle")
 
     resource = content.get_resource(body.resource_id)
-    if not resource:
-        raise HTTPException(status_code=404, detail="Resource not found")
-    if resource["resource_type"] != "fuel":
+    if not resource or resource.get("resource_type") != "fuel":
         raise HTTPException(status_code=400, detail="Not a fuel resource")
 
     ship_config = content.get_ship(ship["ship_config_id"]) or {}
-    resolved = resolve_effective_stats(
-        ship_config,
-        ship.get("equipped_artifacts", []),
-        content,
-    )
+    resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
     max_fuel = resolved["effective_stats"]["max_fuel"]
-    current_fuel = ship["fuel_current"]
-    if current_fuel >= max_fuel:
+
+    if ship["fuel_current"] >= max_fuel:
         raise HTTPException(status_code=400, detail="Fuel already full")
 
-    restore_per_unit = 10
-    needed = max_fuel - current_fuel
-    units_needed = -(-needed // restore_per_unit)
-
-    inv_item = _resolve_inventory(user_id, body.resource_id, db)
-    actual_used = min(inv_item["quantity"], units_needed)
-    new_fuel = min(max_fuel, current_fuel + actual_used * restore_per_unit)
-
-    db.table("user_ships").update({"fuel_current": new_fuel}).eq("id", ship_id).execute()
-    db.table("user_inventory").update({
-        "quantity": inv_item["quantity"] - actual_used,
-    }).eq("id", inv_item["id"]).execute()
+    _use_resource_on_ship(ship, resource, max_fuel, 10, db)
 
     updated_ship = _enrich_ship(
-        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0],
-        content,
+        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
     )
     updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
-
     return {"ship": updated_ship, "inventory": updated_inv}
 
 
@@ -107,41 +121,22 @@ async def repair_ship(
         raise HTTPException(status_code=400, detail="Ship must be idle")
 
     resource = content.get_resource(body.resource_id)
-    if not resource:
-        raise HTTPException(status_code=404, detail="Resource not found")
-    if resource["resource_type"] != "repair_kit":
+    if not resource or resource.get("resource_type") != "repair_kit":
         raise HTTPException(status_code=400, detail="Not a repair resource")
 
     ship_config = content.get_ship(ship["ship_config_id"]) or {}
-    resolved = resolve_effective_stats(
-        ship_config,
-        ship.get("equipped_artifacts", []),
-        content,
-    )
+    resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
     max_stability = resolved["effective_stats"]["max_stability"]
-    current_stability = ship["stability"]
-    if current_stability >= max_stability:
+
+    if ship["stability"] >= max_stability:
         raise HTTPException(status_code=400, detail="Stability already full")
 
-    restore_per_unit = 10
-    needed = max_stability - current_stability
-    units_needed = -(-needed // restore_per_unit)
-
-    inv_item = _resolve_inventory(user_id, body.resource_id, db)
-    actual_used = min(inv_item["quantity"], units_needed)
-    new_stability = min(max_stability, current_stability + actual_used * restore_per_unit)
-
-    db.table("user_ships").update({"stability": new_stability}).eq("id", ship_id).execute()
-    db.table("user_inventory").update({
-        "quantity": inv_item["quantity"] - actual_used,
-    }).eq("id", inv_item["id"]).execute()
+    _use_resource_on_ship(ship, resource, max_stability, 10, db)
 
     updated_ship = _enrich_ship(
-        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0],
-        content,
+        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
     )
     updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
-
     return {"ship": updated_ship, "inventory": updated_inv}
 
 

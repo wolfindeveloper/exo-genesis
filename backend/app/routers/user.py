@@ -1,15 +1,37 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
 from supabase import Client
 
 from app.core.dependencies import get_content_loader, get_current_user_id, get_db, get_init_data_payload
 from app.models.user import UserProfile
-from app.services.box_opener import open_box
 from app.services.artifact_resolver import resolve_effective_stats
 from app.services.content_loader import ContentLoader
 from app.services.progression import check_streak
+
+def _grant_starter_pack(user_id: str, supabase: Client, now: str) -> None:
+    existing = supabase.table("user_ships").select("id").eq("user_id", user_id).execute()
+    if not existing.data:
+        supabase.table("user_ships").insert({
+            "user_id": user_id,
+            "ship_config_id": "vega_mk2",
+            "stability": 100,
+            "acquired_at": now,
+        }).execute()
+
+    items = [
+        ("resource", "fuel", 20),
+        ("resource", "repair_kit", 5),
+    ]
+    for item_type, config_id, qty in items:
+        supabase.table("user_inventory").insert({
+            "user_id": user_id,
+            "item_type": item_type,
+            "item_config_id": config_id,
+            "quantity": qty,
+        }).execute()
+
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -24,7 +46,7 @@ class ProfileResponse(UserProfile):
 
 class ProfileUpdate(BaseModel):
     username: str | None = None
-    add_xgen: int = 0
+    add_xgen: int = Field(default=0, ge=0, le=10000)
 
 
 @router.get("/profile", response_model=ProfileResponse)
@@ -32,7 +54,6 @@ async def get_profile(
     user_id: str = Depends(get_current_user_id),
     payload: dict = Depends(get_init_data_payload),
     db: Client = Depends(get_db),
-    content: ContentLoader = Depends(get_content_loader),
 ):
     now = datetime.now(timezone.utc).isoformat()
     tg_user = payload["user"]
@@ -52,7 +73,7 @@ async def get_profile(
         "id": user_id,
         "username": tg_user.get("username", ""),
         "language_code": tg_user.get("language_code", "en"),
-        "balance_xgen": 0,
+        "balance_xgen": 10,
         "balance_stars": 0,
         "level": 1,
         "xp": 0,
@@ -64,8 +85,8 @@ async def get_profile(
     if not result.data:
         return ProfileResponse(id=user_id, is_new=True)
 
-    rewards = open_box("nothing_extra_starter_pack", user_id, db, content)
-    return ProfileResponse(**result.data[0], is_new=True, box_rewards=rewards)
+    _grant_starter_pack(user_id, db, now)
+    return ProfileResponse(**result.data[0], is_new=True)
 
 
 @router.patch("/profile", response_model=UserProfile)
@@ -79,12 +100,15 @@ async def patch_profile(
         updates["username"] = body.username
     if body.add_xgen > 0:
         current = db.table("users").select("balance_xgen").eq("id", user_id).execute().data
-        if current:
-            new_balance = current[0]["balance_xgen"] + body.add_xgen
-            db.table("users").update({"balance_xgen": new_balance}).eq("id", user_id).execute()
+        if not current:
+            raise HTTPException(status_code=404, detail="User not found")
+        new_balance = current[0].get("balance_xgen", 0) + body.add_xgen
+        db.table("users").update({"balance_xgen": new_balance}).eq("id", user_id).execute()
     if updates:
         db.table("users").update(updates).eq("id", user_id).execute()
     result = db.table("users").select("*").eq("id", user_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="User not found")
     return UserProfile(**result.data[0])
 
 

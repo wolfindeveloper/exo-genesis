@@ -3,6 +3,9 @@ import { motion } from 'motion/react'
 
 import { fadeIn, staggerContainer } from '../lib/animations'
 import { useCountUp } from '../hooks/useCountUp'
+import { getNextLevelXp, getXpProgress } from '../lib/xp'
+import { getTierForLevel, findRank } from '../lib/ranks'
+import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import { useGameStore } from '../store/game'
 import type { Rank } from '../types'
 
@@ -16,22 +19,6 @@ const tierGradients = [
 
 const tierRingColors = ['#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
 
-function getTierForLevel(level: number): number {
-  if (level >= 50) return 5
-  if (level >= 30) return 4
-  if (level >= 15) return 3
-  if (level >= 5) return 2
-  return 1
-}
-
-function findRank(level: number, ranks: Rank[]): Rank | null {
-  let best: Rank | null = null
-  for (const r of ranks) {
-    if (level >= r.level) best = r
-  }
-  return best
-}
-
 function computeAchievements(stats: {
   artifacts_crafted: number; total_expeditions: number; joined_days: number
 }) {
@@ -43,19 +30,23 @@ function computeAchievements(stats: {
 }
 
 export function Profile() {
-  const { user, stats, ranksContent, loadProfile, loadStats, updateNickname } = useGameStore()
+  const user = useGameStore((s) => s.user)
+  const stats = useGameStore((s) => s.stats)
+  const ranksContent = useGameStore((s) => s.ranksContent)
+  const loadProfile = useGameStore((s) => s.loadProfile)
+  const loadStats = useGameStore((s) => s.loadStats)
+  const updateNickname = useGameStore((s) => s.updateNickname)
   const [editing, setEditing] = useState(false)
   const [nick, setNick] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const tg = (window as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: { photo_url?: string; first_name?: string } } } } }).Telegram?.WebApp
-  const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
-  const first = tg?.initDataUnsafe?.user?.first_name
+  const avatarUrl = getAvatarUrl()
+  const first = getFirstName()
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
-  const nextLevelXp = level * 100
-  const xpPercent = Math.min(100, Math.round((xp / nextLevelXp) * 100))
+  const nextLevelXp = getNextLevelXp(level)
+  const xpPercent = getXpProgress(xp, level)
   const tier = getTierForLevel(level)
   const rank = findRank(level, ranksContent)
 

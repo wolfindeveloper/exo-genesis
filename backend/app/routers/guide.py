@@ -232,6 +232,8 @@ async def fix_glitch(
     cost = entry.get("fragment_cost", 0) * 2
 
     user_result = db.table("users").select("balance_fragments").eq("id", user_id).execute()
+    if not user_result.data:
+        raise HTTPException(status_code=404, detail="User not found")
     current_balance = user_result.data[0].get("balance_fragments", 0)
     if current_balance < cost:
         raise HTTPException(status_code=400, detail=f"Not enough fragments. Need {cost}, have {current_balance}")

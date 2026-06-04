@@ -102,6 +102,23 @@ export function RewardSheet() {
                 </div>
               )}
 
+              {/* XP & Level */}
+              {lastLoot && (
+                <div className="space-y-1">
+                  {lastLoot.leveledUp && (
+                    <div className="flex items-center justify-between text-xs bg-amber-500/10 rounded-lg px-3 py-2 border border-amber-500/20">
+                      <span className="text-amber-400 font-bold tracking-wider">🌟 ПОВЫШЕНИЕ УРОВНЯ!</span>
+                      <span className="font-mono text-amber-300">LVL {lastLoot.level}</span>
+                    </div>
+                  )}
+                  {lastLoot.xpGained != null && (
+                    <div className="flex items-center justify-between text-xs bg-space-600/30 rounded-lg px-3 py-2">
+                      <span className="text-slate-500">✨ Опыт получено</span>
+                      <span className="font-mono text-neon-cyan">+{lastLoot.xpGained} XP</span>
+                    </div>
+                  )}
+                </div>
+              )}
               {/* Stability */}
               {lastLoot && (
                 <div className="flex items-center justify-between text-xs bg-space-600/30 rounded-lg px-3 py-2">

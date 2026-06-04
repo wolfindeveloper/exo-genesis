@@ -1,10 +1,5 @@
 import type { Variants } from 'motion/react'
 
-export const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
-}
-
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.4 } },

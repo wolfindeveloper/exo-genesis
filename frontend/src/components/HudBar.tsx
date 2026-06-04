@@ -3,26 +3,13 @@ import { motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
 import { useCountUp } from '../hooks/useCountUp'
+import { getNextLevelXp, getXpProgress } from '../lib/xp'
+import { getTierForLevel, findRank } from '../lib/ranks'
+import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import { useGameStore } from '../store/game'
 import type { Rank } from '../types'
 
 const tierColors = ['#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
-
-function getTierForLevel(level: number): number {
-  if (level >= 50) return 5
-  if (level >= 30) return 4
-  if (level >= 15) return 3
-  if (level >= 5) return 2
-  return 1
-}
-
-function findRank(level: number, ranks: Rank[]): Rank | null {
-  let best: Rank | null = null
-  for (const r of ranks) {
-    if (level >= r.level) best = r
-  }
-  return best
-}
 
 export function HudBar() {
   const navigate = useNavigate()
@@ -30,14 +17,12 @@ export function HudBar() {
   const pendingClaims = useGameStore((s) => s.pendingClaims)
   const ranksContent = useGameStore((s) => s.ranksContent)
 
-  const tg = (window as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: { photo_url?: string; first_name?: string } } } } }).Telegram?.WebApp
-  const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
-  const first = tg?.initDataUnsafe?.user?.first_name
+  const avatarUrl = getAvatarUrl()
+  const first = getFirstName()
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
-  const nextXp = level * 100
-  const xpPct = Math.min(100, Math.round((xp / nextXp) * 100))
+  const xpPct = getXpProgress(xp, level)
   const tier = getTierForLevel(level)
   const rank = findRank(level, ranksContent)
 

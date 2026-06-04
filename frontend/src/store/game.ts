@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Artifact, Expedition, GuideChapterSummary, InventoryItem, LootItem, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { Artifact, Expedition, GuideChapterSummary, InventoryItem, LootItem, LootResult, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -18,7 +18,7 @@ interface GameState {
   ranksContent: Rank[]
   boxRewards: Record<string, unknown> | null
   pendingClaims: { shipId: string; shipName: string; fresh?: boolean }[]
-  lastLoot: { shipName: string; loot: LootItem[]; shipStability: number } | null
+  lastLoot: LootResult | null
   guideChapters: GuideChapterSummary[]
   isLoading: boolean
   isAuthReady: boolean
@@ -219,7 +219,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       const result = await api.claimExpedition(expeditionId)
       set({
         activeExpeditions: get().activeExpeditions.filter((e) => e.id !== expeditionId),
-        lastLoot: { shipName: shipName || 'Корабль', loot: result.loot, shipStability: result.ship_stability },
+        lastLoot: {
+          shipName: shipName || 'Корабль',
+          loot: result.loot,
+          shipStability: result.ship_stability,
+          xpGained: result.xp_gained,
+          level: result.level,
+          leveledUp: result.leveled_up,
+        },
         isLoading: false,
       })
       await Promise.all([get().loadShips(), get().loadInventory(), get().loadProfile()])
@@ -302,9 +309,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   claimGuideReward: async (chapterId) => {
     try {
       set({ isLoading: true, error: null })
-      await api.claimReward(chapterId)
+      const result = await api.claimReward(chapterId)
       set({ isLoading: false })
       await Promise.all([get().loadGuideChapters(), get().loadInventory()])
+      return result
     } catch (e) {
       set({ error: (e as Error).message, isLoading: false })
     }

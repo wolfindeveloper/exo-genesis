@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 
+import { getTelegramWebApp } from '../lib/telegram'
 import { useGameStore } from '../store/game'
 
 export function NotificationBanner() {
@@ -20,7 +21,7 @@ export function NotificationBanner() {
     setDismissed(false)
     if (first.fresh && !shownFresh.current.has(first.shipId)) {
       shownFresh.current.add(first.shipId)
-      const tg = (window as any).Telegram?.WebApp
+      const tg = getTelegramWebApp()
       if (tg?.showPopup) {
         tg.showPopup({
           title: '🚀 Экспедиция завершена!',
@@ -38,9 +39,10 @@ export function NotificationBanner() {
   }, [first?.shipId])
 
   const handleTap = useCallback(() => {
+    if (!first) return
     setDismissed(true)
-    removePendingClaim(first!.shipId)
-    navigate(`/hangar?claim=${first!.shipId}`)
+    removePendingClaim(first.shipId)
+    navigate(`/hangar?claim=${first.shipId}`)
   }, [first, navigate, removePendingClaim])
 
   const handleDismiss = useCallback(() => {

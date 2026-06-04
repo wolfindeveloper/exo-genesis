@@ -12,7 +12,9 @@ const tierColors = ['', 'text-neon-cyan border-neon-cyan/30', 'text-neon-green b
 const tierBg = ['', 'bg-neon-cyan/10', 'bg-neon-green/10', 'bg-neon-purple/10', 'bg-neon-amber/10', 'bg-neon-red/10']
 
 export function Galaxy() {
-  const { zonesContent: zones, startExpedition, isLoading } = useGameStore()
+  const zones = useGameStore((s) => s.zonesContent)
+  const startExpedition = useGameStore((s) => s.startExpedition)
+  const isLoading = useGameStore((s) => s.isLoading)
   const ships = useGameStore((s) => s.ships)
   const loadShips = useGameStore((s) => s.loadShips)
   const [tierFilter, setTierFilter] = useState(1)

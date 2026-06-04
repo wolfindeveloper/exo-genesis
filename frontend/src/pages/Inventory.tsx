@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
+import { hapticImpact } from '../lib/telegram'
 import { useGameStore } from '../store/game'
 import type { Artifact, InventoryItem, Resource } from '../types'
 
@@ -154,7 +155,12 @@ function buildSections(
 }
 
 export function Inventory() {
-  const { inventory, loadInventory, resourcesContent, artifactsContent, ships, loadShips } = useGameStore()
+  const inventory = useGameStore((s) => s.inventory)
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
+  const artifactsContent = useGameStore((s) => s.artifactsContent)
+  const ships = useGameStore((s) => s.ships)
+  const loadInventory = useGameStore((s) => s.loadInventory)
+  const loadShips = useGameStore((s) => s.loadShips)
   const [filter, setFilter] = useState<string>('all')
   const [sortMode, setSortMode] = useState<SortMode>('tier')
   const [selectedItem, setSelectedItem] = useState<{ item: InventoryItem; info: ItemInfo } | null>(null)
@@ -423,7 +429,12 @@ function ItemDetailSheet({
   info: ItemInfo
   onClose: () => void
 }) {
-  const { ships, shipsContent, refuelShip, repairShip, loadInventory, loadShips } = useGameStore()
+  const ships = useGameStore((s) => s.ships)
+  const shipsContent = useGameStore((s) => s.shipsContent)
+  const refuelShip = useGameStore((s) => s.refuelShip)
+  const repairShip = useGameStore((s) => s.repairShip)
+  const loadInventory = useGameStore((s) => s.loadInventory)
+  const loadShips = useGameStore((s) => s.loadShips)
   const meta = item.metadata || {}
   const rc = rarityConfig[info.rarity] || rarityConfig.common
   const [imgError, setImgError] = useState(false)
@@ -451,8 +462,7 @@ function ItemDetailSheet({
 
   const handleUse = useCallback(async () => {
     if (!matchingShips.length) return
-    const tg = (window as { Telegram?: { WebApp?: { HapticFeedback?: { impactOccurred: (s: string) => void } } } }).Telegram?.WebApp
-    tg?.HapticFeedback?.impactOccurred('medium')
+    hapticImpact('medium')
 
     const ship = matchingShips[0]
     try {

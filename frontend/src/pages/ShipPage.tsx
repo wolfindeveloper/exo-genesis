@@ -5,6 +5,8 @@ import { useGameStore } from '../store/game'
 import { HexSlot } from '../components/HexSlot'
 import SlotSelectModal from '../components/SlotSelectModal'
 import { useExpeditionTimer } from '../hooks/useTimer'
+import { getNextLevelXp, getXpProgress } from '../lib/xp'
+import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import type { Artifact } from '../types'
 import { api } from '../api/client'
 
@@ -76,13 +78,12 @@ export default function ShipPage() {
 
   const level = user?.level ?? 1
   const xp = user?.xp ?? 0
-  const nextXp = level * 100
-  const xpPct = Math.min(100, Math.round((xp / nextXp) * 100))
+  const nextXp = getNextLevelXp(level)
+  const xpPct = getXpProgress(xp, level)
   const navigate = useNavigate()
 
-  const tg = (window as { Telegram?: { WebApp?: { initDataUnsafe?: { user?: { photo_url?: string; first_name?: string } } } } }).Telegram?.WebApp
-  const avatarUrl = tg?.initDataUnsafe?.user?.photo_url
-  const first = tg?.initDataUnsafe?.user?.first_name
+  const avatarUrl = getAvatarUrl()
+  const first = getFirstName()
 
   const [stickerIdx, setStickerIdx] = useState(() => {
     const saved = localStorage.getItem(`${EGGS_LS}/state`)
@@ -173,8 +174,12 @@ export default function ShipPage() {
   })
 
   /* ── Inventory counts ── */
-  const fuelInInventory = inventory.find((i) => i.item_config_id === 'fuel')?.quantity ?? 0
-  const repairInInventory = inventory.find((i) => i.item_config_id === 'repair_kit')?.quantity ?? 0
+  const fuelInInventory = inventory
+    .filter((i) => i.item_config_id === 'fuel' || i.item_config_id.startsWith('fuel_t'))
+    .reduce((sum, i) => sum + i.quantity, 0)
+  const repairInInventory = inventory
+    .filter((i) => i.item_config_id === 'repair_kit' || i.item_config_id.startsWith('repair_kit_t'))
+    .reduce((sum, i) => sum + i.quantity, 0)
 
   const isShipIdle = mainShip?.status === 'idle'
 

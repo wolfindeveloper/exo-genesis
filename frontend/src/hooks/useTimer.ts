@@ -29,6 +29,7 @@ export function useExpeditionTimer(
     if (!startTimeIso || !endTimeIso) return null
     const start = new Date(startTimeIso).getTime()
     const end = new Date(endTimeIso).getTime()
+    if (isNaN(start) || isNaN(end)) return null
     const elapsed = now - start
     const total = end - start
     const remaining = Math.max(0, end - now)

@@ -71,7 +71,7 @@ def _resolve_item_type(content: ContentLoader, item_config_id: str) -> str:
         return "resource"
     if content.get_artifact(item_config_id):
         return "artifact"
-    return "resource"
+    raise ValueError(f"Unknown item config '{item_config_id}' — cannot resolve item type")
 
 
 @router.post("/start", response_model=Expedition)

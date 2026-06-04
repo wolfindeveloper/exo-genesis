@@ -1,11 +1,7 @@
 import type { Artifact, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone } from '../types'
+import { getInitData } from '../lib/telegram'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
-
-function getInitData(): string {
-  const tg = (window as any).Telegram?.WebApp
-  return tg?.initData || ''
-}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const initData = getInitData()

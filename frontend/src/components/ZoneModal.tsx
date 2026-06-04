@@ -52,7 +52,10 @@ interface ZoneModalProps {
 }
 
 export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps) {
-  const { ships, shipsContent, resourcesContent, artifactsContent } = useGameStore()
+  const ships = useGameStore((s) => s.ships)
+  const shipsContent = useGameStore((s) => s.shipsContent)
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
+  const artifactsContent = useGameStore((s) => s.artifactsContent)
   const loadShips = useGameStore((s) => s.loadShips)
   const [confirming, setConfirming] = useState(false)
   const [imgError, setImgError] = useState(false)
