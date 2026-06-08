@@ -225,6 +225,7 @@ export interface ShopGrantedItem {
   item_config_id?: string
   quantity?: number
   tier?: number
+  name_key?: string
 }
 
 export interface ShopBuyResponse {

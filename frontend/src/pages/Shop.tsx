@@ -4,7 +4,7 @@ import { AlertTriangle, Diamond, Gift, Package, ShoppingBag, Star, Zap } from 'l
 
 import { api } from '../api/client'
 import { useGameStore } from '../store/game'
-import type { ShopItem } from '../types'
+import type { ShopBuyResponse, ShopItem } from '../types'
 
 const rarityConfig: Record<string, { color: string; label: string }> = {
   common: { color: 'text-slate-400', label: 'C' },
@@ -197,6 +197,7 @@ export function Shop() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [activeCategory, setActiveCategory] = useState('resources')
   const [buyerCommentItem, setBuyerCommentItem] = useState<ShopItem | null>(null)
+  const [lastBuyResult, setLastBuyResult] = useState<ShopBuyResponse | null>(null)
   const commentTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
@@ -227,9 +228,12 @@ export function Shop() {
     setBuying(shopItem.id)
     setError(null)
     try {
-      await api.buyShopItem(shopItem.id)
+      const result = await api.buyShopItem(shopItem.id)
       setSuccessMsg(shopItem.name_key)
       setBuyerCommentItem(shopItem)
+      if (result.granted.length > 0) {
+        setLastBuyResult(result)
+      }
       await Promise.all([loadProfile(), loadInventory()])
     } catch (e) {
       setError((e as Error).message)
@@ -444,6 +448,92 @@ export function Shop() {
                 «Спасибо за покупку. Возвращайтесь, когда нагуляете аппетит к сомнительным сделкам.»
               </p>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Reward reveal */}
+      <AnimatePresence>
+        {lastBuyResult && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setLastBuyResult(null)} />
+            <motion.div
+              className="relative w-full sm:max-w-md bg-gradient-to-b from-space-800 to-space-900 border border-amber-500/20 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden"
+              initial={{ y: '100%', opacity: 0, scale: 0.9 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: '30%', opacity: 0, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 0.9 }}
+            >
+              <div className="px-5 pt-6 pb-2 text-center">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
+                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 flex items-center justify-center mx-auto mb-3"
+                >
+                  <Gift size={24} className="text-amber-400" />
+                </motion.div>
+                <h2 className="font-display text-sm text-amber-400 uppercase tracking-[0.15em]">
+                  Таинственный ящик
+                </h2>
+                <p className="text-[10px] text-slate-500 mt-1">
+                  «Вселенная щедра сегодня. Или просто издевается.»
+                </p>
+              </div>
+
+              <div className="px-5 py-4 space-y-2">
+                {lastBuyResult.granted.map((g, i) => (
+                  <motion.div
+                    key={`${g.item_config_id}-${i}`}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + i * 0.08 }}
+                    className="flex items-center gap-3 bg-white/5 rounded-xl px-3.5 py-3 border border-white/5"
+                  >
+                    <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                      g.type === 'artifact'
+                        ? 'bg-purple-500/15 border border-purple-500/25'
+                        : 'bg-neon-cyan/10 border border-neon-cyan/20'
+                    }`}>
+                      {g.type === 'artifact' ? (
+                        <Diamond size={14} className="text-purple-400" />
+                      ) : (
+                        <Package size={14} className="text-neon-cyan" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-slate-200 truncate">
+                        {g.name_key || g.item_config_id}
+                      </p>
+                      <p className="text-[9px] text-slate-500 mt-0.5">
+                        {g.type === 'artifact' ? 'Артефакт' : 'Ресурс'}
+                        {g.tier ? ` · T${g.tier}` : ''}
+                      </p>
+                    </div>
+                    {g.quantity && g.quantity > 1 && (
+                      <span className="shrink-0 text-xs text-slate-400 font-mono">
+                        ×{g.quantity}
+                      </span>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="px-5 pb-6 pt-2">
+                <button
+                  onClick={() => setLastBuyResult(null)}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/25 text-amber-400 text-[11px] font-display uppercase tracking-wider active:scale-[0.97] transition-all"
+                >
+                  Забрать
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

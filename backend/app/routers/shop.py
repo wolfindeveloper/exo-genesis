@@ -29,6 +29,32 @@ def _artifact_to_catalog_item(artifact: dict) -> dict:
     }
 
 
+def _add_or_update_inventory(
+    db: Client,
+    user_id: str,
+    item_type: str,
+    item_config_id: str,
+    qty: int,
+    metadata: dict | None = None,
+) -> None:
+    existing = (
+        db.table("user_inventory")
+        .select("id, quantity")
+        .eq("user_id", user_id)
+        .eq("item_type", item_type)
+        .eq("item_config_id", item_config_id)
+        .execute()
+    )
+    if existing.data:
+        new_qty = existing.data[0]["quantity"] + qty
+        db.table("user_inventory").update({"quantity": new_qty}).eq("id", existing.data[0]["id"]).execute()
+    else:
+        row = {"user_id": user_id, "item_type": item_type, "item_config_id": item_config_id, "quantity": qty}
+        if metadata is not None:
+            row["metadata"] = metadata
+        db.table("user_inventory").insert(row).execute()
+
+
 @router.get("/catalog")
 async def get_catalog(content: ContentLoader = Depends(get_content_loader)):
     shop_items = list(content.shop)
@@ -86,26 +112,13 @@ async def buy_item(
     granted: list[dict] = []
 
     if is_artifact:
-        existing = (
-            db.table("user_inventory")
-            .select("id, quantity")
-            .eq("user_id", user_id)
-            .eq("item_type", "artifact")
-            .eq("item_config_id", artifact["id"])
-            .execute()
-        )
-        if existing.data:
-            new_qty = existing.data[0]["quantity"] + 1
-            db.table("user_inventory").update({"quantity": new_qty}).eq("id", existing.data[0]["id"]).execute()
-        else:
-            db.table("user_inventory").insert({
-                "user_id": user_id,
-                "item_type": "artifact",
-                "item_config_id": artifact["id"],
-                "quantity": 1,
-                "metadata": {},
-            }).execute()
-        granted.append({"type": "artifact", "item_config_id": artifact["id"], "tier": artifact["tier"]})
+        _add_or_update_inventory(db, user_id, "artifact", artifact["id"], 1, metadata={})
+        granted.append({
+            "type": "artifact",
+            "item_config_id": artifact["id"],
+            "name_key": artifact["name_key"],
+            "tier": artifact["tier"],
+        })
     else:
         rewards = shop_item.get("rewards", [])
         for reward in rewards:
@@ -121,65 +134,50 @@ async def buy_item(
                     new_frags = (cur[0]["balance_fragments"] if cur else 0) + qty
                     db.table("users").update({"balance_fragments": new_frags}).eq("id", user_id).execute()
                 else:
-                    existing = (
-                        db.table("user_inventory")
-                        .select("id, quantity")
-                        .eq("user_id", user_id)
-                        .eq("item_type", item_type)
-                        .eq("item_config_id", item_config_id)
-                        .execute()
-                    )
+                    _add_or_update_inventory(db, user_id, item_type, item_config_id, qty)
 
-                    if existing.data:
-                        new_qty = existing.data[0]["quantity"] + qty
-                        db.table("user_inventory").update({"quantity": new_qty}).eq("id", existing.data[0]["id"]).execute()
-                    else:
-                        db.table("user_inventory").insert({
-                            "user_id": user_id,
-                            "item_type": item_type,
-                            "item_config_id": item_config_id,
-                            "quantity": qty,
-                        }).execute()
-
-                granted.append({"type": rtype, "item_config_id": item_config_id, "quantity": qty})
+                granted.append({
+                    "type": rtype if item_type == "fragment" else item_type,
+                    "item_config_id": item_config_id,
+                    "name_key": _resolve_name(content, item_type, item_config_id),
+                    "quantity": qty,
+                })
 
             elif rtype == "mystery_box":
-                db.table("user_inventory").insert({
-                    "user_id": user_id,
-                    "item_type": "resource",
+                _add_or_update_inventory(db, user_id, "resource", "repair_kit", qty * 3)
+                granted.append({
+                    "type": "resource",
                     "item_config_id": "repair_kit",
+                    "name_key": _resolve_name(content, "resource", "repair_kit"),
                     "quantity": qty * 3,
-                }).execute()
+                })
 
-                pool = [a for a in content.artifacts if a.get("tier") and a["tier"] <= 3]
+                pool = [a for a in content.artifacts if a.get("tier") and a["tier"] <= 3 and a.get("shop_available", True)]
                 if pool:
-                    random_artifact = random.choice(pool)
-                    db.table("user_inventory").insert({
-                        "user_id": user_id,
-                        "item_type": "artifact",
-                        "item_config_id": random_artifact["id"],
-                        "quantity": 1,
-                        "metadata": {},
-                    }).execute()
-                    granted.append({"type": "artifact", "item_config_id": random_artifact["id"], "tier": random_artifact.get("tier")})
-
-                granted.append({"type": "resource", "item_config_id": "repair_kit", "quantity": qty * 3})
+                    ra = random.choice(pool)
+                    _add_or_update_inventory(db, user_id, "artifact", ra["id"], 1, metadata={})
+                    granted.append({
+                        "type": "artifact",
+                        "item_config_id": ra["id"],
+                        "name_key": ra["name_key"],
+                        "tier": ra.get("tier"),
+                    })
 
             elif rtype == "instant_finish":
-                db.table("user_inventory").insert({
-                    "user_id": user_id,
-                    "item_type": "resource",
+                _add_or_update_inventory(db, user_id, "resource", "repair_kit", qty * 5)
+                _add_or_update_inventory(db, user_id, "resource", "fuel", qty * 10)
+                granted.append({
+                    "type": "resource",
                     "item_config_id": "repair_kit",
+                    "name_key": _resolve_name(content, "resource", "repair_kit"),
                     "quantity": qty * 5,
-                }).execute()
-                db.table("user_inventory").insert({
-                    "user_id": user_id,
-                    "item_type": "resource",
+                })
+                granted.append({
+                    "type": "resource",
                     "item_config_id": "fuel",
+                    "name_key": _resolve_name(content, "resource", "fuel"),
                     "quantity": qty * 10,
-                }).execute()
-                granted.append({"type": "resource", "item_config_id": "repair_kit", "quantity": qty * 5})
-                granted.append({"type": "resource", "item_config_id": "fuel", "quantity": qty * 10})
+                })
 
     if currency == "xgen":
         db.table("users").update({"balance_xgen": int(user.get("balance_xgen", 0) or 0) - amount}).eq("id", user_id).execute()
@@ -195,3 +193,11 @@ async def buy_item(
         "balance_xgen": int(updated.get("balance_xgen", 0) or 0),
         "balance_stars": int(updated.get("balance_stars", 0) or 0),
     }
+
+
+def _resolve_name(content: ContentLoader, item_type: str, item_config_id: str) -> str:
+    if item_type == "resource":
+        r = next((x for x in content.resources if x["id"] == item_config_id), None)
+        if r:
+            return r.get("name_key", item_config_id)
+    return item_config_id
