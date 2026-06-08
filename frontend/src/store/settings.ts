@@ -15,14 +15,14 @@ interface SettingsState {
 function load(): { language: Language; musicEnabled: boolean } {
   try {
     const raw = localStorage.getItem('exo-settings')
-    if (!raw) return { language: 'ru', musicEnabled: false }
+    if (!raw) return { language: 'ru', musicEnabled: true }
     const parsed = JSON.parse(raw)
     return {
       language: ['ru', 'en', 'ua'].includes(parsed.language) ? parsed.language : 'ru',
-      musicEnabled: typeof parsed.musicEnabled === 'boolean' ? parsed.musicEnabled : false,
+      musicEnabled: typeof parsed.musicEnabled === 'boolean' ? parsed.musicEnabled : true,
     }
   } catch {
-    return { language: 'ru', musicEnabled: false }
+    return { language: 'ru', musicEnabled: true }
   }
 }
 
