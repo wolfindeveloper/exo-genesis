@@ -116,7 +116,8 @@ export default function ShipPage() {
 
   useEffect(() => {
     if (!consoleMsg) return
-    const t = setTimeout(() => setConsoleMsg(null), 2500)
+    const delay = consoleMsg.length > 60 ? 6000 : 2500
+    const t = setTimeout(() => setConsoleMsg(null), delay)
     return () => clearTimeout(t)
   }, [consoleMsg])
 
@@ -784,11 +785,11 @@ active={!!a}
 
             {/* console message toast */}
             {consoleMsg && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 animate-fade-in">
-                <div className="bg-black/70 backdrop-blur-sm border border-cyan-500/20 rounded-lg px-3 py-1.5 shadow-[0_0_16px_rgba(0,245,255,.1)] whitespace-nowrap">
-                  <span className="text-[8px] text-cyan-400/60 font-mono tracking-wider">{consoleMsg}</span>
+              <div className="fixed left-1/2 -translate-x-1/2 z-[100] animate-fade-in"
+                   style={{ bottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
+                <div className="bg-black/80 backdrop-blur-sm border border-cyan-500/20 rounded-xl px-4 py-3 shadow-[0_0_20px_rgba(0,245,255,.12)] max-w-[300px] text-center">
+                  <span className="text-[11px] text-cyan-400/80 font-mono leading-relaxed">{consoleMsg}</span>
                 </div>
-                <div className="absolute bottom-[-3px] left-1/2 -translate-x-1/2 w-2 h-2 bg-black/70 border-r border-b border-cyan-500/20 rotate-45" />
               </div>
             )}
           </div>
