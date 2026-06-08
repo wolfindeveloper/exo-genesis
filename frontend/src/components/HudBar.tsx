@@ -13,7 +13,6 @@ const tierColors = ['#22d3ee', '#22c55e', '#a855f7', '#f59e0b', '#ef4444']
 export function HudBar() {
   const navigate = useNavigate()
   const user = useGameStore((s) => s.user)
-  const pendingClaims = useGameStore((s) => s.pendingClaims)
   const ranksContent = useGameStore((s) => s.ranksContent)
 
   const avatarUrl = getAvatarUrl()
@@ -26,15 +25,9 @@ export function HudBar() {
   const rank = findRank(level, ranksContent)
 
   const xgenCount = useCountUp(user?.balance_xgen ?? 0, 800, true)
-  const pendingCount = pendingClaims.length
-  const hasPending = pendingCount > 0
 
   const handleAvatarClick = useCallback(() => {
     navigate('/profile')
-  }, [navigate])
-
-  const handleClaimsClick = useCallback(() => {
-    navigate('/')
   }, [navigate])
 
   if (!user) return null
@@ -91,25 +84,6 @@ export function HudBar() {
           </div>
         </div>
       </div>
-
-      {hasPending && (
-        <motion.button
-          onClick={handleClaimsClick}
-          className="flex items-center gap-1 px-2 py-1 rounded-full bg-neon-green/15 border border-neon-green/25 text-[10px] font-mono text-neon-green shrink-0"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <motion.span
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            🎁
-          </motion.span>
-          {pendingCount}
-        </motion.button>
-      )}
 
       <span className="text-[11px] text-neon-cyan font-mono tabular-nums shrink-0">
         🔷{xgenCount}
