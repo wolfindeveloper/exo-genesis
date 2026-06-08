@@ -1,14 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertTriangle, Gift, Package, ShoppingBag, Sparkles, Star } from 'lucide-react'
+import { AlertTriangle, Diamond, Gift, Package, ShoppingBag, Star, Zap } from 'lucide-react'
 
 import { api } from '../api/client'
 import { useGameStore } from '../store/game'
 import type { ShopItem } from '../types'
 
+const rarityConfig: Record<string, { color: string; label: string }> = {
+  common: { color: 'text-slate-400', label: 'C' },
+  uncommon: { color: 'text-green-400', label: 'U' },
+  rare: { color: 'text-blue-400', label: 'R' },
+  epic: { color: 'text-purple-400', label: 'E' },
+  legendary: { color: 'text-amber-400', label: 'L' },
+}
+
+const tierNames: Record<number, string> = {
+  1: 'Ранг I',
+  2: 'Ранг II',
+  3: 'Ранг III',
+  4: 'Ранг IV',
+  5: 'Ранг V',
+}
+
 const categoryIcons: Record<string, typeof Package> = {
   resources: Package,
-  artifacts: Sparkles,
+  artifacts: Diamond,
   premium: Star,
   mystery: Gift,
 }
@@ -17,13 +33,16 @@ const sellerComments: Record<string, string[]> = {
   fuel_pack: ['«Разумный выбор. Редкость.»', '«Пейте, космонавты, заварку — в космосе она бесполезна, но согревает душу.»'],
   repair_pack: ['«Оптимизм — это вам не прочность. Но звучит лучше.»', '«Купил — починился. Не починился — купи ещё.»'],
   fragment_pack: ['«Бред — он и в галактике бред.»', '«20 фрагментов. 20 шансов запутаться ещё сильнее.»'],
-  random_artifact_t1: ['«Дешево и сердито. Как и всё в этой галактике.»', '«Может работать. А может и нет. В этом вся соль.'],
-  random_artifact_t2: ['«Ого, вы раскошелились!»', '«T2 выглядит внушительно. До первой поломки.'],
   mystery_box: ['«Никто не знает, что там. Даже я. Особенно я.»', '«Может там артефакт. А может там записка «купи ещё». Спекуляция!»'],
-  premium_artifact_t3: ['«Премиум. Звучит дорого. И вы заплатили дорого. Логика.»', '«T3 за 5 звёзд. Бюджетный люкс.'],
-  premium_artifact_t4: ['«Вы уверены? Ладно, ваше право.»', '«15 звёзд за шанс. Галактика лотерея.'],
-  premium_artifact_t5: ['«50 звёзд. Серьёзно. Вы либо отчаянны, либо богаты. Я ставлю на отчаяние.»', '«Легендарный. Если не легенда — возврат не принимается.'],
   instant_finish: ['«Срезать углы? В космосе нет углов. Но мы их придумаем за 3 звезды.»', '«Мгновенно. Почти. Как и всё в этой вселенной.'],
+}
+
+const artifactComments: Record<number, string[]> = {
+  1: ['«Начальный уровень. Как первая работа.»', '«T1 — это вам не T2. Но и не T0. А T0 нет.»'],
+  2: ['«Уже что-то. Почти.»', '«Второй ранг. Звучит лучше, чем «почти легендарка».»'],
+  3: ['«Редкость. Как честный политик.»', '«T3. Золотая середина между «дешево» и «дорого».»'],
+  4: ['«Эпик. Вы либо везунчик, либо транжира.»', '«T4. Если не работает — попробуйте перезагрузить вселенную.»'],
+  5: ['«Легендарно. Поздравляю. Вы разорились.»', '«T5. Единственное, что легендарнее этого артефакта — ваша способность тратить звёзды.»'],
 }
 
 const categories = ['resources', 'artifacts', 'premium', 'mystery']
@@ -34,10 +53,20 @@ const categoryLabels: Record<string, string> = {
   mystery: 'Ящики',
 }
 
-function SellerComment({ itemId, visible }: { itemId: string; visible: boolean }) {
-  const comments = sellerComments[itemId]
-  if (!comments) return null
-  const comment = comments[Math.floor(Math.random() * comments.length)]
+function getComment(item: ShopItem): string | null {
+  if (item.type === 'artifact' && item.tier) {
+    const pool = artifactComments[item.tier]
+    if (!pool) return null
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+  const pool = sellerComments[item.id]
+  if (!pool) return null
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+function SellerComment({ item, visible }: { item: ShopItem; visible: boolean }) {
+  const comment = getComment(item)
+  if (!comment) return null
   return (
     <AnimatePresence>
       {visible && (
@@ -54,6 +83,108 @@ function SellerComment({ itemId, visible }: { itemId: string; visible: boolean }
   )
 }
 
+function StatBadge({ label, value }: { label: string; value: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[9px] text-slate-500 bg-white/5 px-1.5 py-0.5 rounded-md">
+      <Zap size={10} className="text-neon-cyan/60" />
+      {label} {value > 0 ? '+' : ''}{value}
+    </span>
+  )
+}
+
+function ArtifactCard({
+  item,
+  canAfford,
+  isBuying,
+  onBuy,
+}: {
+  item: ShopItem
+  canAfford: boolean
+  isBuying: boolean
+  onBuy: () => void
+}) {
+  const rarity = rarityConfig[item.rarity ?? 'common'] ?? rarityConfig.common
+  const stats = item.stats_modifiers ?? {}
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+      className="rounded-xl border border-white/5 bg-space-800/60 p-3.5 space-y-2"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className={`shrink-0 w-9 h-9 rounded-lg border flex items-center justify-center ${rarity.color.replace('text', 'border')}/30 bg-black/30`}>
+            <Diamond size={16} className={rarity.color} />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-[9px] font-bold ${rarity.color} px-1 py-0.5 rounded border ${rarity.color.replace('text', 'border')}/30 leading-none`}>
+                {rarity.label}
+              </span>
+              <span className="text-[9px] text-slate-600 font-mono">{tierNames[item.tier ?? 1]}</span>
+              <h3 className="font-display text-xs text-slate-200 uppercase tracking-wider truncate">
+                {item.name_key}
+              </h3>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
+              {item.description_key}
+            </p>
+            {Object.keys(stats).length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {Object.entries(stats).map(([key, val]) => (
+                  <StatBadge key={key} label={key} value={val} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <span className="font-display text-sm tabular-nums text-neon-cyan">
+            {item.price.amount}
+          </span>
+          <span className="text-[10px] ml-0.5 text-neon-cyan">
+            ✦
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onBuy}
+          disabled={!canAfford || isBuying}
+          className={`flex-1 py-2 rounded-lg text-[10px] font-display uppercase tracking-wider transition-all ${
+            isBuying
+              ? 'bg-slate-700/50 text-slate-500'
+              : canAfford
+                ? 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 active:scale-[0.97]'
+                : 'bg-slate-800/50 text-slate-700 border border-slate-700/30 cursor-not-allowed'
+          }`}
+        >
+          {isBuying ? (
+            <span className="flex items-center justify-center gap-1">
+              <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                <Package size={12} />
+              </motion.span>
+              Обрабатываем...
+            </span>
+          ) : canAfford ? (
+            'Приобрести'
+          ) : (
+            'Не хватает'
+          )}
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
+function artifactPriceCurrency(item: ShopItem): 'xgen' | 'stars' {
+  const tier = item.tier ?? 1
+  return tier <= 2 ? 'xgen' : 'stars'
+}
+
 export function Shop() {
   const loadProfile = useGameStore((s) => s.loadProfile)
   const loadInventory = useGameStore((s) => s.loadInventory)
@@ -65,7 +196,7 @@ export function Shop() {
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [activeCategory, setActiveCategory] = useState('resources')
-  const [buyerCommentId, setBuyerCommentId] = useState<string | null>(null)
+  const [buyerCommentItem, setBuyerCommentItem] = useState<ShopItem | null>(null)
   const commentTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
@@ -82,13 +213,15 @@ export function Shop() {
   }, [successMsg])
 
   useEffect(() => {
-    if (!buyerCommentId) return
+    if (!buyerCommentItem) return
     clearTimeout(commentTimeout.current)
-    commentTimeout.current = setTimeout(() => setBuyerCommentId(null), 3000)
+    commentTimeout.current = setTimeout(() => setBuyerCommentItem(null), 3000)
     return () => clearTimeout(commentTimeout.current)
-  }, [buyerCommentId])
+  }, [buyerCommentItem])
 
-  const filtered = items.filter((i) => i.category === activeCategory)
+  const shopItems = items.filter((i) => i.category === activeCategory && i.type !== 'artifact')
+  const artifactItems = items.filter((i) => i.category === 'artifacts' && i.type === 'artifact')
+  const isArtifactCategory = activeCategory === 'artifacts'
 
   const handleBuy = useCallback(async (shopItem: ShopItem) => {
     setBuying(shopItem.id)
@@ -96,7 +229,7 @@ export function Shop() {
     try {
       await api.buyShopItem(shopItem.id)
       setSuccessMsg(shopItem.name_key)
-      setBuyerCommentId(shopItem.id)
+      setBuyerCommentItem(shopItem)
       await Promise.all([loadProfile(), loadInventory()])
     } catch (e) {
       setError((e as Error).message)
@@ -117,7 +250,6 @@ export function Shop() {
 
   return (
     <div className="px-4 pt-4 pb-4 space-y-4">
-      {/* Header */}
       <div className="text-center">
         <h1 className="font-display text-sm text-amber-400 uppercase tracking-[0.15em]">
           Спекулятивная лавка
@@ -127,13 +259,11 @@ export function Shop() {
         </p>
       </div>
 
-      {/* Balance */}
       <div className="flex items-center justify-center gap-4 text-xs">
         <span className="text-neon-cyan font-mono">✦ {user?.balance_xgen ?? 0}</span>
         <span className="text-amber-400 font-mono">⭐ {user?.balance_stars ?? 0}</span>
       </div>
 
-      {/* Error */}
       <AnimatePresence>
         {error && (
           <motion.div
@@ -148,7 +278,6 @@ export function Shop() {
         )}
       </AnimatePresence>
 
-      {/* Category tabs */}
       <div className="flex gap-1 overflow-x-auto -mx-4 px-4 scrollbar-none">
         {categories.map((cat) => {
           const active = activeCategory === cat
@@ -170,7 +299,6 @@ export function Shop() {
         })}
       </div>
 
-      {/* Items grid */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeCategory}
@@ -180,87 +308,126 @@ export function Shop() {
           transition={{ duration: 0.2 }}
           className="space-y-3"
         >
-          {filtered.map((item) => {
-            const isPremium = item.price.currency === 'stars'
-            const canAfford = isPremium
-              ? (user?.balance_stars ?? 0) >= item.price.amount
-              : (user?.balance_xgen ?? 0) >= item.price.amount
-            const isBuying = buying === item.id
-
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-                className={`rounded-xl border p-3.5 space-y-2 ${
-                  isPremium
-                    ? 'bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/15'
-                    : 'bg-space-800/60 border-white/5'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag size={14} className="text-amber-500/70 shrink-0" />
-                      <h3 className="font-display text-xs text-slate-200 uppercase tracking-wider truncate">
-                        {item.name_key}
-                      </h3>
-                    </div>
-                    <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-                      {item.description_key}
-                    </p>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <span className={`font-display text-sm tabular-nums ${isPremium ? 'text-amber-400' : 'text-neon-cyan'}`}>
-                      {item.price.amount}
-                    </span>
-                    <span className={`text-[10px] ml-0.5 ${isPremium ? 'text-amber-400' : 'text-neon-cyan'}`}>
-                      {isPremium ? '⭐' : '✦'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleBuy(item)}
-                    disabled={!canAfford || isBuying}
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-display uppercase tracking-wider transition-all ${
-                      isBuying
-                        ? 'bg-slate-700/50 text-slate-500'
-                        : canAfford
-                          ? isPremium
-                            ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-400 border border-amber-500/25 active:scale-[0.97]'
-                            : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 active:scale-[0.97]'
-                          : 'bg-slate-800/50 text-slate-700 border border-slate-700/30 cursor-not-allowed'
-                    }`}
-                  >
-                    {isBuying ? (
-                      <span className="flex items-center justify-center gap-1">
-                        <motion.span
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        >
-                          <Package size={12} />
-                        </motion.span>
-                        Обрабатываем...
+          {isArtifactCategory ? (
+            artifactItems.length > 0 ? (
+              [5, 4, 3, 2, 1].map((tier) => {
+                const tierArtifacts = artifactItems.filter((a) => a.tier === tier)
+                if (tierArtifacts.length === 0) return null
+                return (
+                  <div key={tier} className="space-y-2">
+                    <div className="flex items-center gap-2 pt-1">
+                      <div className="h-px flex-1 bg-white/5" />
+                      <span className="text-[9px] text-slate-600 font-display uppercase tracking-widest">
+                        {tierNames[tier]}
                       </span>
-                    ) : canAfford ? (
-                      'Приобрести'
-                    ) : (
-                      'Не хватает'
-                    )}
-                  </button>
-                </div>
-
-                <SellerComment itemId={item.id} visible={buyerCommentId === item.id} />
-              </motion.div>
+                      <div className="h-px flex-1 bg-white/5" />
+                    </div>
+                    {tierArtifacts.map((item) => {
+                      const currency = artifactPriceCurrency(item)
+                      const canAfford = currency === 'stars'
+                        ? (user?.balance_stars ?? 0) >= item.price.amount
+                        : (user?.balance_xgen ?? 0) >= item.price.amount
+                      return (
+                        <ArtifactCard
+                          key={item.id}
+                          item={item}
+                          canAfford={canAfford}
+                          isBuying={buying === item.id}
+                          onBuy={() => handleBuy(item)}
+                        />
+                      )
+                    })}
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-8">
+                <Diamond size={24} className="text-slate-700 mx-auto mb-2" />
+                <p className="text-[11px] text-slate-600">Артефакты закончились</p>
+              </div>
             )
-          })}
+          ) : (
+            shopItems.map((item) => {
+              const isPremium = item.price.currency === 'stars'
+              const canAfford = isPremium
+                ? (user?.balance_stars ?? 0) >= item.price.amount
+                : (user?.balance_xgen ?? 0) >= item.price.amount
+              const isBuying = buying === item.id
+
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                  className={`rounded-xl border p-3.5 space-y-2 ${
+                    isPremium
+                      ? 'bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/15'
+                      : 'bg-space-800/60 border-white/5'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <ShoppingBag size={14} className="text-amber-500/70 shrink-0" />
+                        <h3 className="font-display text-xs text-slate-200 uppercase tracking-wider truncate">
+                          {item.name_key}
+                        </h3>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                        {item.description_key}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <span className={`font-display text-sm tabular-nums ${isPremium ? 'text-amber-400' : 'text-neon-cyan'}`}>
+                        {item.price.amount}
+                      </span>
+                      <span className={`text-[10px] ml-0.5 ${isPremium ? 'text-amber-400' : 'text-neon-cyan'}`}>
+                        {isPremium ? '⭐' : '✦'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleBuy(item)}
+                      disabled={!canAfford || isBuying}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-display uppercase tracking-wider transition-all ${
+                        isBuying
+                          ? 'bg-slate-700/50 text-slate-500'
+                          : canAfford
+                            ? isPremium
+                              ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-400 border border-amber-500/25 active:scale-[0.97]'
+                              : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 active:scale-[0.97]'
+                            : 'bg-slate-800/50 text-slate-700 border border-slate-700/30 cursor-not-allowed'
+                      }`}
+                    >
+                      {isBuying ? (
+                        <span className="flex items-center justify-center gap-1">
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                          >
+                            <Package size={12} />
+                          </motion.span>
+                          Обрабатываем...
+                        </span>
+                      ) : canAfford ? (
+                        'Приобрести'
+                      ) : (
+                        'Не хватает'
+                      )}
+                    </button>
+                  </div>
+
+                  <SellerComment item={item} visible={buyerCommentItem?.id === item.id} />
+                </motion.div>
+              )
+            })
+          )}
         </motion.div>
       </AnimatePresence>
 
-      {/* Success toast */}
       <AnimatePresence>
         {successMsg && (
           <motion.div

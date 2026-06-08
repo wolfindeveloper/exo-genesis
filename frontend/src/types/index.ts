@@ -213,6 +213,11 @@ export interface ShopItem {
   description_key: string
   price: { amount: number; currency: 'xgen' | 'stars' }
   rewards: { type: string; quantity?: number; tier?: number; item_type?: string; item_config_id?: string }[]
+  icon_path?: string
+  tier?: number
+  rarity?: string
+  stats_modifiers?: Record<string, number>
+  type?: string
 }
 
 export interface ShopGrantedItem {

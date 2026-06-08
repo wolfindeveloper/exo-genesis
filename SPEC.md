@@ -413,3 +413,14 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 
 #### Атрибуция музыки
 Трек: "Technological Integration (La Integración de la Tecnología)" — Cyberpunk / Darksynth Metal Instrumental by David J. Barrios — Free Music Archive — CC BY 4.0
+
+### Phase 8 — Магазин артефактов ✅
+- [x] Добавить `shop_available`, `price`, `icon_path` в `artifacts.json` — все 44 артефакта
+- [x] 4 наградных артефакта (termos_optimizma, slovar_izvineniy, sinya_izolenta, ochki_veroyatnosti) — `shop_available: false`
+- [x] Цены по тиру: T1=300✦, T2=800✦, T3=5⭐, T4=15⭐, T5=50⭐
+- [x] Убрать `random_artifact_t*` из `shop.json` — артефакты идут из `artifacts.json`
+- [x] `GET /shop/catalog` — мержит shop.json + shop_available артефакты
+- [x] `POST /shop/buy` — поддержка прямой покупки артефакта по `item_id`
+- [x] Обновить `ShopItem` type — добавить `icon_path`, `tier`, `rarity`, `stats_modifiers`, `type`
+- [x] `Shop.tsx` — группа артефактов по тирам (Ранг I–V), rarity badge, stats, icon placeholder
+- [x] UI-ux-pro-max стилизация артефактов: Diamond иконка, цветовые badge по редкости, stat-badge

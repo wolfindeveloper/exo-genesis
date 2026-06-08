@@ -112,38 +112,23 @@ sections = [
 
 ---
 
-## Спекулятивная лавка (план реализации)
+## Спекулятивная лавка (реализовано)
 
 **Концепция:** Магазин в стиле Дугласа Адамса — тёмная подсобка на захолустной станции.
 Продавец — AI с пассивной агрессией. Каждый товар — спекуляция.
 
-### Товары
-- **Ресурсы:** Космическая заварка, Усилитель Оптимизма, Фрагменты бреда — за ✦ (xgen)
-- **Артефакты T1–T5:** Случайный артефакт из пула по тиру — T1–T2 за ✦, T3–T5 за ⭐ (Stars)
-- **Мгновенное завершение:** 3 ⭐
-- **Таинственный ящик:** 200 ✦ — случайный лут
-
-### Архитектура
-- `content/shop.json` — каталог товаров (загружается ContentLoader)
-- `routers/shop.py` — `GET /shop/catalog` + `POST /shop/buy`
-- `pages/Shop.tsx` — страница с категориями, карточками, комментариями AI-продавца
-- В NavBar добавляется кнопка `Store` (6-я, между Profile и Settings)
-
-### Визуал
-- Тёплый amber-фон вместо холодного циана
-- Карточки с эффектом старой бумаги/чека
-- Акцент: янтарный неон (#f59e0b)
-- Stagger-анимация входа карточек
-- Комментарий продавца после покупки
-
-### Файлы
-- `backend/content/shop.json` — создать
-- `backend/app/services/content_loader.py` — `_shop` + property
-- `backend/app/routers/shop.py` — создать
-- `backend/app/main.py` — `include_router`
-- `frontend/src/types/index.ts` — `ShopItem`, `BuyRequest`, `BuyResponse`
-- `frontend/src/api/client.ts` — `getShopCatalog()`, `buyShopItem()`
-- `frontend/src/pages/Shop.tsx` — создать
-- `frontend/src/App.tsx` — роут `/shop`
-- `frontend/src/components/NavBar.tsx` — кнопка Store
-- `frontend/src/lib/i18n.ts` — `nav.shop`
+### Решение (2026-06-08): Артефакты в магазине
+- Артефакты продаются **напрямую** (поштучно), а не случайным выбором
+- В `artifacts.json` добавлены поля:
+  - `shop_available: bool` — флаг доступности в лавке (4 наградных артефакта = `false`)
+  - `price: { amount, currency }` — цена по тиру (T1–T2 за ✦, T3–T5 за ⭐)
+  - `icon_path: ""` — SVG иконки (пока не готовы)
+- `content/shop.json` — больше не содержит случайные артефакты (fuel_pack, repair_pack, fragment_pack, mystery_box, instant_finish)
+- `GET /shop/catalog` — мержит shop.json + артефакты с `shop_available: true`
+- `POST /shop/buy` — принимает item_id артефакта напрямую, проверяет `shop_available`, цену, выдаёт в инвентарь
+- `pages/Shop.tsx` — артефакты сгруппированы по тирам (Ранг I–V), показывают:
+  - Rarity badge (C/U/R/E/L) с цветом
+  - `icon_path` placeholder (Diamond SVG)
+  - Модификаторы статов
+  - Tier-заголовки между группами
+- Комментарии продавца для артефактов — по тиру (T1–T5), а не по id
