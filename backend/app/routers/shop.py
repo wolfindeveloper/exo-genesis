@@ -73,12 +73,12 @@ async def buy_item(
     user = user.data[0]
 
     if currency == "xgen":
-        balance = user.get("balance_xgen", 0)
-        if (balance or 0) < amount:
+        balance = int(user.get("balance_xgen", 0) or 0)
+        if balance < amount:
             raise HTTPException(status_code=400, detail="Недостаточно ✦ xGen")
     elif currency == "stars":
-        balance = user.get("balance_stars", 0)
-        if (balance or 0) < amount:
+        balance = int(user.get("balance_stars", 0) or 0)
+        if balance < amount:
             raise HTTPException(status_code=400, detail="Недостаточно ⭐ Stars")
     else:
         raise HTTPException(status_code=400, detail="Unknown currency")
@@ -177,9 +177,9 @@ async def buy_item(
                 granted.append({"type": "resource", "item_config_id": "fuel", "quantity": qty * 10})
 
     if currency == "xgen":
-        db.table("users").update({"balance_xgen": (user.get("balance_xgen", 0) or 0) - amount}).eq("id", user_id).execute()
+        db.table("users").update({"balance_xgen": int(user.get("balance_xgen", 0) or 0) - amount}).eq("id", user_id).execute()
     elif currency == "stars":
-        db.table("users").update({"balance_stars": (user.get("balance_stars", 0) or 0) - amount}).eq("id", user_id).execute()
+        db.table("users").update({"balance_stars": int(user.get("balance_stars", 0) or 0) - amount}).eq("id", user_id).execute()
 
     updated_user = db.table("users").select("*").eq("id", user_id).execute()
     updated = updated_user.data[0] if updated_user.data else user
@@ -187,6 +187,6 @@ async def buy_item(
     return {
         "status": "ok",
         "granted": granted,
-        "balance_xgen": updated.get("balance_xgen", 0),
-        "balance_stars": updated.get("balance_stars", 0),
+        "balance_xgen": int(updated.get("balance_xgen", 0) or 0),
+        "balance_stars": int(updated.get("balance_stars", 0) or 0),
     }

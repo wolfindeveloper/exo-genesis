@@ -97,14 +97,17 @@ function ArtifactCard({
   canAfford,
   isBuying,
   onBuy,
+  buyerCommentVisible,
 }: {
   item: ShopItem
   canAfford: boolean
   isBuying: boolean
   onBuy: () => void
+  buyerCommentVisible: boolean
 }) {
   const rarity = rarityConfig[item.rarity ?? 'common'] ?? rarityConfig.common
   const stats = item.stats_modifiers ?? {}
+  const isStars = item.price.currency === 'stars'
 
   return (
     <motion.div
@@ -141,11 +144,11 @@ function ArtifactCard({
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <span className="font-display text-sm tabular-nums text-neon-cyan">
+          <span className={`font-display text-sm tabular-nums ${isStars ? 'text-amber-400' : 'text-neon-cyan'}`}>
             {item.price.amount}
           </span>
-          <span className="text-[10px] ml-0.5 text-neon-cyan">
-            ✦
+          <span className={`text-[10px] ml-0.5 ${isStars ? 'text-amber-400' : 'text-neon-cyan'}`}>
+            {isStars ? '⭐' : '✦'}
           </span>
         </div>
       </div>
@@ -176,13 +179,10 @@ function ArtifactCard({
           )}
         </button>
       </div>
+
+      <SellerComment item={item} visible={buyerCommentVisible} />
     </motion.div>
   )
-}
-
-function artifactPriceCurrency(item: ShopItem): 'xgen' | 'stars' {
-  const tier = item.tier ?? 1
-  return tier <= 2 ? 'xgen' : 'stars'
 }
 
 export function Shop() {
@@ -323,8 +323,7 @@ export function Shop() {
                       <div className="h-px flex-1 bg-white/5" />
                     </div>
                     {tierArtifacts.map((item) => {
-                      const currency = artifactPriceCurrency(item)
-                      const canAfford = currency === 'stars'
+                      const canAfford = item.price.currency === 'stars'
                         ? (user?.balance_stars ?? 0) >= item.price.amount
                         : (user?.balance_xgen ?? 0) >= item.price.amount
                       return (
@@ -334,6 +333,7 @@ export function Shop() {
                           canAfford={canAfford}
                           isBuying={buying === item.id}
                           onBuy={() => handleBuy(item)}
+                          buyerCommentVisible={buyerCommentItem?.id === item.id}
                         />
                       )
                     })}
