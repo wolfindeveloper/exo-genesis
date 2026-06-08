@@ -9,6 +9,7 @@ class ContentLoader:
     _resources: list[dict] = []
     _boxes: list[dict] = []
     _ranks: list[dict] = []
+    _shop: list[dict] = []
     _guide: dict | None = None
 
     @property
@@ -30,6 +31,10 @@ class ContentLoader:
     @property
     def boxes(self) -> list[dict]:
         return self._boxes
+
+    @property
+    def shop(self) -> list[dict]:
+        return self._shop
 
     @property
     def ranks(self) -> list[dict]:
@@ -75,6 +80,7 @@ class ContentLoader:
         self._resources = self._load_json(content_dir / "resources.json")
         self._boxes = self._load_json(content_dir / "boxes.json")
         self._ranks = self._load_json(content_dir / "ranks.json")
+        self._shop = self._load_json(content_dir / "shop.json")
         self._guide = self._load_dict_json(content_dir / "guide.json")
 
     @staticmethod

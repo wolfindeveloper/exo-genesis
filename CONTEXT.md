@@ -109,3 +109,41 @@ sections = [
 5. `components/SettingsSheet.tsx` — bottom sheet
 6. `App.tsx` — NavBar редизайн + кнопка ⚙️ + initAudio
 7. Постепенная замена строк на `t()` во всех компонентах
+
+---
+
+## Спекулятивная лавка (план реализации)
+
+**Концепция:** Магазин в стиле Дугласа Адамса — тёмная подсобка на захолустной станции.
+Продавец — AI с пассивной агрессией. Каждый товар — спекуляция.
+
+### Товары
+- **Ресурсы:** Космическая заварка, Усилитель Оптимизма, Фрагменты бреда — за ✦ (xgen)
+- **Артефакты T1–T5:** Случайный артефакт из пула по тиру — T1–T2 за ✦, T3–T5 за ⭐ (Stars)
+- **Мгновенное завершение:** 3 ⭐
+- **Таинственный ящик:** 200 ✦ — случайный лут
+
+### Архитектура
+- `content/shop.json` — каталог товаров (загружается ContentLoader)
+- `routers/shop.py` — `GET /shop/catalog` + `POST /shop/buy`
+- `pages/Shop.tsx` — страница с категориями, карточками, комментариями AI-продавца
+- В NavBar добавляется кнопка `Store` (6-я, между Profile и Settings)
+
+### Визуал
+- Тёплый amber-фон вместо холодного циана
+- Карточки с эффектом старой бумаги/чека
+- Акцент: янтарный неон (#f59e0b)
+- Stagger-анимация входа карточек
+- Комментарий продавца после покупки
+
+### Файлы
+- `backend/content/shop.json` — создать
+- `backend/app/services/content_loader.py` — `_shop` + property
+- `backend/app/routers/shop.py` — создать
+- `backend/app/main.py` — `include_router`
+- `frontend/src/types/index.ts` — `ShopItem`, `BuyRequest`, `BuyResponse`
+- `frontend/src/api/client.ts` — `getShopCatalog()`, `buyShopItem()`
+- `frontend/src/pages/Shop.tsx` — создать
+- `frontend/src/App.tsx` — роут `/shop`
+- `frontend/src/components/NavBar.tsx` — кнопка Store
+- `frontend/src/lib/i18n.ts` — `nav.shop`

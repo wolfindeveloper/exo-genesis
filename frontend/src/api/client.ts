@@ -1,4 +1,4 @@
-import type { Artifact, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, UserProfile, UserStats, ShipConfig, Zone } from '../types'
+import type { Artifact, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, ShopBuyResponse, ShopItem, UserProfile, UserStats, ShipConfig, Zone } from '../types'
 import { getInitData } from '../lib/telegram'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
@@ -113,5 +113,13 @@ export const api = {
     request<{ status: string }>('/user/events', {
       method: 'POST',
       body: JSON.stringify({ event_key: eventKey }),
+    }),
+
+  getShopCatalog: () => request<ShopItem[]>('/shop/catalog'),
+
+  buyShopItem: (itemId: string) =>
+    request<ShopBuyResponse>('/shop/buy', {
+      method: 'POST',
+      body: JSON.stringify({ item_id: itemId }),
     }),
 }

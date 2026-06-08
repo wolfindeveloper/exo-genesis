@@ -1,0 +1,82 @@
+[
+  {
+    "id": "fuel_pack",
+    "category": "resources",
+    "name_key": "Космическая заварка ×10",
+    "description_key": "Дегустационный набор. Вкус — как если бы вселенная решила стать чаем, но передумала в последний момент и стала просто тёплой водой с примесью ностальгии.",
+    "price": { "amount": 50, "currency": "xgen" },
+    "rewards": [{ "type": "item", "item_type": "resource", "item_config_id": "fuel", "quantity": 10 }]
+  },
+  {
+    "id": "repair_pack",
+    "category": "resources",
+    "name_key": "Усилитель Оптимизма ×5",
+    "description_key": "Восстанавливает веру в лучшее. И прочность корабля. В основном прочность. Вера восстанавливается отдельно, в нерабочее время и за дополнительную плату.",
+    "price": { "amount": 75, "currency": "xgen" },
+    "rewards": [{ "type": "item", "item_type": "resource", "item_config_id": "repair_kit", "quantity": 5 }]
+  },
+  {
+    "id": "fragment_pack",
+    "category": "resources",
+    "name_key": "Фрагменты бреда ×20",
+    "description_key": "Проверенный набор обрывков реальности. За достоверность не отвечаем, но звучат убедительно. Особенно если читать их шёпотом при выключенном свете.",
+    "price": { "amount": 100, "currency": "xgen" },
+    "rewards": [{ "type": "item", "item_type": "fragment", "item_config_id": "fragments", "quantity": 20 }]
+  },
+  {
+    "id": "random_artifact_t1",
+    "category": "artifacts",
+    "name_key": "Случайный артефакт T1",
+    "description_key": "Снято с корабля, который, возможно, не разбился. Гарантия — пока вы видите этот текст. Как только дочитали — гарантия аннулирована.",
+    "price": { "amount": 300, "currency": "xgen" },
+    "rewards": [{ "type": "random_artifact", "tier": 1, "quantity": 1 }]
+  },
+  {
+    "id": "random_artifact_t2",
+    "category": "artifacts",
+    "name_key": "Случайный артефакт T2",
+    "description_key": "Найден в зоне повышенной аномальности. Предыдущий владелец утверждал, что это подарок судьбы. Судьба отказалась комментировать, сославшись на занятость.",
+    "price": { "amount": 800, "currency": "xgen" },
+    "rewards": [{ "type": "random_artifact", "tier": 2, "quantity": 1 }]
+  },
+  {
+    "id": "mystery_box",
+    "category": "mystery",
+    "name_key": "Таинственный ящик",
+    "description_key": "Внутри может быть что угодно. Включая разочарование. Или вторую такую же коробку, внутри которой — третья. Мы не проверяли. Честность — наша политика. Отсутствие политики — тоже наша политика.",
+    "price": { "amount": 200, "currency": "xgen" },
+    "rewards": [{ "type": "mystery_box", "quantity": 1 }]
+  },
+  {
+    "id": "premium_artifact_t3",
+    "category": "premium",
+    "name_key": "Случайный артефакт T3 ★",
+    "description_key": "Сертификат подлинности прилагается. На обороте — рецепт печенья. Печенье не прилагается.",
+    "price": { "amount": 5, "currency": "stars" },
+    "rewards": [{ "type": "random_artifact", "tier": 3, "quantity": 1 }]
+  },
+  {
+    "id": "premium_artifact_t4",
+    "category": "premium",
+    "name_key": "Случайный артефакт T4 ★",
+    "description_key": "Крайне редкий экземпляр. Если он не сломается в первую неделю — вы счастливчик. Если сломается — вы коллекционер.",
+    "price": { "amount": 15, "currency": "stars" },
+    "rewards": [{ "type": "random_artifact", "tier": 4, "quantity": 1 }]
+  },
+  {
+    "id": "premium_artifact_t5",
+    "category": "premium",
+    "name_key": "Случайный артефакт T5 ★",
+    "description_key": "Легенда. Миф. И, возможно, просто хорошо освещённый камень. Решать вам. Но если это камень — вы заплатили 50 звёзд за камень. Поздравляем.",
+    "price": { "amount": 50, "currency": "stars" },
+    "rewards": [{ "type": "random_artifact", "tier": 5, "quantity": 1 }]
+  },
+  {
+    "id": "instant_finish",
+    "category": "premium",
+    "name_key": "Мгновенное завершение ★",
+    "description_key": "Ваш корабль возвращается быстрее, чем вы успеваете пожалеть о запуске. Эффект может сопровождаться лёгким головокружением, чувством дежавю и подозрением, что вы никогда не улетали.",
+    "price": { "amount": 3, "currency": "stars" },
+    "rewards": [{ "type": "instant_finish", "quantity": 1 }]
+  }
+]

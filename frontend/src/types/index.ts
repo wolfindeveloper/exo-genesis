@@ -205,3 +205,26 @@ export interface GuideClaimRewardResponse {
   artifact_id: string
   artifact_name: string
 }
+
+export interface ShopItem {
+  id: string
+  category: string
+  name_key: string
+  description_key: string
+  price: { amount: number; currency: 'xgen' | 'stars' }
+  rewards: { type: string; quantity?: number; tier?: number; item_type?: string; item_config_id?: string }[]
+}
+
+export interface ShopGrantedItem {
+  type: string
+  item_config_id?: string
+  quantity?: number
+  tier?: number
+}
+
+export interface ShopBuyResponse {
+  status: string
+  granted: ShopGrantedItem[]
+  balance_xgen: number
+  balance_stars: number
+}

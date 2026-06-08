@@ -22,6 +22,9 @@ const dict: Record<string, Record<Language, string>> = {
     ua: '"Technological Integration" — David J. Barrios (Free Music Archive, CC BY 4.0)',
   },
 
+  // NavBar
+  'nav.shop':       { ru: 'Лавка', en: 'Shop', ua: 'Крамниця' },
+
   // Common
   'common.close':   { ru: 'Закрыть', en: 'Close', ua: 'Закрити' },
   'common.save':    { ru: 'Сохранить', en: 'Save', ua: 'Зберегти' },

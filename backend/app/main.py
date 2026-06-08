@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, content, events, expeditions, guide, health, user, user_ships
+from app.routers import auth, content, events, expeditions, guide, health, shop, user, user_ships
 from app.services.content_loader import ContentLoader
 from app.services.notifier import run_notifier
 from bot.webhook import delete_webhook, set_webhook, router as bot_router
@@ -73,5 +73,6 @@ app.include_router(expeditions.router)
 app.include_router(content.router)
 app.include_router(guide.router)
 app.include_router(events.router)
+app.include_router(shop.router)
 
 app.include_router(bot_router)

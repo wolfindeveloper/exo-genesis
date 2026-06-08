@@ -15,6 +15,7 @@ import ShipPage from './pages/ShipPage'
 import GuidePage from './pages/GuidePage'
 import { Inventory } from './pages/Inventory'
 import { Profile } from './pages/Profile'
+import { Shop } from './pages/Shop'
 import { PageTransition } from './components/PageTransition'
 
 function AppContent() {
@@ -91,6 +92,7 @@ function AppContent() {
           <Route path="/galaxy" element={<PageTransition><Galaxy /></PageTransition>} />
           <Route path="/inventory" element={<PageTransition><Inventory /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/shop" element={<PageTransition><Shop /></PageTransition>} />
         </Routes>
       </AnimatePresence>
       {error && (
