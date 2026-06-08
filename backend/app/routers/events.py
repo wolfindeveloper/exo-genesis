@@ -21,7 +21,7 @@ async def log_event(
         "stare_60s",
         "red_button_3x",
         "fuel_below_5",
-        "toggle_sound_5x",
+        "listened_5x",
         "donated",
     }
     if body.event_key not in allowed_events:

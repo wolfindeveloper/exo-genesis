@@ -231,7 +231,7 @@
           "id": "invisible_frequencies",
           "title": "Шёпот невидимых частот",
           "text": "Вы только что настроились на волну коллективного бессознательного. Надеюсь, там ничего неприличного.",
-          "unlock_event": "toggle_sound_5x",
+          "unlock_event": "listened_5x",
           "fragment_cost": 0,
           "glitch_chance": 0
         },
