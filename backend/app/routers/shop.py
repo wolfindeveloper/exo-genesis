@@ -116,25 +116,30 @@ async def buy_item(
                 item_type = reward["item_type"]
                 item_config_id = reward["item_config_id"]
 
-                existing = (
-                    db.table("user_inventory")
-                    .select("id, quantity")
-                    .eq("user_id", user_id)
-                    .eq("item_type", item_type)
-                    .eq("item_config_id", item_config_id)
-                    .execute()
-                )
-
-                if existing.data:
-                    new_qty = existing.data[0]["quantity"] + qty
-                    db.table("user_inventory").update({"quantity": new_qty}).eq("id", existing.data[0]["id"]).execute()
+                if item_type == "fragment":
+                    cur = db.table("users").select("balance_fragments").eq("id", user_id).execute().data
+                    new_frags = (cur[0]["balance_fragments"] if cur else 0) + qty
+                    db.table("users").update({"balance_fragments": new_frags}).eq("id", user_id).execute()
                 else:
-                    db.table("user_inventory").insert({
-                        "user_id": user_id,
-                        "item_type": item_type,
-                        "item_config_id": item_config_id,
-                        "quantity": qty,
-                    }).execute()
+                    existing = (
+                        db.table("user_inventory")
+                        .select("id, quantity")
+                        .eq("user_id", user_id)
+                        .eq("item_type", item_type)
+                        .eq("item_config_id", item_config_id)
+                        .execute()
+                    )
+
+                    if existing.data:
+                        new_qty = existing.data[0]["quantity"] + qty
+                        db.table("user_inventory").update({"quantity": new_qty}).eq("id", existing.data[0]["id"]).execute()
+                    else:
+                        db.table("user_inventory").insert({
+                            "user_id": user_id,
+                            "item_type": item_type,
+                            "item_config_id": item_config_id,
+                            "quantity": qty,
+                        }).execute()
 
                 granted.append({"type": rtype, "item_config_id": item_config_id, "quantity": qty})
 
