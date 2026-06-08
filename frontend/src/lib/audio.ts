@@ -28,10 +28,18 @@ export function initAudio(): HTMLAudioElement {
   return _audio
 }
 
+let _playOnClick: (() => void) | null = null
+
 export function playMusic(): void {
   const el = initAudio()
   if (el.paused) {
-    el.play().catch(() => { /* autoplay blocked — user interaction required */ })
+    el.play().catch(() => {
+      if (_playOnClick) return
+      _playOnClick = () => {
+        el.play().catch(() => {})
+      }
+      document.addEventListener('click', _playOnClick, { once: true })
+    })
   }
 }
 
