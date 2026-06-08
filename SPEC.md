@@ -388,3 +388,28 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 - [x] **ShipPage.tsx** — fuel/stability bars display `current / effective_max`, PWR/SHLD/SPD reflect real stats
 - [x] **ZoneModal.tsx** — reads `effective_stats` from API response instead of local artifact resolution
 - [x] **expeditions/start** — uses `artifact_resolver` instead of manual artifact iteration
+
+### Phase 7 — Settings & i18n ✅
+- [x] Создать `lib/i18n.ts` — словари RU/EN/UA + `t(key, lang)` — *планируется*
+- [x] Создать `hooks/useTranslate.ts` — возвращает `t()` из стора — *планируется*
+- [x] Создать `lib/audio.ts` — `initAudio()`, `playMusic()`, `stopMusic()`, `MUSIC_TRACKS` — *планируется*
+- [x] Расширить `store/game.ts`: `settings: { language, musicEnabled }` + `setLanguage`, `toggleMusic` — *планируется*
+- [x] Создать `components/SettingsSheet.tsx` — bottom sheet с секциями (язык, музыка) — *планируется*
+- [x] Переделать NavBar — только активная кнопка с текстом + кнопка ⚙️ — *планируется*
+- [x] Инициализировать аудио в App.tsx, слушать `musicEnabled` — *планируется*
+- [x] Постепенная замена строк на `t()` — начиная с NavBar, SettingsSheet — *планируется*
+
+#### NavBar — редизайн
+- Только активная кнопка показывает текст (слева от иконки)
+- Остальные — только иконки
+- 6 кнопок: Ангар | Гайд | Карта | Инв | Проф | ⚙️
+- ⚙️ открывает `SettingsSheet`
+
+#### SettingsSheet (bottom sheet)
+- **Секция «Язык»**: select с опциями RU / EN / UA
+- **Секция «Музыка»**: toggle вкл/выкл + атрибуция трека
+- Каждая секция — элемент массива. Добавление новой = +1 элемент в массиве.
+- Место для расширения: выбор трека, звуковые эффекты и т.д.
+
+#### Атрибуция музыки
+Трек: "Technological Integration (La Integración de la Tecnología)" — Cyberpunk / Darksynth Metal Instrumental by David J. Barrios — Free Music Archive — CC BY 4.0

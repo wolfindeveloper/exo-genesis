@@ -56,3 +56,56 @@ curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://backend
 - `balance_xgen` → `int()` при получении из Supabase (защита от строк)
 - BoxReveal: клиент читает `item_id` сервера, а не перевыбирает из `pool`
 - Придумать онбординг вместо BoxReveal для новых игроков
+
+---
+
+## Settings — UI Настроек (план)
+
+**Решение (2026-06-04):** Добавить кнопку ⚙️ в NavBar, открывает `SettingsSheet` — bottom sheet с настройками.
+
+### Архитектура
+- **Стор:** Расширить `GameState` → `settings: { language: 'ru' | 'en' | 'ua', musicEnabled: boolean }`
+- **Персист:** `localStorage` (не требует бекенда)
+- **i18n:** Кастомный хук `useTranslate()` + словари в `lib/i18n.ts` (RU/EN/UA)
+- **Аудио:** `HTMLAudioElement` в `lib/audio.ts`, один трек с loop
+- **UI:** `components/SettingsSheet.tsx` — bottom sheet с секциями (язык, музыка)
+
+### Структура SettingsSheet
+```typescript
+// Каждая настройка — элемент массива. Добавление новой = +1 элемент.
+sections = [
+  {
+    title: 'Язык',
+    items: [{ type: 'select', options: ['RU','EN','UA'], value: language }]
+  },
+  {
+    title: 'Музыка',
+    items: [
+      { type: 'toggle', key: 'musicEnabled', value: musicEnabled },
+      // сюда же позже: { type: 'music_track', tracks: [...], current: trackId }
+    ]
+  },
+  // место для будущих секций
+]
+```
+
+### NavBar — редизайн
+- Только активная кнопка показывает текст (слева от иконки)
+- Остальные — только иконки
+- 6 кнопок: Ангар | Гайд | Карта | Инв | Проф | ⚙️
+
+### Музыкальный трек
+- Файл: `public/music/technological_integration.mp3`
+- Атрибуция (CC BY 4.0):
+  > "Technological Integration (La Integración de la Tecnología)" — Cyberpunk / Darksynth Metal Instrumental  
+  > by David J. Barrios — Free Music Archive — CC BY 4.0
+- Кредиты показывать под переключателем музыки в SettingsSheet
+
+### План реализации
+1. `lib/i18n.ts` — словари RU/EN/UA + `t(key, lang)`
+2. `hooks/useTranslate.ts` — возвращает `t()` из стора
+3. `lib/audio.ts` — `initAudio()`, `playMusic()`, `stopMusic()`, `MUSIC_TRACKS`
+4. `store/game.ts` — расширить: `settings` slice + экшены
+5. `components/SettingsSheet.tsx` — bottom sheet
+6. `App.tsx` — NavBar редизайн + кнопка ⚙️ + initAudio
+7. Постепенная замена строк на `t()` во всех компонентах
