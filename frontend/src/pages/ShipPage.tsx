@@ -187,9 +187,12 @@ export default function ShipPage() {
     await refuelShip(mainShip.id, 'fuel')
   }
 
+  const repairMsg = '«Уровень Оптимизма восстановлен. Корабль снова верит, что долетит до конца карты, хотя это крайне сомнительно»'
+
   const handleRepair = async () => {
     if (!mainShip || repairInInventory === 0) return
     await repairShip(mainShip.id, 'repair_kit')
+    setConsoleMsg(repairMsg)
   }
 
   /* ── Expedition state ── */
