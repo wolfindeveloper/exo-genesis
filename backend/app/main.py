@@ -53,6 +53,7 @@ app = FastAPI(
 origins = [
     settings.frontend_url,
     "https://exo-genesis.vercel.app",
+    "https://exo-genesis-1ac1.apps.hostingguru.io",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
