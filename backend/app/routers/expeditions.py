@@ -119,9 +119,9 @@ async def start_expedition(
     eff = resolved["effective_stats"]
     artifacts = [{
         "speed_mod": eff["total_speed_bonus"],
-        "stability_bonus": eff["total_stability_bonus"],
+        "damage_reduction": eff["damage_reduction"],
         "fuel_efficiency": eff["total_fuel_efficiency"],
-    }] if (eff["total_speed_bonus"] or eff["total_stability_bonus"] or eff["total_fuel_efficiency"]) else []
+    }] if (eff["total_speed_bonus"] or eff["damage_reduction"] or eff["total_fuel_efficiency"]) else []
 
     stats = calculate_zone_stats(
         zone_config=zone_config,
@@ -206,11 +206,16 @@ async def claim_expedition(
         .execute()
     ).data[0]
 
+    ship_config = content.get_ship(ship["ship_config_id"]) or {}
+    resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
+    damage_reduction = resolved["effective_stats"]["damage_reduction"]
+
     rng = random.Random()
     new_stability = calculate_damage(
         zone_config.get("risk_factor", 0.1),
         ship["stability"],
         rng,
+        damage_reduction,
     )
 
     db.table("user_ships").update({

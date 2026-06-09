@@ -86,7 +86,7 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
     if (!eff) return []
     const mods: Record<string, number> = {}
     if (eff.total_speed_bonus) mods.speed_mod = eff.total_speed_bonus
-    if (eff.total_stability_bonus) mods.stability_bonus = eff.total_stability_bonus
+    if (eff.damage_reduction) mods.damage_reduction = eff.damage_reduction
     if (eff.total_fuel_efficiency) mods.fuel_efficiency = eff.total_fuel_efficiency
     return Object.keys(mods).length > 0 ? [mods] : []
   }, [eff])
@@ -197,7 +197,7 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
                 {Object.entries(artifactBonuses[0]).map(([key, val]) => {
                   const color =
                     key === 'speed_mod' ? 'text-neon-cyan border-neon-cyan/20 bg-neon-cyan/10'
-                    : key === 'stability_bonus' ? 'text-neon-green border-neon-green/20 bg-neon-green/10'
+                    : key === 'damage_reduction' ? 'text-neon-green border-neon-green/20 bg-neon-green/10'
                     : key === 'fuel_efficiency' ? 'text-neon-amber border-neon-amber/20 bg-neon-amber/10'
                     : 'text-slate-400 border-white/10 bg-white/5'
                   return (

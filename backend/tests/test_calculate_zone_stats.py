@@ -43,10 +43,10 @@ class TestCalculateZoneStats:
     def test_with_artifact_bonuses(self):
         zone = {"risk_factor": 0.1, "fuel_cost": 10, "duration_hours": 4}
         bonuses = [
-            {"stability_bonus": 0.02},
+            {"damage_reduction": 0.02},
             {"fuel_efficiency": 0.1},
             {"speed_mod": 0.2},
-            {"stability_bonus": 0.01},
+            {"damage_reduction": 0.01},
         ]
         result = calculate_zone_stats(zone, 100, 1.2, 100, bonuses)
         assert result == {

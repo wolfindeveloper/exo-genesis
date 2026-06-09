@@ -2,7 +2,7 @@ export interface EffectiveStats {
   max_stability: number
   max_fuel: number
   speed_mod: number
-  total_stability_bonus: number
+  damage_reduction: number
   total_speed_bonus: number
   total_fuel_efficiency: number
 }

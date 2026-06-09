@@ -11,7 +11,7 @@ def resolve_effective_stats(
     base_fuel = base_stats.get("fuel_capacity", 100)
     base_speed = base_stats.get("speed_mod", 1.0)
 
-    total_stability_bonus = 0.0
+    total_damage_reduction = 0.0
     total_speed_bonus = 0.0
     total_fuel_efficiency = 0.0
 
@@ -24,7 +24,7 @@ def resolve_effective_stats(
         if a:
             resolved_artifacts.append(a)
             mods = a.get("stats_modifiers", {})
-            total_stability_bonus += mods.get("stability_bonus", 0)
+            total_damage_reduction += mods.get("stability_bonus", 0)
             total_speed_bonus += mods.get("speed_mod", 0)
             total_fuel_efficiency += mods.get("fuel_efficiency", 0)
         else:
@@ -33,10 +33,10 @@ def resolve_effective_stats(
     return {
         "resolved_artifacts": resolved_artifacts,
         "effective_stats": {
-            "max_stability": base_stability + total_stability_bonus,
+            "max_stability": base_stability,
             "max_fuel": base_fuel,
             "speed_mod": base_speed,
-            "total_stability_bonus": total_stability_bonus,
+            "damage_reduction": total_damage_reduction,
             "total_speed_bonus": total_speed_bonus,
             "total_fuel_efficiency": total_fuel_efficiency,
         },

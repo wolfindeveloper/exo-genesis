@@ -19,14 +19,14 @@ def calculate_zone_stats(
     artifact_bonuses: list[dict] | None = None,
 ) -> dict:
     total_speed_bonus = sum(a.get("speed_mod", 0) for a in (artifact_bonuses or []))
-    total_stability_bonus = sum(a.get("stability_bonus", 0) for a in (artifact_bonuses or []))
+    total_damage_reduction = sum(a.get("damage_reduction", 0) for a in (artifact_bonuses or []))
     total_fuel_efficiency = sum(a.get("fuel_efficiency", 0) for a in (artifact_bonuses or []))
 
     risk_factor = zone_config.get("risk_factor", 0.1)
     fuel_cost = zone_config.get("fuel_cost", 10)
     duration_hours = zone_config.get("duration_hours", 4)
 
-    effective_risk = risk_factor * (1 - ship_stability / 200) - total_stability_bonus
+    effective_risk = risk_factor * (1 - ship_stability / 200) - total_damage_reduction
     effective_fuel_cost = fuel_cost * (1 - total_fuel_efficiency)
     effective_duration = duration_hours / ship_speed_mod * (1 - total_speed_bonus)
 
@@ -64,6 +64,7 @@ def calculate_loot(
     return [{"item_config_id": chosen["item_id"], "quantity": quantity}]
 
 
-def calculate_damage(risk_factor: float, stability: float, rng: random.Random) -> float:
+def calculate_damage(risk_factor: float, stability: float, rng: random.Random, damage_reduction: float = 0) -> float:
     damage = risk_factor * rng.uniform(5, 15)
+    damage = damage * (1 - damage_reduction / 100)
     return round(max(0, stability - damage), 1)

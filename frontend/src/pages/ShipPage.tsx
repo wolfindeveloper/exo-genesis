@@ -537,7 +537,7 @@ export default function ShipPage() {
                 {/* stats bar */}
                 <div className="flex justify-between mt-2 text-[7px] text-cyan-400/20 tracking-wider">
                   <span>PWR {Math.round(mainShip?.fuel_current ?? 0)}/{Math.round(mainShip?.effective_stats?.max_fuel ?? 100)}</span>
-                  <span>SHLD {Math.round(mainShip?.effective_stats?.max_stability ?? 100)}%</span>
+                  <span>SHLD {Math.round(mainShip?.effective_stats?.max_stability ?? 100)}%{mainShip?.effective_stats?.damage_reduction ? ` -${mainShip.effective_stats.damage_reduction}%DMG` : ''}</span>
                   <span>SPD {((mainShip?.effective_stats?.speed_mod ?? 1.0) + (mainShip?.effective_stats?.total_speed_bonus ?? 0)).toFixed(2)}</span>
                 </div>
               </div>

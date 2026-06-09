@@ -43,10 +43,10 @@ describe('calculateZoneStats', () => {
 
   it('artifact bonuses reduce risk, fuel, and duration', () => {
     const bonuses = [
-      { stability_bonus: 0.02 },
+      { damage_reduction: 0.02 },
       { fuel_efficiency: 0.1 },
       { speed_mod: 0.2 },
-      { stability_bonus: 0.01 },
+      { damage_reduction: 0.01 },
     ]
     const result = calculateZoneStats(0.1, 10, 4, 100, 1.2, 100, bonuses)
     expect(result).toEqual({

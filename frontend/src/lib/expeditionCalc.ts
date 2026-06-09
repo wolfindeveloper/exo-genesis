@@ -10,7 +10,7 @@ export interface CalculatedStats {
 
 export interface ArtifactBonus {
   speed_mod?: number
-  stability_bonus?: number
+  damage_reduction?: number
   fuel_efficiency?: number
 }
 
@@ -24,10 +24,10 @@ export function calculateZoneStats(
   artifactBonuses: ArtifactBonus[] = [],
 ): CalculatedStats {
   const totalSpeedBonus = artifactBonuses.reduce((s, a) => s + (a.speed_mod || 0), 0)
-  const totalStabilityBonus = artifactBonuses.reduce((s, a) => s + (a.stability_bonus || 0), 0)
+  const totalDamageReduction = artifactBonuses.reduce((s, a) => s + (a.damage_reduction || 0), 0)
   const totalFuelEfficiency = artifactBonuses.reduce((s, a) => s + (a.fuel_efficiency || 0), 0)
 
-  const effectiveRisk = zoneRiskFactor * (1 - shipStability / 200) - totalStabilityBonus
+  const effectiveRisk = zoneRiskFactor * (1 - shipStability / 200) - totalDamageReduction
   const effectiveFuelCost = zoneFuelCost * (1 - totalFuelEfficiency)
   const effectiveDuration = zoneDurationHours / shipSpeedMod * (1 - totalSpeedBonus)
 
