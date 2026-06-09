@@ -9,7 +9,7 @@
       "speed_mod": 0.12,
       "fuel_efficiency": 0.1
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -26,7 +26,7 @@
       "speed_mod": 0.19,
       "stability_bonus": 9.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -44,7 +44,7 @@
       "stability_bonus": 13.0,
       "fuel_efficiency": 0.2
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -61,7 +61,7 @@
       "speed_mod": 0.33,
       "stability_bonus": 17.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -79,7 +79,7 @@
       "stability_bonus": 21.0,
       "fuel_efficiency": 0.31
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -96,7 +96,7 @@
       "stability_bonus": 3.0,
       "fuel_efficiency": 0.09
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -113,7 +113,7 @@
       "speed_mod": 0.18,
       "stability_bonus": 9.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -131,7 +131,7 @@
       "stability_bonus": 14.0,
       "fuel_efficiency": 0.19
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -148,7 +148,7 @@
       "speed_mod": 0.35,
       "stability_bonus": 18.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -166,7 +166,7 @@
       "stability_bonus": 22.0,
       "fuel_efficiency": 0.33
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -182,7 +182,7 @@
     "stats_modifiers": {
       "stability_bonus": 4.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -200,7 +200,7 @@
       "stability_bonus": 8.0,
       "fuel_efficiency": 0.13
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -217,7 +217,7 @@
       "speed_mod": 0.27,
       "stability_bonus": 14.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -234,7 +234,7 @@
       "stability_bonus": 17.0,
       "fuel_efficiency": 0.25
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -252,7 +252,7 @@
       "stability_bonus": 23.0,
       "fuel_efficiency": 0.32
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -268,7 +268,7 @@
     "stats_modifiers": {
       "speed_mod": 0.11
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -285,7 +285,7 @@
       "stability_bonus": 9.0,
       "fuel_efficiency": 0.14
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -303,7 +303,7 @@
       "stability_bonus": 15.0,
       "fuel_efficiency": 0.21
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -320,7 +320,7 @@
       "speed_mod": 0.36,
       "fuel_efficiency": 0.27
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -337,7 +337,7 @@
       "stability_bonus": 24.0,
       "fuel_efficiency": 0.34
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -354,7 +354,7 @@
       "speed_mod": 0.13,
       "stability_bonus": 6.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -370,7 +370,7 @@
     "stats_modifiers": {
       "speed_mod": 0.18
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -388,7 +388,7 @@
       "stability_bonus": 16.0,
       "fuel_efficiency": 0.22
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -405,7 +405,7 @@
       "stability_bonus": 19.0,
       "fuel_efficiency": 0.26
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -423,7 +423,7 @@
       "stability_bonus": 25.0,
       "fuel_efficiency": 0.35
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -439,7 +439,7 @@
     "stats_modifiers": {
       "fuel_efficiency": 0.11
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -456,7 +456,7 @@
       "speed_mod": 0.19,
       "fuel_efficiency": 0.15
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -473,7 +473,7 @@
       "stability_bonus": 15.0,
       "fuel_efficiency": 0.2
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -491,7 +491,7 @@
       "stability_bonus": 20.0,
       "fuel_efficiency": 0.28
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -509,7 +509,7 @@
       "stability_bonus": 26.0,
       "fuel_efficiency": 0.36
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -526,7 +526,7 @@
       "speed_mod": 0.14,
       "stability_bonus": 7.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -543,7 +543,7 @@
       "stability_bonus": 10.0,
       "fuel_efficiency": 0.16
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -560,7 +560,7 @@
       "speed_mod": 0.3,
       "stability_bonus": 16.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -577,7 +577,7 @@
       "speed_mod": 0.38,
       "fuel_efficiency": 0.29
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -595,7 +595,7 @@
       "stability_bonus": 27.0,
       "fuel_efficiency": 0.37
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -611,7 +611,7 @@
     "stats_modifiers": {
       "fuel_efficiency": 0.12
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t1.svg",
     "shop_available": true,
     "price": {
       "amount": 300,
@@ -628,7 +628,7 @@
       "speed_mod": 0.2,
       "stability_bonus": 11.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t2.svg",
     "shop_available": true,
     "price": {
       "amount": 800,
@@ -645,7 +645,7 @@
       "speed_mod": 0.31,
       "fuel_efficiency": 0.23
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": true,
     "price": {
       "amount": 5,
@@ -662,7 +662,7 @@
       "stability_bonus": 21.0,
       "fuel_efficiency": 0.3
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": true,
     "price": {
       "amount": 15,
@@ -680,7 +680,7 @@
       "stability_bonus": 28.0,
       "fuel_efficiency": 0.38
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": true,
     "price": {
       "amount": 50,
@@ -696,7 +696,7 @@
     "stats_modifiers": {
       "stability_bonus": 5.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": false,
     "price": {
       "amount": 5,
@@ -712,7 +712,7 @@
     "stats_modifiers": {
       "stability_bonus": 8.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t3.svg",
     "shop_available": false,
     "price": {
       "amount": 5,
@@ -728,7 +728,7 @@
     "stats_modifiers": {
       "stability_bonus": 15.0
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t4.svg",
     "shop_available": false,
     "price": {
       "amount": 15,
@@ -745,7 +745,7 @@
       "speed_mod": 0.2,
       "fuel_efficiency": 0.15
     },
-    "icon_path": "",
+    "icon_path": "/artifacts/t5.svg",
     "shop_available": false,
     "price": {
       "amount": 50,

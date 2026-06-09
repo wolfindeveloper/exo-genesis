@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { fadeIn, scaleIn, staggerContainer } from '../lib/animations'
 import { hapticImpact } from '../lib/telegram'
+import { statIcons, statLabels } from '../lib/stats'
 import { useGameStore } from '../store/game'
 import type { Artifact, InventoryItem, Resource } from '../types'
 
@@ -90,7 +91,7 @@ function buildInfo(item: InventoryItem, resMap: Map<string, Resource>, artMap: M
       name: a.name_key ?? item.item_config_id,
       tier: a.tier ?? 1,
       rarity: a.rarity ?? 'common',
-      icon_path: '',
+      icon_path: a.icon_path ?? '',
       description_key: a.description_key,
     }
   }
@@ -395,9 +396,9 @@ const InventoryRow = memo(function InventoryRow({
         </p>
         {item.item_type === 'artifact' && Object.keys(meta).length > 0 && (
           <div className="flex gap-2 mt-1">
-            {(meta.speed_mod as number) && <span className="text-[9px] text-neon-cyan/70">⚡ +{(meta.speed_mod as number).toFixed(2)}</span>}
-            {(meta.stability_bonus as number) && <span className="text-[9px] text-neon-green/70">🛡️ +{meta.stability_bonus as number}</span>}
-            {(meta.fuel_efficiency as number) && <span className="text-[9px] text-neon-amber/70">⛽ +{(meta.fuel_efficiency as number).toFixed(2)}</span>}
+            {(meta.speed_mod as number) && <span className="text-[9px] text-neon-cyan/70">{statIcons.speed_mod} +{(meta.speed_mod as number).toFixed(2)}</span>}
+            {(meta.stability_bonus as number) && <span className="text-[9px] text-neon-green/70">{statIcons.stability_bonus} +{meta.stability_bonus as number}</span>}
+            {(meta.fuel_efficiency as number) && <span className="text-[9px] text-neon-amber/70">{statIcons.fuel_efficiency} +{(meta.fuel_efficiency as number).toFixed(2)}</span>}
           </div>
         )}
       </div>
@@ -579,19 +580,19 @@ function ItemDetailSheet({
               <div className="grid grid-cols-2 gap-2">
                 {(meta.speed_mod as number) && (
                   <div className="glass-card px-3 py-2 text-center">
-                    <p className="text-[10px] text-slate-500">⚡ Скорость</p>
+                    <p className="text-[10px] text-slate-500">{statLabels.speed_mod}</p>
                     <p className="text-sm text-neon-cyan font-mono">+{(meta.speed_mod as number).toFixed(2)}</p>
                   </div>
                 )}
                 {(meta.stability_bonus as number) && (
                   <div className="glass-card px-3 py-2 text-center">
-                    <p className="text-[10px] text-slate-500">🛡️ Стабильность</p>
+                    <p className="text-[10px] text-slate-500">{statLabels.stability_bonus}</p>
                     <p className="text-sm text-neon-green font-mono">+{meta.stability_bonus as number}</p>
                   </div>
                 )}
                 {(meta.fuel_efficiency as number) && (
                   <div className="glass-card px-3 py-2 text-center">
-                    <p className="text-[10px] text-slate-500">⛽ Эффективность</p>
+                    <p className="text-[10px] text-slate-500">{statLabels.fuel_efficiency}</p>
                     <p className="text-sm text-neon-amber font-mono">+{(meta.fuel_efficiency as number).toFixed(2)}</p>
                   </div>
                 )}

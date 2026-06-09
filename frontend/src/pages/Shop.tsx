@@ -4,6 +4,7 @@ import { AlertTriangle, Diamond, Gift, Package, ShoppingBag, Star } from 'lucide
 
 import { api } from '../api/client'
 import { useGameStore } from '../store/game'
+import { statLabels } from '../lib/stats'
 import type { ShopBuyResponse, ShopItem } from '../types'
 
 const rarityConfig: Record<string, { color: string; label: string }> = {
@@ -43,12 +44,6 @@ const artifactComments: Record<number, string[]> = {
   3: ['«Редкость. Как честный политик.»', '«T3. Золотая середина между «дешево» и «дорого».»'],
   4: ['«Эпик. Вы либо везунчик, либо транжира.»', '«T4. Если не работает — попробуйте перезагрузить вселенную.»'],
   5: ['«Легендарно. Поздравляю. Вы разорились.»', '«T5. Единственное, что легендарнее этого артефакта — ваша способность тратить звёзды.»'],
-}
-
-const statLabels: Record<string, string> = {
-  speed_mod: '⚡ Скорость',
-  stability_bonus: '🛡️ Стабильность',
-  fuel_efficiency: '⛽ Расход',
 }
 
 const categories = ['resources', 'artifacts', 'premium', 'mystery']

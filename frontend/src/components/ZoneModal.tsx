@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 
 import { calculateZoneStats } from '../lib/expeditionCalc'
+import { statLabels } from '../lib/stats'
 import { useGameStore } from '../store/game'
 import type { Zone } from '../types'
 
@@ -188,6 +189,26 @@ export function ZoneModal({ zone, onClose, onStart, isLoading }: ZoneModalProps)
               ))}
             </div>
           </div>
+
+          {artifactBonuses.length > 0 && (
+            <div>
+              <h4 className="text-[10px] font-display uppercase tracking-wider text-slate-500 mb-2">Бонусы артефактов</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {Object.entries(artifactBonuses[0]).map(([key, val]) => {
+                  const color =
+                    key === 'speed_mod' ? 'text-neon-cyan border-neon-cyan/20 bg-neon-cyan/10'
+                    : key === 'stability_bonus' ? 'text-neon-green border-neon-green/20 bg-neon-green/10'
+                    : key === 'fuel_efficiency' ? 'text-neon-amber border-neon-amber/20 bg-neon-amber/10'
+                    : 'text-slate-400 border-white/10 bg-white/5'
+                  return (
+                    <span key={key} className={`text-[10px] px-2 py-1 rounded-md border ${color}`}>
+                      {statLabels[key] || key} {val > 0 ? '+' : ''}{val}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {calcedStats && (
             <div className="flex justify-between text-xs">

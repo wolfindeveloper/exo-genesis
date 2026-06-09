@@ -90,6 +90,7 @@ export interface Artifact {
   tier: number
   rarity: string
   stats_modifiers?: Record<string, number>
+  icon_path?: string
 }
 
 export interface Resource {
