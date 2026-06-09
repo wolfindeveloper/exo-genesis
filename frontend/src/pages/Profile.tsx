@@ -167,6 +167,16 @@ export function Profile() {
 
   if (!user) return <div className="p-4 pb-28 space-y-4">{Array.from({ length: 4 }, (_, i) => <div key={i} className="shimmer rounded-xl h-24" />)}</div>
 
+  const safeStats = stats || {
+    total_expeditions: 0, completed_expeditions: 0, failed_expeditions: 0,
+    artifacts_crafted: 0, joined_days: 0, total_xp_earned: 0, zones_explored: 0,
+    equipped_artifacts_count: 0, unique_artifacts: 0,
+    resources: { fuel: 0, repair_kits: 0 },
+    guide_progress: { total_chapters: 0, completed_chapters: 0, entries_researched: 0 },
+    recent_expeditions: [],
+    glitches_fixed: 0, total_purchases: 0,
+  } satisfies UserStats
+
   const ringRadius = 36
   const ringCircumference = 2 * Math.PI * ringRadius
   const ringOffset = ringCircumference - (xpPercent / 100) * ringCircumference
@@ -560,9 +570,9 @@ export function Profile() {
       >
         {Object.entries(ACHIEVEMENT_DEFS).map(([aid, def]) => {
           const claimed = claimedSet.has(aid)
-          const met = def.check(stats || {} as UserStats, user?.streak_days ?? 0)
+          const met = def.check(safeStats, user?.streak_days ?? 0)
           const Icon = def.icon
-          const prog = def.progress?.(stats || {} as UserStats, user?.streak_days ?? 0)
+          const prog = def.progress?.(safeStats, user?.streak_days ?? 0)
           const canClaim = met && !claimed
 
           return (
