@@ -13,7 +13,7 @@ import { getNextLevelXp, getXpProgress } from '../lib/xp'
 import { getTierForLevel, findRank } from '../lib/ranks'
 import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import { useGameStore } from '../store/game'
-import type { UserStats } from '../types'
+import type { Artifact, Resource, UserStats } from '../types'
 
 const tierGradients = [
   'from-cyan-500/20 to-blue-600/20',
@@ -88,6 +88,8 @@ export function Profile() {
   const claimAchievement = useGameStore((s) => s.claimAchievement)
   const updateNickname = useGameStore((s) => s.updateNickname)
   const artifactsContent = useGameStore((s) => s.artifactsContent)
+  const zonesContent = useGameStore((s) => s.zonesContent)
+  const resourcesContent = useGameStore((s) => s.resourcesContent)
   const [editing, setEditing] = useState(false)
   const [nick, setNick] = useState('')
   const [claiming, setClaiming] = useState<string | null>(null)
@@ -110,7 +112,7 @@ export function Profile() {
     [mainShip],
   )
 
-  const equippedCount = mainShip?.equipped_artifacts?.length ?? 0
+  const equippedCount = mainShip?.equipped_artifacts?.filter(Boolean).length ?? 0
 
   const claimedSet = useMemo(() => new Set(achievements.filter((a) => a.claimed).map((a) => a.achievement_id)), [achievements])
 
@@ -176,6 +178,20 @@ export function Profile() {
     recent_expeditions: [],
     glitches_fixed: 0, total_purchases: 0,
   } satisfies UserStats
+
+  const zoneName = (id: string) => zonesContent.find((z) => z.id === id)?.name_key || id
+  const itemName = (id: string) => {
+    const r = resourcesContent.find((r) => r.id === id)
+    if (r) return r.name_key
+    const a = artifactsContent.find((a) => a.id === id)
+    if (a) return a.name_key
+    return id
+  }
+  const readableLoot = (summary: string) =>
+    summary.split(', ').map((part) => {
+      const m = part.match(/^(.+?)x(\d+)$/)
+      return m ? `${itemName(m[1])} x${m[2]}` : part
+    }).join(', ')
 
   const ringRadius = 36
   const ringCircumference = 2 * Math.PI * ringRadius
@@ -536,13 +552,13 @@ export function Profile() {
                 <div className={`w-2 h-2 rounded-full shrink-0 ${exp.status === 'completed' ? 'bg-neon-green' : exp.status === 'failed' ? 'bg-red-500' : 'bg-slate-600'}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-slate-300 truncate">{exp.zone_config_id}</span>
+                    <span className="text-[10px] text-slate-300 truncate">{zoneName(exp.zone_config_id)}</span>
                     <span className={`text-[8px] ${exp.status === 'completed' ? 'text-neon-green' : exp.status === 'failed' ? 'text-red-400' : 'text-slate-500'}`}>
                       {exp.status === 'completed' ? 'Успех' : exp.status === 'failed' ? 'Провал' : exp.status}
                     </span>
                   </div>
                   {exp.loot_summary && (
-                    <p className="text-[8px] text-slate-600 truncate mt-0.5">{exp.loot_summary}</p>
+                    <p className="text-[8px] text-slate-600 truncate mt-0.5">{readableLoot(exp.loot_summary)}</p>
                   )}
                 </div>
                 {exp.end_time && (
