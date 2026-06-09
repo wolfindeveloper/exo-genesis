@@ -1,6 +1,10 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from supabase import Client
+
+logger = logging.getLogger(__name__)
 
 from app.core.dependencies import (
     get_content_loader,
@@ -86,28 +90,34 @@ async def refuel_ship(
     db: Client = Depends(get_db),
     content: ContentLoader = Depends(get_content_loader),
 ):
-    ship = await _get_ship_or_404(ship_id, user_id, db)
-    if ship["status"] != "idle":
-        raise HTTPException(status_code=400, detail="Ship must be idle")
+    try:
+        ship = await _get_ship_or_404(ship_id, user_id, db)
+        if ship["status"] != "idle":
+            raise HTTPException(status_code=400, detail="Ship must be idle")
 
-    resource = content.get_resource(body.resource_id)
-    if not resource or resource.get("resource_type") != "fuel":
-        raise HTTPException(status_code=400, detail="Not a fuel resource")
+        resource = content.get_resource(body.resource_id)
+        if not resource or resource.get("resource_type") != "fuel":
+            raise HTTPException(status_code=400, detail="Not a fuel resource")
 
-    ship_config = content.get_ship(ship["ship_config_id"]) or {}
-    resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
-    max_fuel = resolved["effective_stats"]["max_fuel"]
+        ship_config = content.get_ship(ship["ship_config_id"]) or {}
+        resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
+        max_fuel = resolved["effective_stats"]["max_fuel"]
 
-    if ship["fuel_current"] >= max_fuel:
-        raise HTTPException(status_code=400, detail="Fuel already full")
+        if ship["fuel_current"] >= max_fuel:
+            raise HTTPException(status_code=400, detail="Fuel already full")
 
-    _use_resource_on_ship(ship, resource, max_fuel, 10, db)
+        _use_resource_on_ship(ship, resource, max_fuel, 10, db)
 
-    updated_ship = _enrich_ship(
-        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
-    )
-    updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
-    return {"ship": updated_ship, "inventory": updated_inv}
+        updated_ship = _enrich_ship(
+            db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
+        )
+        updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
+        return {"ship": updated_ship, "inventory": updated_inv}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("refuel_ship failed: %s", e)
+        raise HTTPException(status_code=500, detail=f"Refuel failed: {e}")
 
 
 @router.post("/{ship_id}/repair")
@@ -118,28 +128,34 @@ async def repair_ship(
     db: Client = Depends(get_db),
     content: ContentLoader = Depends(get_content_loader),
 ):
-    ship = await _get_ship_or_404(ship_id, user_id, db)
-    if ship["status"] != "idle":
-        raise HTTPException(status_code=400, detail="Ship must be idle")
+    try:
+        ship = await _get_ship_or_404(ship_id, user_id, db)
+        if ship["status"] != "idle":
+            raise HTTPException(status_code=400, detail="Ship must be idle")
 
-    resource = content.get_resource(body.resource_id)
-    if not resource or resource.get("resource_type") != "repair_kit":
-        raise HTTPException(status_code=400, detail="Not a repair resource")
+        resource = content.get_resource(body.resource_id)
+        if not resource or resource.get("resource_type") != "repair_kit":
+            raise HTTPException(status_code=400, detail="Not a repair resource")
 
-    ship_config = content.get_ship(ship["ship_config_id"]) or {}
-    resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
-    max_stability = resolved["effective_stats"]["max_stability"]
+        ship_config = content.get_ship(ship["ship_config_id"]) or {}
+        resolved = resolve_effective_stats(ship_config, ship.get("equipped_artifacts", []), content)
+        max_stability = resolved["effective_stats"]["max_stability"]
 
-    if ship["stability"] >= max_stability:
-        raise HTTPException(status_code=400, detail="Stability already full")
+        if ship["stability"] >= max_stability:
+            raise HTTPException(status_code=400, detail="Stability already full")
 
-    _use_resource_on_ship(ship, resource, max_stability, 10, db)
+        _use_resource_on_ship(ship, resource, max_stability, 10, db)
 
-    updated_ship = _enrich_ship(
-        db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
-    )
-    updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
-    return {"ship": updated_ship, "inventory": updated_inv}
+        updated_ship = _enrich_ship(
+            db.table("user_ships").select("*").eq("id", ship_id).execute().data[0], content,
+        )
+        updated_inv = db.table("user_inventory").select("*").eq("user_id", user_id).execute().data or []
+        return {"ship": updated_ship, "inventory": updated_inv}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("repair_ship failed: %s", e)
+        raise HTTPException(status_code=500, detail=f"Repair failed: {e}")
 
 
 class EquipRequest(BaseModel):
