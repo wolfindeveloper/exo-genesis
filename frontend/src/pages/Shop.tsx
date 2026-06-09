@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { AlertTriangle, Diamond, Gift, Package, ShoppingBag, Star, Zap } from 'lucide-react'
+import { AlertTriangle, Diamond, Gift, Package, ShoppingBag, Star } from 'lucide-react'
 
 import { api } from '../api/client'
 import { useGameStore } from '../store/game'
@@ -45,6 +45,12 @@ const artifactComments: Record<number, string[]> = {
   5: ['«Легендарно. Поздравляю. Вы разорились.»', '«T5. Единственное, что легендарнее этого артефакта — ваша способность тратить звёзды.»'],
 }
 
+const statLabels: Record<string, string> = {
+  speed_mod: '⚡ Скорость',
+  stability_bonus: '🛡️ Стабильность',
+  fuel_efficiency: '⛽ Расход',
+}
+
 const categories = ['resources', 'artifacts', 'premium', 'mystery']
 const categoryLabels: Record<string, string> = {
   resources: 'Ресурсы',
@@ -86,8 +92,10 @@ function SellerComment({ item, visible }: { item: ShopItem; visible: boolean }) 
 function StatBadge({ label, value }: { label: string; value: number }) {
   return (
     <span className="inline-flex items-center gap-1 text-[9px] text-slate-500 bg-white/5 px-1.5 py-0.5 rounded-md">
-      <Zap size={10} className="text-neon-cyan/60" />
-      {label} {value > 0 ? '+' : ''}{value}
+      <span className="text-[9px]">{statLabels[label] || label}</span>
+      <span className={value > 0 ? 'text-neon-cyan' : 'text-slate-500'}>
+        {value > 0 ? '+' : ''}{value}
+      </span>
     </span>
   )
 }
