@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Artifact, Expedition, GuideChapterSummary, GuideClaimRewardResponse, InventoryItem, LootResult, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
+import type { AchievementStatus, Artifact, Expedition, GuideChapterSummary, GuideClaimRewardResponse, InventoryItem, LootResult, Rank, Resource, Ship, ShipConfig, UserProfile, UserStats, Zone } from '../types'
 import { api } from '../api/client'
 
 let _initStarted = false
@@ -11,6 +11,7 @@ interface GameState {
   inventory: InventoryItem[]
   activeExpeditions: Expedition[]
   stats: UserStats | null
+  achievements: AchievementStatus[]
   shipsContent: ShipConfig[]
   zonesContent: Zone[]
   resourcesContent: Resource[]
@@ -38,6 +39,8 @@ interface GameState {
   equipSlot: (shipId: string, slotIndex: number, artifactId: string) => Promise<void>
   unequipSlot: (shipId: string, slotIndex: number) => Promise<void>
   loadStats: () => Promise<void>
+  loadAchievements: () => Promise<void>
+  claimAchievement: (achievementId: string) => Promise<void>
   loadContent: () => Promise<void>
   clearBoxRewards: () => void
   updateNickname: (username: string) => Promise<void>
@@ -54,6 +57,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   inventory: [],
   activeExpeditions: [],
   stats: null,
+  achievements: [],
   shipsContent: [],
   zonesContent: [],
   resourcesContent: [],
@@ -225,6 +229,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     try {
       const stats = await api.getStats()
       set({ stats })
+    } catch (e) {
+      set({ error: (e as Error).message })
+    }
+  },
+
+  loadAchievements: async () => {
+    try {
+      const achievements = await api.getAchievements()
+      set({ achievements })
+    } catch {
+      // non-critical
+    }
+  },
+
+  claimAchievement: async (achievementId: string) => {
+    try {
+      await api.claimAchievement(achievementId)
+      await Promise.all([get().loadAchievements(), get().loadProfile(), get().loadStats()])
     } catch (e) {
       set({ error: (e as Error).message })
     }

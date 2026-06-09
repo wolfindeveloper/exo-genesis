@@ -72,6 +72,8 @@
 | `balance_xgen` | INTEGER | Default: `0` |
 | `balance_stars` | INTEGER | Default: `0` |
 | `balance_fragments` | INTEGER | Default: `0` — fragment currency for The Guide |
+| `glitches_fixed` | INTEGER | Default: `0` — total glitches repaired |
+| `total_purchases` | INTEGER | Default: `0` — total shop purchases |
 | `level` | INTEGER | Default: `1` |
 | `xp` | INTEGER | Default: `0` |
 | `created_at` | TIMESTAMPTZ | |
@@ -424,3 +426,14 @@ Chapters group related entries. Each entry has a fragment cost and optional glit
 - [x] Обновить `ShopItem` type — добавить `icon_path`, `tier`, `rarity`, `stats_modifiers`, `type`
 - [x] `Shop.tsx` — группа артефактов по тирам (Ранг I–V), rarity badge, stats, icon placeholder
 - [x] UI-ux-pro-max стилизация артефактов: Diamond иконка, цветовые badge по редкости, stat-badge
+
+### Phase 9 — Профиль + Достижения ✅
+- [x] Расширить `GET /user/stats` — 13 полей (xp earned, zones, artifacts, resources, guide, expeditions, purchases)
+- [x] Миграция `00007_achievements.sql` — таблица `user_achievements`, колонки `glitches_fixed`, `total_purchases`
+- [x] `POST /user/achievements` — список достижений с is_claimed
+- [x] `POST /user/achievements/claim` — проверка условий, выдача XP/XGEN
+- [x] Guide/fix-glitch — инкремент `glitches_fixed`
+- [x] Shop/buy — инкремент `total_purchases`
+- [x] `Profile.tsx` — редизайн: hero с рангом, ship info, guide progress, 9 достижений с прогресс-барами и claim, витрина артефактов, лента экспедиций, inventory summary, Lucide иконки
+- [x] SVG иконки артефактов (5 tier-based)
+- [x] Shared statLabels в `lib/stats.ts` для всех страниц

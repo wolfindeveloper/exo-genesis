@@ -1,4 +1,4 @@
-import type { Artifact, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, ShopBuyResponse, ShopItem, UserProfile, UserStats, ShipConfig, Zone } from '../types'
+import type { AchievementStatus, Artifact, ClaimAchievementResponse, ClaimResult, Expedition, GuideChapterDetail, GuideChaptersResponse, GuideClaimRewardResponse, GuideFixGlitchResponse, GuideResearchResponse, InventoryItem, Rank, Resource, Ship, ShipActionResponse, ShopBuyResponse, ShopItem, UserProfile, UserStats, ShipConfig, Zone } from '../types'
 import { getInitData } from '../lib/telegram'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
@@ -121,5 +121,13 @@ export const api = {
     request<ShopBuyResponse>('/shop/buy', {
       method: 'POST',
       body: JSON.stringify({ item_id: itemId }),
+    }),
+
+  getAchievements: () => request<AchievementStatus[]>('/user/achievements'),
+
+  claimAchievement: (achievementId: string) =>
+    request<ClaimAchievementResponse>('/user/achievements/claim', {
+      method: 'POST',
+      body: JSON.stringify({ achievement_id: achievementId }),
     }),
 }

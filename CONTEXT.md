@@ -52,10 +52,53 @@ curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://backend
 
 ---
 
-## Отложенные задачи (medium/low)
-- `balance_xgen` → `int()` при получении из Supabase (защита от строк)
-- BoxReveal: клиент читает `item_id` сервера, а не перевыбирает из `pool`
-- Придумать онбординг вместо BoxReveal для новых игроков
+## Достижения (реализовано 2026-06-09)
+
+**Бекенд:**
+- Миграция `00007_achievements.sql`:
+  - `users.glitches_fixed INTEGER DEFAULT 0`
+  - `users.total_purchases INTEGER DEFAULT 0`
+  - Таблица `user_achievements` (user_id, achievement_id, claimed_at)
+- Расширен `GET /user/stats` — новые поля:
+  - `total_xp_earned`, `zones_explored`, `equipped_artifacts_count`, `unique_artifacts`
+  - `resources: { fuel, repair_kits }`
+  - `guide_progress: { total_chapters, completed_chapters, entries_researched }`
+  - `recent_expeditions: [{ id, zone_config_id, status, end_time, loot_summary }]`
+  - `glitches_fixed`, `total_purchases`
+- `POST /user/achievements` — список достижений с статусом claim
+- `POST /user/achievements/claim` — проверяет условия, выдаёт XP/XGEN
+- `guide.py` — инкремент `glitches_fixed` при фиксе глитча
+- `shop.py` — инкремент `total_purchases` при покупке
+
+**Фронтенд:**
+- `Profile.tsx` — полный редизайн:
+  - Hero: ранг с `Award` SVG, следующий ранг, ship info
+  - Guide progress (количество глав / записей)
+  - Ship slots: X/8 артефактов экипировано
+  - Балансы с Lucide иконками (Flame, Star, ✦)
+  - Inventory summary strip (топливо / ремонт / артефакты)
+  - Витрина экипированных артефактов
+  - Лента последних экспедиций
+  - 9 достижений с прогресс-барами и кнопкой «Забрать»
+  - Всего emoji заменены на Lucide (Pencil, Flame, Award, Trophy и т.д.)
+- `api/client.ts` — `getAchievements()`, `claimAchievement()`
+- `store/game.ts` — `achievements` state, `loadAchievements()`, `claimAchievement()`
+- `lib/stats.ts` — общий файл statLabels (используется Shop, Inventory, ZoneModal, SlotSelectModal)
+- SVG иконки артефактов: `frontend/public/artifacts/t1–t5.svg`
+- SlotSelectModal: statLabels + SVG иконки
+
+### Достижения (9 шт):
+| ID | Название | Условие | Награда |
+|---|---|---|---|
+| engineer | Инженер | artifacts_crafted > 0 | 50 XP |
+| explorer | Исследователь | 10 экспедиций | 100 XP + 10 ✦ |
+| veteran | Ветеран | 30 дней в проекте | 200 XP + 25 ✦ |
+| collector | Коллекционер | 5 разных артефактов | 100 XP + 10 ✦ |
+| hardworker | Трудоголик | 25 экспедиций | 200 XP + 25 ✦ |
+| mechanic | Механик | 8 экипированных слотов | 150 XP + 15 ✦ |
+| scholar | Эрудит | 20 записей в гайде | 150 XP + 15 ✦ |
+| lucky | Счастливчик | 5 глитчей исправлено | 100 XP + 10 ✦ |
+| steadfast | Стойкий | 7-дневный стрик | 100 XP + 10 ✦ |
 
 ---
 

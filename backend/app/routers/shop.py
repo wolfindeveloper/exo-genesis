@@ -187,6 +187,10 @@ async def buy_item(
     updated_user = db.table("users").select("*").eq("id", user_id).execute()
     updated = updated_user.data[0] if updated_user.data else user
 
+    result = db.table("users").select("total_purchases").eq("id", user_id).execute()
+    current_purchases = result.data[0].get("total_purchases", 0) if result.data else 0
+    db.table("users").update({"total_purchases": current_purchases + 1}).eq("id", user_id).execute()
+
     return {
         "status": "ok",
         "granted": granted,

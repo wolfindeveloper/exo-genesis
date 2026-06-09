@@ -241,6 +241,12 @@ async def fix_glitch(
     db.table("users").update({"balance_fragments": current_balance - cost}).eq("id", user_id).execute()
     db.table("guide_progress").update({"status": "researched"}).eq("id", prog["id"]).execute()
 
+    db.table("users").update({"glitches_fixed": db.raw("glitches_fixed + 1")}).eq("id", user_id).execute()
+
+    result = db.table("users").select("glitches_fixed").eq("id", user_id).execute()
+    current_glitches = result.data[0].get("glitches_fixed", 0) if result.data else 0
+    db.table("users").update({"glitches_fixed": current_glitches + 1}).eq("id", user_id).execute()
+
     return {
         "status": "researched",
         "balance_fragments": current_balance - cost,
