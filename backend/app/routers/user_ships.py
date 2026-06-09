@@ -74,10 +74,6 @@ def _use_resource_on_ship(
     new_val = min(max_val, raw)
     if field == "fuel_current":
         new_val = int(new_val)
-    # DB check constraint caps stability at 100; artifact bonuses can raise
-    # effective max_stability beyond 100, so clamp the stored value to 100
-    if field == "stability":
-        new_val = min(new_val, 100)
 
     db.table("user_ships").update({field: new_val}).eq("id", ship["id"]).execute()
     db.table("user_inventory").update({
