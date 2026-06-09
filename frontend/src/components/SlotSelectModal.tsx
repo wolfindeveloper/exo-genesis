@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Artifact, InventoryItem } from '../types'
+import { statLabels } from '../lib/stats'
 
 interface SlotSelectModalProps {
   open: boolean
@@ -41,6 +42,44 @@ export default function SlotSelectModal({
 
   if (!open) return null
 
+  function ArtifactIcon({ artifact, size = 'md' }: { artifact: Artifact; size?: 'sm' | 'md' }) {
+    const [err, setErr] = useState(false)
+    const dim = size === 'sm' ? 'w-8 h-8' : 'w-10 h-10'
+    const emojiSize = size === 'sm' ? 'text-base' : 'text-lg'
+    const tierColor = TIER_COLORS[Math.min(artifact.tier - 1, 4)]
+    if (artifact.icon_path && !err) {
+      return (
+        <div
+          className={`${dim} rounded-full flex items-center justify-center shrink-0 overflow-hidden`}
+          style={{
+            background: `radial-gradient(circle at 30% 30%, ${tierColor}22, transparent)`,
+            border: `1px solid ${tierColor}44`,
+            boxShadow: `0 0 12px ${tierColor}22`,
+          }}
+        >
+          <img
+            src={artifact.icon_path}
+            alt={artifact.name_key}
+            className="w-full h-full object-cover"
+            onError={() => setErr(true)}
+          />
+        </div>
+      )
+    }
+    return (
+      <div
+        className={`${dim} rounded-full flex items-center justify-center ${emojiSize} shrink-0`}
+        style={{
+          background: `radial-gradient(circle at 30% 30%, ${tierColor}22, transparent)`,
+          border: `1px solid ${tierColor}44`,
+          boxShadow: `0 0 12px ${tierColor}22`,
+        }}
+      >
+        ⚙
+      </div>
+    )
+  }
+
   const ownedIds = new Set(inventory.filter((i) => i.item_type === 'artifact' && i.quantity > 0).map((i) => i.item_config_id))
   const ownedArtifacts = artifactsContent.filter((a) => ownedIds.has(a.id))
 
@@ -66,16 +105,7 @@ export default function SlotSelectModal({
         {equippedArtifact && (
           <div className="mb-4 bg-white/5 rounded-xl p-3 border border-cyan-500/10">
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0"
-                style={{
-                  background: `radial-gradient(circle at 30% 30%, ${TIER_COLORS[Math.min(equippedArtifact.tier - 1, 4)]}22, transparent)`,
-                  border: `1px solid ${TIER_COLORS[Math.min(equippedArtifact.tier - 1, 4)]}44`,
-                  boxShadow: `0 0 12px ${TIER_COLORS[Math.min(equippedArtifact.tier - 1, 4)]}22`,
-                }}
-              >
-                ⚙
-              </div>
+              <ArtifactIcon artifact={equippedArtifact} />
               <div className="flex-1 min-w-0">
                 <div className="text-[10px] font-bold text-white/80 truncate">{equippedArtifact.name_key}</div>
                 <div className="text-[7px] text-cyan-400/20 mt-0.5">ЭКИПИРОВАНО</div>
@@ -104,8 +134,8 @@ export default function SlotSelectModal({
               const tierColor = TIER_COLORS[Math.min(artifact.tier - 1, 4)]
               const statsText = artifact.stats_modifiers
                 ? Object.entries(artifact.stats_modifiers)
-                    .map(([k, v]) => `${k}: ${(v > 0 ? '+' : '')}${v}`)
-                    .join(' ')
+                    .map(([k, v]) => `${statLabels[k] || k}: ${(v > 0 ? '+' : '')}${v}`)
+                    .join('  ')
                 : ''
               return (
                 <button
@@ -113,16 +143,7 @@ export default function SlotSelectModal({
                   onClick={() => onEquip(artifact.id)}
                   className="flex items-center gap-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl p-3 border border-cyan-500/10 text-left w-full active:scale-[0.98]"
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0"
-                    style={{
-                      background: `radial-gradient(circle at 30% 30%, ${tierColor}22, transparent)`,
-                      border: `1px solid ${tierColor}44`,
-                      boxShadow: `0 0 12px ${tierColor}22`,
-                    }}
-                  >
-                    ⚙
-                  </div>
+                  <ArtifactIcon artifact={artifact} size="sm" />
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-bold text-white/80 truncate">{artifact.name_key}</div>
                     {statsText && (
