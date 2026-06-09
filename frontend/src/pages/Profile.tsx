@@ -13,7 +13,7 @@ import { getNextLevelXp, getXpProgress } from '../lib/xp'
 import { getTierForLevel, findRank } from '../lib/ranks'
 import { getAvatarUrl, getFirstName } from '../lib/telegram'
 import { useGameStore } from '../store/game'
-import type { Artifact, Resource, UserStats } from '../types'
+import type { UserStats } from '../types'
 
 const tierGradients = [
   'from-cyan-500/20 to-blue-600/20',
